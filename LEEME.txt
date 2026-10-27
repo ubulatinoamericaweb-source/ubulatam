@@ -1,0 +1,15 @@
+UBU Latinoamérica · Sitio web
+==============================
+
+index.html ............ Página de inicio (debe quedar en la raíz del repositorio)
+paginas/ .............. Nosotros, Catálogo, Máquinas, Hidrogel, Accesorios, Para tu negocio,
+                        Soporte, Contacto, Ubicación y Lista de cotización
+productos/ ............ Una ficha por producto (47)
+legal/ ................ Privacidad y tratamiento de datos, Cookies, Términos de uso
+descargas/ ............ Catálogo 2026 en PDF
+vercel.json ........... Configuración de Vercel (URLs sin .html)
+404.html .............. Página de error con redirección de respaldo
+
+Las imágenes, el degradado, los estilos y el código van incrustados dentro de cada página.
+No hay archivos de imagen sueltos: cada .html se ve completo por sí solo.
+Total: 65 archivos (GitHub permite subir hasta 100 por vez desde la web).
