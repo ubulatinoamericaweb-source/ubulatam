@@ -9,7 +9,18 @@ legal/ ................ Privacidad y tratamiento de datos, Cookies, Términos de
 descargas/ ............ Catálogo 2026 en PDF
 vercel.json ........... Configuración de Vercel (URLs sin .html)
 404.html .............. Página de error con redirección de respaldo
+admin.html ............ Panel administrativo (precios, disponibilidad y solicitudes) · tudominio.com/admin
 
 Las imágenes, el degradado, los estilos y el código van incrustados dentro de cada página.
+
+CÓMO EDITAR
+- Precios y disponibilidad: desde el panel admin.html (Supabase). No hace falta tocar archivos.
+- Productos nuevos, nombres, fotos o descripciones: se editan en data2.py / data.py y se vuelve a generar
+  el sitio con build3.py (se regeneran las 61 páginas con el mismo diseño).
+- Videos "UBU en acción" (Shorts): en build2.py, lista SHORTS. Cada video tiene
+  id, title, youtubeUrl, poster, relatedProductId y enabled. Para activar uno basta con pegar la URL
+  del Short en youtubeUrl y regenerar. Mientras la URL esté vacía se muestra "Video próximamente".
+  Si relatedProductId coincide con el slug de un producto, el video aparece también en su ficha.
+- Destacados del inicio: en build3.py, lista FEATURED (slugs de productos) y FEAT_NOTE (texto corto).
 No hay archivos de imagen sueltos: cada .html se ve completo por sí solo.
 Total: 65 archivos (GitHub permite subir hasta 100 por vez desde la web).
