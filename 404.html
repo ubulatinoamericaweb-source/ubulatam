@@ -995,6 +995,32 @@ html.rm *{scroll-behavior:auto}
   .counter .obj,.assure .num span{opacity:1;transform:none}
 }
 
+
+/* ---------- Catálogo: dos secciones principales ---------- */
+.secswitch{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:28px}
+.seccard{position:relative;display:flex;flex-direction:column;justify-content:flex-end;min-height:clamp(330px,30vw,380px);padding:26px;border-radius:var(--radius-xl);background:var(--grad-card);text-decoration:none;color:inherit;overflow:hidden;isolation:isolate;transition:transform .4s var(--ease-out),box-shadow .4s}
+.seccard:hover{transform:translateY(-3px);box-shadow:var(--shadow-contact)}
+.seccard .layer{position:absolute;pointer-events:none;transition:transform .5s var(--ease-out)}
+.seccard .l1{right:-1%;top:2%;width:40%}
+.seccard .l2{right:36%;top:8%;width:22%;transform:rotate(-7deg)}
+.seccard .l3{right:3%;top:26%;width:20%;transform:rotate(8deg)}
+.seccard:hover .l1{transform:translateY(-6px)}
+.seccard .layer img{filter:drop-shadow(0 18px 24px rgba(14,42,74,.25))}
+.seccard .txt{position:relative;z-index:2;margin:auto -26px -26px;padding:18px 26px 24px;background:linear-gradient(180deg,rgba(255,255,255,0) 0%,rgba(255,255,255,.96) 16%,rgba(255,255,255,.98) 100%)}
+.seccard h2{font-size:clamp(28px,3vw,38px)}
+.seccard p{margin-top:6px;color:var(--muted);font-size:15px;max-width:38ch}
+.seccard .meta{display:flex;align-items:center;gap:14px;margin-top:12px;font-family:var(--font-ui);font-weight:600;font-size:15px}
+.seccard .meta span:first-child{color:var(--ink-strong)}
+.seccard .meta span:last-child{color:var(--link)}
+.seccard .meta span:last-child::after{content:" →"}
+.catsec{scroll-margin-top:calc(var(--header-h) + 100px)}
+.catsec-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;margin-bottom:26px}
+.catsec-head h2{font-size:clamp(30px,4vw,48px);margin-top:8px}
+.catsec-head p{color:var(--muted);margin-top:8px;max-width:58ch}
+.catsec-head .count{margin:0}
+.cat-sep{display:inline-block;width:1px;height:22px;background:var(--line);margin:0 4px;align-self:center;flex:none}
+@media (max-width:700px){.secswitch{grid-template-columns:1fr}.seccard{min-height:340px}.seccard .l1{width:40%}.seccard .l2{right:34%;width:22%}.seccard .l3{width:19%}}
+
 /* ---------- Fondo general claro con el degradado de la marca ---------- */
 html{color-scheme:light;background:#EAF7F8}
 body{background:linear-gradient(rgba(255,255,255,.64),rgba(255,255,255,.64)),var(--aqua-img);background-attachment:fixed;background-color:#EAF7F8}
