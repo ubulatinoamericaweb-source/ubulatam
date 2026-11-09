@@ -143,10 +143,15 @@ const slim = Object.fromEntries(segments.flatMap((s) => s.kit).map((s) => [s, { 
   .seg__panel[hidden] { display: none; } .seg__lead { display: grid; gap: 14px; } .seg__lead h3 { font-size: clamp(1.6rem, 3vw, 2.3rem); } .seg__lead p { color: var(--texto-suave); }
   .seg__note { font-size: .9rem; padding: 12px 14px; border-radius: 12px; background: var(--bruma); } .seg__actions { display: flex; flex-wrap: wrap; gap: 10px; } .seg__done a { font-weight: 700; color: var(--confianza-indigo); }
   .kit { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); gap: 12px; }
-  .kit__item { display: grid; grid-template-columns: 84px 1fr; gap: 12px; align-items: center; padding: 12px; border-radius: var(--r-md); border: 1px solid var(--linea); background: linear-gradient(135deg, #fff, var(--bruma)); transition: transform .35s var(--ease); }
-  .kit__item:hover { transform: translateY(-4px); } .kit__img { display: grid; place-items: center; width: 84px; height: 84px; } .kit__img img { width: 100%; height: 100%; object-fit: contain; } .kit__img img.blend { mix-blend-mode: multiply; }
+  .kit__item { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 12px; align-items: center; min-height: 112px; padding: 8px 12px 8px 8px; border-radius: var(--r-md); border: 1px solid var(--linea); background: linear-gradient(135deg, #fff, var(--bruma)); overflow: hidden; transition: transform .35s var(--ease); }
+  .kit__item:hover { transform: translateY(-4px); }
+  /* Espacio fijo para la imagen: la foto se escala para caber completa (sin recortes, posiciones absolutas ni transformaciones) */
+  .kit__img { display: flex; align-items: center; justify-content: center; box-sizing: border-box; width: 96px; height: 96px; padding: 6px; overflow: hidden; }
+  .kit__img img { display: block; width: auto; height: auto; max-width: 100%; max-height: 100%; object-fit: contain; object-position: center; }
+  .kit__img img.blend { mix-blend-mode: multiply; }
   .kit__item > div { display: grid; gap: 4px; min-width: 0; } .kit__item a { text-decoration: none; font-family: var(--font-display); font-weight: 600; font-size: .95rem; line-height: 1.25; } .kit__item .price { font-size: 1.05rem; color: var(--tinta-1); }
   @media (max-width: 860px) { .seg__panel { grid-template-columns: 1fr; } }
+  @media (max-width: 480px) { .kit__item { grid-template-columns: 88px minmax(0, 1fr); min-height: 104px; } .kit__img { width: 88px; height: 88px; } }
 
   .how { padding: clamp(70px, 9vw, 120px) 0; background: radial-gradient(60% 70% at 15% 0%, rgba(1,220,239,.18), transparent 70%), var(--tinta-1); }
   .how__steps { list-style: none; margin: 36px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; position: relative; counter-reset: s; }
