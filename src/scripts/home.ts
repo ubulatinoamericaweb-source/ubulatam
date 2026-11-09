@@ -113,6 +113,74 @@ mm.add('(max-width: 899px) and ' + ANY_MOTION, () => {
   return () => gsap.set(wrap, { clearProps: 'all' });
 });
 
+/* Móvil: el camión se desintegra en partículas que dibujan la carita en su mismo lugar, ligado al desplazamiento normal
+   (sin pin: ~1/3 de pantalla de scroll y la página sigue). Reutiliza el camión, las partículas y la carita del escritorio. */
+mm.add('(max-width: 899px) and ' + ANY_MOTION, () => {
+  const pin = $('[data-hero-pin]')!, hero = $('[data-hero]')!;
+  const wrap = $('[data-truck-wrap]')!, face = $('[data-hero-face]')!, box = $('[data-particles]')!;
+  const parts = $$<SVGGElement>('.part', wrap), beam = $('.truck__beam', wrap);
+  const N = 120;
+  const dots = Array.from({ length: N }, () => { const i = document.createElement('i'); box.appendChild(i); return i; });
+  const faceSvg = face.querySelector('svg') as SVGSVGElement;
+  const bodyPaths = $$<SVGPathElement>('.ubu-face__body path', face as unknown as ParentNode);
+  const eyePaths = $$<SVGPathElement>('.ubu-face__eye', face as unknown as ParentNode);
+  let T: { x: number; y: number; eye: boolean }[] = [];
+  const place = () => { // la carita queda centrada donde está el camión
+    face.style.left = wrap.offsetLeft + wrap.offsetWidth / 2 - face.offsetWidth / 2 + 'px';
+    face.style.top = wrap.offsetTop + wrap.offsetHeight / 2 + 'px';
+  };
+  const targets = () => {
+    place();
+    const vb = faceSvg.viewBox.baseVal, k = face.offsetWidth / vb.width;
+    const left = face.offsetLeft, top = face.offsetTop - face.offsetHeight / 2;
+    const at = (path: SVGPathElement, len: number) => { const pt = path.getPointAtLength(len); return { x: left + (pt.x - vb.x) * k, y: top + (pt.y - vb.y) * k }; };
+    const eyeEach = 7, eyeTotal = eyePaths.length * eyeEach;
+    const lens = bodyPaths.map((q) => q.getTotalLength()), sum = lens.reduce((a, b) => a + b, 0);
+    const out: { x: number; y: number; eye: boolean }[] = [];
+    bodyPaths.forEach((q, qi) => { const n = Math.max(2, Math.round((lens[qi] / sum) * (N - eyeTotal))); for (let j = 0; j < n; j++) out.push({ ...at(q, ((j + 0.5) / n) * lens[qi]), eye: false }); });
+    eyePaths.forEach((q) => { const L = q.getTotalLength(); for (let j = 0; j < eyeEach; j++) out.push({ ...at(q, ((j + 0.5) / eyeEach) * L), eye: true }); });
+    while (out.length < N) out.push(out[out.length % Math.max(1, out.length)]);
+    return out.slice(0, N);
+  };
+  const start = (i: number) => ({
+    x: wrap.offsetLeft + wrap.offsetWidth * (0.14 + 0.72 * ((i * 37) % 100) / 100),
+    y: wrap.offsetTop + wrap.offsetHeight * (0.24 + 0.5 * ((i * 53) % 100) / 100),
+  });
+  const tag = () => dots.forEach((d, i) => d.classList.toggle('is-eye', !!T[i]?.eye));
+  T = targets(); tag();
+  gsap.set(face, { yPercent: -50, y: 0, scale: 0.85, opacity: 0 });
+  gsap.set(dots, { x: (i) => start(i).x, y: (i) => start(i).y, opacity: 0, scale: 1 });
+  const f = () => wrap.offsetWidth / 950; // los desplazamientos de las piezas están pensados para ~950px de ancho
+
+  const tl = gsap.timeline({
+    defaults: { ease: 'none' },
+    scrollTrigger: { trigger: hero, start: 'top top', end: () => '+=' + Math.round(Math.min(innerHeight * 0.27, 230)), scrub: 0.4, invalidateOnRefresh: true,
+      onRefresh: () => { T = targets(); tag(); } },
+  });
+  tl.to('.hero__road, .hero__speed, .truck__shadow', { opacity: 0, duration: 0.3 }, 0)
+    .to(beam, { opacity: 0, duration: 0.2 }, 0)
+    .to(parts, { x: (_, t) => Number(t.dataset.dx) * f(), y: (_, t) => Number(t.dataset.dy) * f(), rotation: (_, t) => Number(t.dataset.rz), duration: 0.4, ease: 'power2.out' }, 0)
+    .to('.truck .solid', { opacity: 0.1, duration: 0.3 }, 0.05)
+    .to('.truck .wire', { opacity: 1, duration: 0.3 }, 0.05)
+    .to(parts, { scale: 0.6, opacity: 0, duration: 0.35, stagger: 0.03, ease: 'power2.in' }, 0.3)
+    .to(dots, { opacity: 1, duration: 0.15, stagger: { each: 0.002, from: 'random' } }, 0.3)
+    .to(dots, { x: (i) => T[i].x, y: (i) => T[i].y, duration: 0.6, ease: 'power2.inOut', stagger: { each: 0.003, from: 'random' } }, 0.45)
+    .fromTo(face, { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.35, ease: 'power2.out' }, 1.15)
+    .to(dots, { opacity: 0, scale: 0.4, duration: 0.25, ease: 'power1.in' }, 1.25);
+  const ro = new ResizeObserver(() => ScrollTrigger.refresh());
+  ro.observe(pin);
+  document.fonts?.ready.then(() => ScrollTrigger.refresh());
+  return () => { ro.disconnect(); dots.forEach((d) => d.remove()); gsap.set([face, ...parts, '.hero__road, .hero__speed, .truck__shadow', beam, '.truck .solid', '.truck .wire'], { clearProps: 'all' }); face.removeAttribute('style'); };
+});
+
+/* Móvil: destacados en secuencia vertical; cada producto entra de derecha a izquierda al bajar (sin carrusel horizontal) */
+mm.add('(max-width: 899px) and ' + ANY_MOTION, () => {
+  const items = $$('[data-sitem]');
+  const tw = items.map((it) => gsap.fromTo(it, { x: () => innerWidth * 0.7, opacity: 0 }, { x: 0, opacity: 1, ease: 'power2.out',
+    scrollTrigger: { trigger: it, start: 'top 94%', end: 'top 58%', scrub: 0.5, invalidateOnRefresh: true } }));
+  return () => { tw.forEach((a) => { a.scrollTrigger?.kill(); a.kill(); }); gsap.set(items, { clearProps: 'opacity,transform,x' }); };
+});
+
 /* ============ 2 · RECORRIDO LATERAL ============ */
 mm.add(FULL, () => {
   const strip = $('[data-strip]')!;
@@ -212,7 +280,7 @@ mm.add(ANY_MOTION, () => {
    y todo queda visible y estático. */
 mm.add('(max-width: 899px) and ' + ANY_MOTION, () => {
   const groups = [
-    '.strip__head > *', '.sitem', '.glass__copy > *', '[data-gstage]', '.handsec__l1', '.handsec__l2',
+    '.strip__head > *','.glass__copy > *', '[data-gstage]', '.handsec__l1', '.handsec__l2',
     '.cats__head', '.biz__fig', '.biz__copy > .kicker, .biz__copy > h2, .biz__cta', '.close__card',
   ];
   const all: HTMLElement[] = [];

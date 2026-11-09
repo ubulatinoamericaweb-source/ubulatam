@@ -69,7 +69,7 @@ const catImg = (slug: string, i = 0) => productImage(bySlug(slug)!.images[i].fil
         <path d="M0 400 C260 300 440 500 740 400 S1200 280 1440 380" fill="none" stroke="#4293D0" stroke-opacity=".28" />
         <path d="M0 440 C280 340 460 540 760 440 S1200 320 1440 420" fill="none" stroke="#56B28E" stroke-opacity=".3" />
       </svg>
-      <p class="strip__ghost" aria-hidden="true">Catálogo 2026</p>
+      <p class="strip__ghost" aria-hidden="true">Catálogo<span class="strip__yr"> 2026</span></p>
       <header class="strip__head wrap">
         <div>
           <p class="kicker">Destacados del catálogo 2026</p>
@@ -297,6 +297,13 @@ const catImg = (slug: string, i = 0) => productImage(bySlug(slug)!.images[i].fil
     .hero__road { bottom: auto; top: 58%; } .hero__floor { height: 22%; }
   }
   @media (prefers-reduced-motion: reduce) { .hero__road i, .hero__speed i { animation: none; } .hero__speed { display: none; } }
+  /* Móvil con movimiento: el camión se desintegra en partículas que forman la carita en su mismo lugar (sin fijar la página) */
+  @media (max-width: 899px) and (prefers-reduced-motion: no-preference) {
+    .hero__particles { display: block; }
+    .hero__face { display: block; position: absolute; left: 0; top: 0; right: auto; width: min(50vw, 210px); transform: none; }
+    :global(.hero__particles i) { width: 6px; height: 6px; margin: -3px 0 0 -3px; }
+    :global(.hero__particles i.is-eye) { width: 8px; height: 8px; margin: -4px 0 0 -4px; }
+  }
 
   /* ---------- 2 · DESTACADOS ---------- */
   .strip { position: relative; background: linear-gradient(180deg, #E9F7F8 0%, #D7EEF1 100%); overflow: hidden; }
@@ -333,10 +340,14 @@ const catImg = (slug: string, i = 0) => productImage(bySlug(slug)!.images[i].fil
   @media (max-width: 899px) {
     .strip__pin { min-height: 0; padding: 84px 0 56px; gap: 22px; }
     .strip__viewport { overflow: visible; scroll-snap-type: none; perspective: none; padding: 0; }
-    .strip__track { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: auto; gap: 30px 14px; padding: 0 var(--gut); transform: none !important; }
+    .strip__track { display: grid; grid-template-columns: minmax(0, 1fr); width: auto; max-width: 440px; margin-inline: auto; gap: 40px; padding: 0 var(--gut); transform: none !important; }
+    /* palabra decorativa «CATÁLOGO» detrás de los productos: acompaña el recorrido y queda completa en pantalla */
+    .strip { overflow: clip; } /* clip no crea contenedor de scroll: permite que la palabra se quede fija (sticky) mientras se baja */
+    .strip__yr { display: none; }
+    .strip__ghost { position: sticky; top: calc(50svh - 8vw); left: auto; right: auto; height: 16vw; margin: 0 0 calc(-16vw - 22px); z-index: 0; transform: none; font-size: 15.2vw; line-height: 16vw; text-transform: uppercase; text-align: center; -webkit-text-stroke: 2px rgba(64,91,165,.5); color: rgba(64,91,165,.12); font-size: 16vw; }
     .sitem { width: auto; min-width: 0; scroll-snap-align: none; transform: none !important; }
     .sitem__stage { aspect-ratio: 1 / 1; }
-    .sitem__stage img { width: 92%; height: 92%; }
+    .sitem__stage img { width: 84%; height: 84%; }
     .sitem__info { gap: 6px; }
     .sitem__info h3 { font-size: .98rem; max-width: none; }
     .sitem__info .price { font-size: 1.25rem; }
