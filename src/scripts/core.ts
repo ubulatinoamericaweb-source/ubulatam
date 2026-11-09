@@ -94,8 +94,8 @@ else {
   revealEls.forEach((e) => io.observe(e));
 }
 
-/* ---------- Ojos que siguen el cursor (solo mouse, sin movimiento reducido) ---------- */
-if (finePointer && !reduced) {
+/* ---------- Ojos: siguen el cursor (mouse) o miran de forma automática y sutil (pantallas táctiles). Sin movimiento reducido ---------- */
+if (!reduced) {
   type Eye = { g: SVGGElement; host: Element; rx: number; ry: number; x: number; y: number; tx: number; ty: number; vis: boolean };
   const eyes: Eye[] = $$<SVGGElement>('[data-eyes]').map((g) => {
     const [rx, ry] = (g.dataset.eyesRange || '9,6').split(',').map(Number);
@@ -117,7 +117,7 @@ if (finePointer && !reduced) {
       }
       raf = moving ? requestAnimationFrame(tick) : 0;
     };
-    addEventListener('pointermove', (ev) => {
+    if (finePointer) addEventListener('pointermove', (ev) => {
       if (ev.pointerType !== 'mouse') return;
       for (const e of eyes) {
         if (!e.vis) continue;
@@ -129,6 +129,22 @@ if (finePointer && !reduced) {
       }
       if (!raf) raf = requestAnimationFrame(tick);
     }, { passive: true });
+    // Táctil (sin cursor): mirada automática suave, con pausas y límites naturales; solo mientras la carita está en pantalla
+    if (!finePointer) {
+      const glance = () => {
+        if (!document.hidden && eyes.some((e) => e.vis)) {
+          for (const e of eyes) {
+            if (!e.vis) continue;
+            const forward = Math.random() < 0.4; // pausa mirando al frente
+            e.tx = forward ? 0 : (Math.random() * 2 - 1) * e.rx * 0.8;
+            e.ty = forward ? 0 : (Math.random() * 2 - 1) * e.ry * 0.6;
+          }
+          if (!raf) raf = requestAnimationFrame(tick);
+        }
+        setTimeout(glance, 1700 + Math.random() * 2400);
+      };
+      setTimeout(glance, 1400);
+    }
   }
 }
 

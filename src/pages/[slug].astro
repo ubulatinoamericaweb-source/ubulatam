@@ -106,7 +106,7 @@ const ld = {
   .pdp__bg { position: absolute; right: -10%; top: -6%; width: 60vw; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(closest-side, rgba(1,220,239,.25), rgba(64,91,165,.1) 60%, transparent 72%); }
   .pdp :global(.crumbs) { color: var(--texto-suave); }
   .pdp__grid { position: relative; display: grid; grid-template-columns: 1.05fr .95fr; gap: clamp(24px, 5vw, 72px); align-items: start; }
-  .pdp__stage { position: relative; aspect-ratio: 1 / 1; display: grid; place-items: center; padding: clamp(18px, 3vw, 36px); border-radius: var(--r-lg); background: radial-gradient(120% 90% at 50% 15%, #fff, var(--bruma) 65%, var(--bruma-2)); border: 1px solid var(--linea); box-shadow: 0 40px 80px -50px rgba(5,16,27,.5); overflow: hidden; }
+  .pdp__stage { --pp: clamp(18px, 3vw, 36px); position: relative; aspect-ratio: 1 / 1; display: grid; place-items: center; border-radius: var(--r-lg); background: radial-gradient(120% 90% at 50% 15%, #fff, var(--bruma) 65%, var(--bruma-2)); border: 1px solid var(--linea); box-shadow: 0 40px 80px -50px rgba(5,16,27,.5); overflow: hidden; }
   .pdp__stage[data-zoom] { touch-action: pan-y; cursor: zoom-in; -webkit-user-select: none; user-select: none; }
   .pdp__stage[data-zoom].is-zoomed { touch-action: none; cursor: zoom-out; }
   .pdp__stage[data-zoom] img { transform-origin: center; will-change: transform; -webkit-user-drag: none; user-select: none; }
@@ -115,7 +115,8 @@ const ld = {
   @media (hover: none), (pointer: coarse) { .h-fine { display: none; } .h-touch { display: inline; } }
   .pdp__zoomreset { position: absolute; top: 12px; right: 12px; z-index: 4; min-height: 44px; padding: 0 1.1em; border: 0; border-radius: var(--r-pill); background: var(--tinta-1); color: #fff; font-family: var(--font-display); font-weight: 600; cursor: pointer; box-shadow: 0 10px 24px -10px rgba(0,0,0,.6); }
   .pdp__zoomreset[hidden] { display: none; }
-  .pdp__stage img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 24px 24px rgba(10,26,41,.22)); }
+  /* caja fija para la foto: nunca más alta que su recuadro (el zoom opera sobre esta caja) */
+  .pdp__stage img { position: absolute; left: var(--pp); top: var(--pp); width: calc(100% - 2 * var(--pp)); height: calc(100% - 2 * var(--pp)); object-fit: contain; filter: drop-shadow(0 24px 24px rgba(10,26,41,.22)); }
   .pdp__stage.is-blend img { mix-blend-mode: multiply; filter: none; }
   .pdp__page { position: absolute; left: 14px; bottom: 12px; font-size: .78rem; color: var(--texto-suave); font-family: var(--font-display); }
   .pdp__empty { display: grid; gap: 12px; place-items: center; color: var(--texto-suave); } .pdp__empty :global(.ubu-face) { width: 40%; opacity: .5; }
@@ -144,4 +145,17 @@ const ld = {
   .pdp__pager a:hover { transform: translateY(-4px); border-color: var(--asombro-turmalina); } .pdp__pager a.is-next { text-align: right; }
   .pdp__pager small { color: var(--confianza-indigo); font-family: var(--font-display); font-weight: 600; } .pdp__pager span { font-family: var(--font-display); font-weight: 600; }
   @media (max-width: 860px) { .pdp__grid { grid-template-columns: 1fr; } .pdp__pager { grid-template-columns: 1fr; } .pdp__pager a.is-next { text-align: left; } }
+  /* móvil: la tabla de modelos y precios pasa a filas compactas (modelo, capacidad, precio y botón) sin desplazamiento horizontal */
+  @media (max-width: 640px) {
+    .tbl { max-height: none; overflow: visible; border: 0; background: transparent; }
+    .tbl table, .tbl tbody, .tbl tr, .tbl th, .tbl td { display: block; }
+    .tbl thead { display: none; }
+    .tbl tbody tr { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; align-items: center; padding: 10px 4px; border-bottom: 1px solid var(--linea); }
+    .tbl tbody th, .tbl tbody td { padding: 0; border: 0; }
+    .tbl tbody th { grid-column: 1; grid-row: 1; font-size: .98rem; }
+    .tbl tbody td:nth-child(2) { grid-column: 1; grid-row: 2; font-size: .9rem; color: var(--texto-suave); }
+    .tbl td.num { grid-column: 2; grid-row: 1; text-align: right; }
+    .tbl td.act { grid-column: 2; grid-row: 2; text-align: right; }
+    .tbl tbody tr:hover { background: transparent; }
+  }
 </style>

@@ -27,7 +27,7 @@ const href = p.info ? undefined : `/${p.slug}`;
     <div class="pcard__foot">
       {hasPrice
         ? <span class="price" data-sb-price={p.sbSlug}><span data-num>{label}</span>{p.unit && <span class="unit">{p.unit}</span>}<small>COP</small></span>
-        : <span class="price"><small style="letter-spacing:.02em;opacity:.7">Sin precio en el catálogo</small></span>}
+        : <span class="price"><small style="font-size:.82rem;letter-spacing:.02em;opacity:.75">Sin precio en el catálogo</small></span>}
       {!p.info && <button class="btn btn--sm btn--line" type="button" data-add={p.slug} data-label="Agregar" aria-pressed="false"><span class="t">Agregar</span></button>}
     </div>
   </div>

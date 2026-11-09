@@ -1,0 +1,63 @@
+---
+// Aviso y panel de preferencias de cookies de MARKETING (Meta Pixel / API de Conversiones, planeados y aún no instalados).
+// Solo se renderiza si se compila con PUBLIC_MARKETING_CONSENT=1 (ver Base.astro). Rechazar es tan fácil como aceptar.
+---
+<div class="cb" data-cb hidden role="region" aria-label="Aviso de cookies">
+  <div class="cb__txt">
+    <b>Tus preferencias de cookies</b>
+    <p>Usamos almacenamiento local para tu carrito. Con tu permiso, también podremos usar cookies de marketing (Meta Pixel y API de Conversiones) para medir resultados y mejorar nuestra publicidad. Están desactivadas hasta que las aceptes. <a href="/cookies">Política de cookies</a></p>
+  </div>
+  <div class="cb__act">
+    <button type="button" class="btn btn--sm cb__btn cb__btn--no" data-cb-reject>Rechazar</button>
+    <button type="button" class="btn btn--sm cb__btn cb__btn--cfg" data-cb-config>Configurar</button>
+    <button type="button" class="btn btn--sm cb__btn cb__btn--ok" data-cb-accept>Aceptar</button>
+  </div>
+</div>
+
+<div class="cm" data-cm hidden>
+  <div class="cm__bg" data-cm-close></div>
+  <div class="cm__box" role="dialog" aria-modal="true" aria-labelledby="cm-t">
+    <h2 id="cm-t">Preferencias de cookies</h2>
+    <div class="cm__row">
+      <div><b>Necesarias</b><p>Guardan tu carrito en el navegador (almacenamiento local). No usan seguimiento.</p></div>
+      <span class="cm__on">Siempre activas</span>
+    </div>
+    <div class="cm__row">
+      <div><b id="cm-m">Marketing</b><p>Meta Pixel y API de Conversiones (planeadas): medir conversiones, atribuir resultados y optimizar campañas. Desactivadas por defecto.</p></div>
+      <label class="cm__sw"><input type="checkbox" role="switch" data-cm-marketing aria-labelledby="cm-m" /><span aria-hidden="true"></span></label>
+    </div>
+    <div class="cm__act">
+      <button type="button" class="btn btn--sm cb__btn cb__btn--no" data-cm-reject>Rechazar todo</button>
+      <button type="button" class="btn btn--sm cb__btn cb__btn--cfg" data-cm-save>Guardar preferencias</button>
+      <button type="button" class="btn btn--sm cb__btn cb__btn--ok" data-cm-accept>Aceptar todo</button>
+    </div>
+    <button type="button" class="cm__x" data-cm-close aria-label="Cerrar sin cambiar mis preferencias">×</button>
+  </div>
+</div>
+<script>import '../scripts/consent';</script>
+
+<style>
+  .cb { position: fixed; z-index: 140; left: 12px; right: 12px; bottom: 12px; max-width: 980px; margin-inline: auto; display: grid; grid-template-columns: 1fr auto; gap: 14px 22px; align-items: center; padding: 16px 20px; border-radius: 22px; background: rgba(5,16,27,.96); color: #fff; border: 1px solid rgba(255,255,255,.22); box-shadow: 0 24px 60px -20px rgba(0,0,0,.8); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); }
+  .cb[hidden], .cm[hidden] { display: none; }
+  .cb__txt b { font-family: var(--font-display); font-size: 1.02rem; } .cb__txt p { font-size: .92rem; opacity: .88; margin-top: 4px; } .cb__txt a { color: var(--cian-realidad-virtual); }
+  .cb__act, .cm__act { display: flex; flex-wrap: wrap; gap: 8px; }
+  .cb__btn { min-height: 44px; border-radius: var(--r-pill); }
+  .cb__btn--ok { --bg: var(--cian-realidad-virtual); --fg: var(--tinta-1); }
+  .cb__btn--no { --bg: #fff; --fg: var(--tinta-1); }   /* rechazar: mismo peso visual que aceptar */
+  .cb__btn--cfg { --bg: transparent; --fg: #fff; border-color: rgba(255,255,255,.5); }
+  .cm { position: fixed; inset: 0; z-index: 150; display: grid; place-items: center; padding: 16px; }
+  .cm__bg { position: absolute; inset: 0; background: rgba(2,8,14,.7); }
+  .cm__box { position: relative; width: min(100%, 560px); max-height: calc(100svh - 32px); overflow: auto; padding: 24px; border-radius: 24px; background: #0B2236; color: #fff; border: 1px solid rgba(255,255,255,.22); display: grid; gap: 14px; }
+  .cm__box h2 { font-size: 1.4rem; padding-right: 36px; }
+  .cm__row { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 14px 16px; border-radius: 16px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); }
+  .cm__row b { font-family: var(--font-display); } .cm__row p { font-size: .9rem; opacity: .82; margin-top: 3px; } .cm__on { font-size: .82rem; opacity: .8; white-space: nowrap; }
+  .cm__sw { position: relative; flex: none; width: 56px; height: 32px; }
+  .cm__sw input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; z-index: 2; }
+  .cm__sw span { position: absolute; inset: 0; border-radius: 99px; background: #51606c; transition: background-color .2s; } .cm__sw span::after { content: ''; position: absolute; left: 4px; top: 4px; width: 24px; height: 24px; border-radius: 50%; background: #fff; transition: transform .25s; }
+  .cm__sw input:checked + span { background: var(--verde-armonia); } .cm__sw input:checked + span::after { transform: translateX(24px); }
+  .cm__sw input:focus-visible + span { outline: 3px solid var(--cian-realidad-virtual); outline-offset: 3px; }
+  .cm__x { position: absolute; right: 12px; top: 12px; width: 44px; height: 44px; border-radius: 50%; border: 0; background: rgba(255,255,255,.1); color: #fff; font-size: 1.6rem; line-height: 1; cursor: pointer; }
+  :global(html.cm-open) { overflow: hidden; }
+  @media (max-width: 720px) { .cb { grid-template-columns: 1fr; bottom: 8px; left: 8px; right: 8px; } .cb__act .btn { flex: 1 1 0; } .cm__act .btn { flex: 1 1 100%; } }
+  @media (prefers-reduced-motion: reduce) { .cm__sw span, .cm__sw span::after { transition: none; } }
+</style>

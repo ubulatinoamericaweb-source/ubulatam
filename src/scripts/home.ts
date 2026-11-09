@@ -206,4 +206,28 @@ mm.add(ANY_MOTION, () => {
   return () => { gsap.set([human, robot, halo, spark, tips], { clearProps: 'all' }); };
 });
 
+/* ============ MÓVIL · revelado progresivo al bajar ============
+   Versión adaptada de las animaciones de escritorio: cada bloque entra al aparecer en pantalla, con el
+   desplazamiento vertical normal (sin fijar la página ni carruseles). Con movimiento reducido no se aplica
+   y todo queda visible y estático. */
+mm.add('(max-width: 899px) and ' + ANY_MOTION, () => {
+  const groups = [
+    '.strip__head > *', '.sitem', '.glass__copy > *', '[data-gstage]', '.handsec__l1', '.handsec__l2',
+    '.cats__head', '.biz__fig', '.biz__copy > .kicker, .biz__copy > h2, .biz__cta', '.close__card',
+  ];
+  const all: HTMLElement[] = [];
+  const triggers: ScrollTrigger[] = [];
+  groups.forEach((sel) => {
+    const els = $$(sel).filter((e) => !e.hasAttribute('data-reveal'));
+    if (!els.length) return;
+    all.push(...els);
+    gsap.set(els, { opacity: 0, y: 34 });
+    triggers.push(...ScrollTrigger.batch(els, {
+      start: 'top 90%', once: true, interval: 0.1, batchMax: 4,
+      onEnter: (batch) => gsap.to(batch, { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out', stagger: 0.09, overwrite: true }),
+    }));
+  });
+  return () => { triggers.forEach((t) => t.kill()); gsap.set(all, { clearProps: 'opacity,transform,y' }); };
+});
+
 addEventListener('load', () => ScrollTrigger.refresh());

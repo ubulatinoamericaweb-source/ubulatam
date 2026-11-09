@@ -35,11 +35,11 @@ const cats = (['conectividad', 'hidrogel'] as const).map((c) => ({ ...categories
             <tbody>
               {c.list.map((p, i) => (
                 <tr>
-                  <td>{i + 1}</td>
+                  <td class="t-n">{i + 1}</td>
                   <th scope="row">{p.info ? p.name : <a href={`/${p.slug}`}>{p.name}</a>}</th>
-                  <td>{p.type}</td>
+                  <td class="t-type">{p.type}</td>
                   <td class="num">{p.price == null ? <small>Sin precio en el catálogo</small> : <>{priceLabel(p)} <small>COP</small></>}</td>
-                  <td>{p.page}</td>
+                  <td class="t-page">{p.page}</td>
                 </tr>
               ))}
             </tbody>
@@ -58,11 +58,35 @@ const cats = (['conectividad', 'hidrogel'] as const).map((c) => ({ ...categories
   .pk__imgs { position: absolute; right: 2%; top: 8%; width: 58%; height: 84%; } .pi { position: absolute; height: auto; filter: drop-shadow(0 16px 16px rgba(0,0,0,.4)); transition: transform .6s var(--ease); }
   .pi--0 { width: 56%; right: 24%; top: 4%; } .pi--1 { width: 38%; right: 0; top: 30%; } .pi--2 { width: 30%; right: 52%; bottom: 0; } .pk:hover .pi--0 { transform: translateY(-8px) rotate(-2deg); } .pk:hover .pi--1 { transform: translateY(-5px) rotate(3deg); }
   .pk__body { position: absolute; left: 22px; bottom: 20px; display: grid; gap: 4px; max-width: 46%; } .pk__body b { font-family: var(--font-display); font-size: clamp(1.5rem, 3vw, 2.2rem); } .pk__body span { font-size: .95rem; opacity: .85; } .pk__body em { font-style: normal; font-family: var(--font-display); font-weight: 700; color: var(--cian-realidad-virtual); } .pk--hidrogel .pk__body em { color: var(--confianza-indigo); }
-  @media (max-width: 760px) { .pick__grid { grid-template-columns: 1fr; } .pk { min-height: 270px; } .pk__body { max-width: 52%; } }
+  @media (max-width: 760px) {
+    .pick__grid { grid-template-columns: 1fr; }
+    /* imágenes arriba (completas dentro de su caja) y texto debajo: nada se corta ni se amontona */
+    .pk { min-height: 0; display: flex; flex-direction: column; }
+    .pk__imgs { position: relative; right: auto; top: auto; width: 100%; height: 190px; flex: none; }
+    .pi { max-width: none; object-fit: contain; }
+    .pi--0 { width: 40%; height: 84%; left: 30%; right: auto; top: 8%; } .pi--1 { width: 30%; height: 66%; right: 6%; left: auto; top: auto; bottom: 8%; } .pi--2 { width: 26%; height: 58%; left: 6%; right: auto; top: auto; bottom: 6%; }
+    .pk__body { position: static; max-width: none; padding: 6px 18px 18px; }
+  }
   .tbl { overflow: auto; border-radius: var(--r-md); border: 1px solid var(--linea); background: #fff; color: var(--texto); }
   table { width: 100%; border-collapse: collapse; min-width: 640px; } th, td { padding: .75em 1em; text-align: left; border-bottom: 1px solid var(--linea); }
   thead th { background: var(--tinta-1); color: #fff; font-family: var(--font-display); font-size: .76rem; letter-spacing: .1em; text-transform: uppercase; }
   tbody th { font-family: var(--font-display); font-weight: 600; } tbody th a { text-decoration: none; } tbody th a:hover { color: var(--confianza-indigo); text-decoration: underline; }
   .num { text-align: right; font-family: var(--font-display); font-weight: 700; white-space: nowrap; } .num small { opacity: .6; font-weight: 600; }
   tbody tr:hover { background: var(--bruma); }
+  /* móvil: cada producto es una tarjeta compacta con TODOS sus datos (número, nombre, tipo, página y precio), sin desplazamiento horizontal */
+  @media (max-width: 720px) {
+    .tbl { overflow: visible; border: 0; background: transparent; border-radius: 0; }
+    table { min-width: 0; }
+    table, tbody, tr, th, td { display: block; }
+    thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    tbody { display: grid; gap: 10px; }
+    tbody tr { display: grid; grid-template-columns: 34px auto minmax(0, 1fr); grid-template-areas: "n name name" "n type page" "n price price"; gap: 2px 10px; align-items: center; padding: 12px 14px 12px 12px; border-radius: var(--r-md); background: #fff; border: 1px solid var(--linea); box-shadow: 0 12px 24px -22px rgba(5,16,27,.5); }
+    tbody tr:hover { background: #fff; }
+    tbody th, tbody td { padding: 0; border: 0; }
+    .t-n { grid-area: n; align-self: start; width: 30px; height: 30px; display: grid; place-items: center; border-radius: 50%; background: var(--bruma); color: var(--confianza-indigo); font-family: var(--font-display); font-weight: 700; font-size: .85rem; }
+    tbody th { grid-area: name; font-size: 1rem; line-height: 1.25; }
+    .t-type { grid-area: type; font-size: .9rem; color: var(--texto-suave); }
+    .t-page { grid-area: page; font-size: .9rem; color: var(--texto-suave); } .t-page::before { content: 'Pág. '; }
+    td.num { grid-area: price; text-align: left; font-size: 1.15rem; }
+  }
 </style>

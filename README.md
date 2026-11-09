@@ -44,6 +44,16 @@ npm run preview    # sirve dist/ tal como saldrá a producción
 - **Contacto** (`/contacto`): datos en `src/data/contacts.ts`, agrupados por área (Gerencia, Ventas, Facturación y cartera). Cada teléfono es un enlace `tel:` y cada botón abre WhatsApp con ese número y un mensaje inicial según el área. El formulario permite elegir a quién escribir; por defecto usa la línea general de WhatsApp ya publicada (+57 304 372 4012).
 - **Zoom de imagen** (`src/scripts/zoom.ts`): solo en la imagen grande de cada ficha. Escritorio: sigue al cursor y vuelve al salir. Celular: un toque amplía, arrastrar recorre, pellizcar amplía/reduce, otro toque o «Quitar zoom» lo devuelve. Las tarjetas del catálogo no lo tienen.
 
+## Publicidad y medición con Meta (PLANEADO — nada instalado ni activo)
+
+Hoy el sitio **no** tiene Meta Pixel, API de Conversiones, Vercel Analytics ni Speed Insights. Lo que sí está preparado:
+
+- **Textos legales** (`privacidad`, `cookies`, `terminos`): describen el uso planeado y sus categorías de datos, sin afirmar que esté activo.
+- **Panel de cookies** (`src/components/ConsentBanner.astro`, `src/scripts/consent.ts`): aceptar, rechazar y configurar las cookies de marketing; **rechazar es tan fácil como aceptar** y todo queda desactivado hasta que la persona acepte. Solo guarda la elección en el navegador (`ubu_consent`). Está **apagado por defecto**: se activa compilando con `PUBLIC_MARKETING_CONSENT=1` (bandera pública, no un secreto), pensado para encenderse junto con el Pixel.
+- **Deduplicación** (`src/scripts/tracking.ts`, inerte y sin importar desde ninguna página): un mismo evento enviado por Pixel y por CAPI debe llevar el **mismo nombre y el mismo `event_id`** (`eventID` en el navegador, `event_id` en el servidor).
+- **Secretos:** el token de CAPI (`META_CAPI_ACCESS_TOKEN`) es un **secreto de servidor**: nunca con prefijo `PUBLIC_`, nunca en el navegador ni en Git. Falta, además, un endpoint de servidor (por ejemplo una función de Vercel) que aún no existe.
+- No se envía a Meta contenido de WhatsApp, direcciones de entrega, datos de pago ni datos personales directos sin confirmación expresa y una necesidad concreta. No se envían eventos de prueba hasta tener el código de prueba de Meta.
+
 ## Comparar versiones y volver al punto de restauración
 
 | Qué | Dónde |

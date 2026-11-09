@@ -8,7 +8,7 @@ import seal from '../assets/sello-365.webp';
 const img = (s: string) => productImage(bySlug(s)!.images[0].file);
 const aud = [
   { t: 'Tiendas de accesorios', d: 'Suma la instalación de hidrogel a tu mostrador y complementa con cargadores, cables y vidrios.', imgs: ['hidrogel-hd', 'cargador-pd-25w-carga-rapida-tc-tc', 'cable-60w-tc-tc-reforzado-1-5-m'] },
-  { t: 'Servicios técnicos', d: 'Máquinas de corte, laminación con bomba de vacío y baterías de reemplazo para iPhone.', imgs: ['maquina-de-hidrogel-21-pulgadas', 'maquina-de-laminacion-bomba-de-vacio-y-saca-burbujas', 'cuchilla-para-maquina-de-hidrogel'] },
+  { t: 'Servicios técnicos', d: 'Máquinas de corte, laminación con bomba de vacío y baterías de reemplazo para iPhone.', imgs: ['maquina-de-hidrogel-21-pulgadas', 'maquina-de-laminacion-bomba-de-vacio-y-saca-burbujas', 'bateria-y-su-presentacion'] },
   { t: 'Comercios y distribuidores', d: 'Hidrogel por paquetes y accesorios para reponer inventario.', imgs: ['hidrogel-mate', 'power-bank-10-000-mah-22-5w-multipuerto', 'cargador-45w-tc-tc-carga-rapida'] },
 ];
 ---
@@ -141,6 +141,14 @@ const aud = [
   .aud__imgs { position: absolute; left: 0; right: 0; top: 0; height: 200px; z-index: -1; } .ai { position: absolute; height: auto; filter: drop-shadow(0 14px 14px rgba(5,16,27,.3)); transition: transform .6s var(--ease); }
   .ai--0 { width: 32%; left: 7%; top: 12%; } .ai--1 { width: 30%; left: 38%; top: 22%; } .ai--2 { width: 24%; right: 6%; top: 6%; } .aud__card:hover .ai--0 { transform: translateY(-6px) rotate(-3deg); } .aud__card:hover .ai--1 { transform: translateY(-8px); }
   @media (max-width: 900px) { .aud__grid { grid-template-columns: 1fr; } .aud__card { min-height: 380px; } }
+  /* móvil: las tres fotos de cada tarjeta se ordenan en una cuadrícula (la principal grande, las otras dos al lado), cada una completa y con proporciones coherentes */
+  @media (max-width: 700px) {
+    .aud__card { min-height: 0; padding-top: 262px; }
+    .aud__imgs { left: 14px; right: 14px; top: 14px; height: 236px; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); gap: 8px 10px; }
+    .ai, .ai--0, .ai--1, .ai--2 { position: static; width: 100%; height: 100%; min-width: 0; min-height: 0; max-width: none; object-fit: contain; }
+    .ai--0 { grid-row: 1 / span 2; grid-column: 1; }
+    .ai--1 { grid-row: 1; grid-column: 2; } .ai--2 { grid-row: 2; grid-column: 2; }
+  }
   .off { padding: clamp(70px, 9vw, 130px) 0; background: radial-gradient(60% 60% at 90% 0%, rgba(64,91,165,.4), transparent 70%), var(--tinta-1); }
   .off__grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(14px, 2.4vw, 28px); margin-top: 34px; }
   .line { position: relative; display: block; min-height: 420px; border-radius: var(--r-lg); overflow: hidden; text-decoration: none; isolation: isolate; border: 1px solid rgba(255,255,255,.16); transition: transform .5s var(--ease); }

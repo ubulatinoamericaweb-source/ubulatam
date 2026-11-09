@@ -150,10 +150,11 @@ a { color: inherit; }
 .pgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: clamp(14px, 2vw, 24px); list-style: none; margin: 0; padding: 0; }
 .pcard { position: relative; display: flex; flex-direction: column; border-radius: var(--r-md); background: #fff; color: var(--texto); overflow: hidden; border: 1px solid var(--linea); transition: transform .45s var(--ease), box-shadow .45s var(--ease); transform-style: preserve-3d; }
 .pcard:hover, .pcard:focus-within { transform: translateY(-6px); box-shadow: 0 28px 50px -22px rgba(5,16,27,.5); }
-.pcard__stage { position: relative; aspect-ratio: 1 / 1; display: grid; place-items: center; padding: clamp(18px, 3vw, 26px) 14px 14px; background: radial-gradient(120% 90% at 50% 20%, #fff 0%, var(--bruma) 70%, var(--bruma-2) 100%); overflow: hidden; }
+.pcard__stage { --pt: clamp(18px, 3vw, 26px); --pp: 14px; position: relative; aspect-ratio: 1 / 1; display: grid; place-items: center; background: radial-gradient(120% 90% at 50% 20%, #fff 0%, var(--bruma) 70%, var(--bruma-2) 100%); overflow: hidden; }
 .pcard__stage::after { content: ''; position: absolute; inset: 0; background: linear-gradient(115deg, transparent 38%, rgba(255,255,255,.75) 50%, transparent 62%); transform: translateX(-130%); transition: transform .9s var(--ease); pointer-events: none; }
 .pcard:hover .pcard__stage::after { transform: translateX(130%); }
-.pcard__stage img { width: 100%; height: 100%; object-fit: contain; object-position: center; transition: transform .7s var(--ease); will-change: transform; }
+/* caja fija para la foto: se escala completa dentro del recuadro (nunca más alta que él) */
+.pcard__stage img { position: absolute; left: var(--pp); top: var(--pt); width: calc(100% - 2 * var(--pp)); height: calc(100% - var(--pt) - var(--pp)); object-fit: contain; object-position: center; transition: transform .7s var(--ease); will-change: transform; }
 @media (hover: hover) and (pointer: fine) { .pcard:hover .pcard__stage img { transform: scale(1.055); } }
 .pcard__stage--blend img { mix-blend-mode: multiply; }
 .pcard__stage--empty { color: var(--gris-guernica); }
@@ -252,3 +253,21 @@ mark.pending { background: #FFF2B8; color: #3B2F00; padding: .05em .4em; border-
 @media (max-width: 760px) { .cmp-toggle { display: none; } }
 .kicker--c { justify-content: center; text-align: center; }
 @media (max-width: 640px) { .kicker--c::before { display: none; } }
+
+/* ---------- Móvil: catálogo en 2 columnas (tarjetas compactas, fotos sin deformar) ---------- */
+@media (max-width: 640px) {
+  .pgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .pcard__stage { --pt: 30px; --pp: 8px; }
+  .pcard__type { left: 8px; top: 8px; padding: .3em .65em; font-size: .75rem; letter-spacing: .06em; }
+  .pcard__sticker { top: auto; bottom: 8px; right: 8px; font-size: .78rem; }
+  .pcard__body { padding: 12px 12px 14px; gap: 8px; }
+  .pcard__name { font-size: .95rem; }
+  .pcard__feats { gap: 4px; } .pcard__feats li { font-size: .78rem; padding: .2em .55em; }
+  .pcard__foot { flex-direction: column; align-items: stretch; gap: 8px; }
+  .pcard__foot .price { font-size: 1.2rem; }
+  .pcard__foot .btn { width: 100%; }
+}
+
+/* Botón con aspecto de enlace (pie: «Preferencias de cookies») */
+.linkbtn { all: unset; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; min-height: 44px; display: inline-flex; align-items: center; }
+.linkbtn:hover { color: var(--cian-realidad-virtual); } .linkbtn:focus-visible { outline: 3px solid var(--cian-realidad-virtual); outline-offset: 3px; border-radius: 6px; }

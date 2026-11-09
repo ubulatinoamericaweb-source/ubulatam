@@ -138,7 +138,14 @@ const moreMachines = category === 'hidrogel';
   .hp { position: absolute; height: auto; object-fit: contain; filter: drop-shadow(0 28px 28px rgba(0,0,0,.4)); animation: bob 7s ease-in-out infinite; }
   .hp--0 { width: 54%; left: 6%; top: 8%; } .hp--1 { width: 44%; right: 2%; top: 30%; animation-delay: -2s; } .hp--2 { width: 34%; left: 28%; bottom: 0; animation-delay: -4s; }
   @keyframes bob { 50% { transform: translateY(-14px) rotate(1.5deg); } }
-  @media (max-width: 860px) { .chero__grid { grid-template-columns: 1fr; } .chero__art { max-width: 420px; margin-inline: auto; width: 100%; } }
+  @media (max-width: 860px) {
+    .chero__grid { grid-template-columns: 1fr; }
+    /* composición de escritorio a escala: las tres fotos quedan completas dentro de su recuadro */
+    .chero__art { aspect-ratio: auto; height: clamp(230px, 64vw, 300px); max-width: 440px; margin-inline: auto; width: 100%; }
+    .hp { max-width: none; object-fit: contain; }
+    .hp--0 { width: 62%; height: 66%; left: 2%; top: 8%; } .hp--1 { width: 38%; height: 70%; right: 2%; top: 18%; } .hp--2 { width: 26%; height: 50%; left: 37%; bottom: 0; }
+    .chero { padding-bottom: 44px; }
+  }
   @media (prefers-reduced-motion: reduce) { .chero__bg .cl, .films i, .hp { animation: none; } }
 
   .clist { position: relative; padding: clamp(40px, 6vw, 80px) 0 clamp(80px, 9vw, 130px); background: linear-gradient(180deg, #EAF6F7, #F7FBFC); scroll-margin-top: 80px; }
@@ -169,4 +176,17 @@ const moreMachines = category === 'hidrogel';
   .refs ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0 20px; max-height: 340px; overflow: auto; border: 1px solid var(--linea); border-radius: var(--r-md); }
   .refs li { padding: .55em 1em; border-bottom: 1px solid var(--linea); font-size: .92rem; font-family: var(--font-display); font-weight: 500; }
   @media (max-width: 760px) { .wide { grid-template-columns: 1fr; } }
+  /* móvil: la tabla de modelos y precios pasa a filas compactas (modelo, capacidad, precio y botón) sin desplazamiento horizontal */
+  @media (max-width: 640px) {
+    .tbl { max-height: none; overflow: visible; border: 0; background: transparent; }
+    .tbl table, .tbl tbody, .tbl tr, .tbl th, .tbl td { display: block; }
+    .tbl thead { display: none; }
+    .tbl tbody tr { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; align-items: center; padding: 10px 4px; border-bottom: 1px solid var(--linea); }
+    .tbl tbody th, .tbl tbody td { padding: 0; border: 0; }
+    .tbl tbody th { grid-column: 1; grid-row: 1; font-size: .98rem; }
+    .tbl tbody td:nth-child(2) { grid-column: 1; grid-row: 2; font-size: .9rem; color: var(--texto-suave); }
+    .tbl td.num { grid-column: 2; grid-row: 1; text-align: right; }
+    .tbl td.act { grid-column: 2; grid-row: 2; text-align: right; }
+    .tbl tbody tr:hover { background: transparent; }
+  }
 </style>

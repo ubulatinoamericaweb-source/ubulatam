@@ -5,6 +5,7 @@ import '../styles/global.css';
 import Logo from '../components/Logo.astro';
 import UbuFace from '../components/UbuFace.astro';
 import Channels from '../components/Channels.astro';
+import ConsentBanner from '../components/ConsentBanner.astro';
 import { WA_PATH, CART_PATH } from '../data/icons';
 import { WA_DISPLAY, waGeneric } from '../data/catalog';
 
@@ -24,6 +25,8 @@ const site = Astro.site ?? new URL('https://www.ubulatinoamerica.com');
 // Ruta limpia: sin barra final, sin «index» y sin «.html» (el build genera archivos .html, pero las URLs públicas no los llevan)
 const path = Astro.url.pathname.replace(/\/$/, '').replace(/\/index(\.html)?$/, '').replace(/\.html$/, '') || '/';
 // Enlaces de comparación con /realista: solo en desarrollo (o si se compila con PUBLIC_ENABLE_REALISTA=1)
+// Panel de cookies de marketing (Meta, planeado): apagado por defecto; se activa compilando con PUBLIC_MARKETING_CONSENT=1
+const consentUI = import.meta.env.PUBLIC_MARKETING_CONSENT === '1';
 const lab = import.meta.env.DEV || import.meta.env.PUBLIC_ENABLE_REALISTA === '1';
 const canonical = new URL(path, site).href;
 const ogImage = new URL(image, site).href;
@@ -139,6 +142,7 @@ const ld = [org, ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [])]
           </div>
         </div>
         <div class="footer-bottom">
+          {consentUI && <button type="button" class="linkbtn" data-consent-open>Preferencias de cookies</button>}
           <span>© {new Date().getFullYear()} UBU Latinoamérica®. Todos los derechos reservados.</span>
           <span>Precios en pesos colombianos (COP), de referencia; se confirman al cotizar.</span>
         </div>
@@ -150,6 +154,7 @@ const ld = [org, ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [])]
     <a class="wa-float" href={waGeneric} target="_blank" rel="noopener" aria-label="Cotizar por WhatsApp">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d={WA_PATH} fill="currentColor" /></svg>
     </a>
+    {consentUI && <ConsentBanner />}
     <script>import '../scripts/core';</script>
   </body>
 </html>
