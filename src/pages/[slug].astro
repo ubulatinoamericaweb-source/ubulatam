@@ -26,7 +26,7 @@ const offer = p.table && prices
 const ld = {
   '@context': 'https://schema.org', '@type': 'Product', name: p.name, brand: { '@type': 'Brand', name: 'UBU' },
   category: cat.name, ...(offer ? { offers: offer } : {}),
-  ...(imgs[0] ? { image: new URL(productImage(imgs[0].file).src, 'https://ubulatinoamerica.com').href } : {}),
+  ...(imgs[0] ? { image: new URL(productImage(imgs[0].file).src, 'https://www.ubulatinoamerica.com').href } : {}),
 };
 ---
 <Base title={p.name} description={desc} type="product" jsonLd={ld} image={imgs[0] ? productImage(imgs[0].file).src : '/og.png'}>

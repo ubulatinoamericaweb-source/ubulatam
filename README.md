@@ -52,7 +52,7 @@ npm run preview    # sirve dist/ tal como saldrá a producción
 | **Alternativa realista (prueba, 3D con three.js)** | `/realista` — ruta aparte, `noindex`, fuera del sitemap |
 | Botón de comparación | En `/` aparece «Comparar: versión realista (prueba)»; en `/realista`, la barra inferior «Ver la versión animada actual» |
 
-La alternativa vive solo en `src/pages/realista.astro` y `src/scripts/realista/` (más `three` en `package.json` y un enlace en `Base.astro`). Los recursos de la versión animada (`Truck`, `Hands`, `PcHead`, `home.ts`) no se tocaron. Para descartarla: borra esos archivos y `npm uninstall three`.
+La alternativa vive solo en `src/lab/realista.astro` y `src/scripts/realista/` (más `three` en `package.json` y un enlace en `Base.astro`). Los recursos de la versión animada (`Truck`, `Hands`, `PcHead`, `home.ts`) no se tocaron. Para descartarla: borra esos archivos y `npm uninstall three`. **Solo existe en desarrollo (`npm run dev`): en la compilación de producción no se genera** (para incluirla en un build de prueba: `PUBLIC_ENABLE_REALISTA=1 npm run build`).
 
 **Punto de restauración local:** commit `01e6f91`, etiqueta `punto-restauracion-animada-v1` (rama `astro-rebuild`). Contiene la portada animada aprobada y no incluye `source-private`. Nada se ha subido a GitHub ni desplegado.
 
@@ -100,7 +100,7 @@ git switch -c volver-a-animada punto-restauracion-animada-v1   # volver a esa ve
 
 Configurado: `<title>` y descripción por página, canonical, Open Graph/Twitter (`/og.png`), JSON-LD (Organization, WebSite, Product, ItemList, FAQPage), `sitemap-index.xml`, `robots.txt`, `noindex` en admin y lista de cotización, redirecciones de URLs antiguas en `vercel.json` (`/paginas/*`, `/productos/*`, `/legal/*`, `/maquinas`, `/accesorios`) y cabeceras de seguridad.
 
-Depende de ti: apuntar el dominio `ubulatinoamerica.com` al proyecto de Vercel (DNS), enviar el sitemap en Search Console y verificar la propiedad.
+Depende de ti: apuntar el dominio al proyecto de Vercel (DNS) y dejar `www.ubulatinoamerica.com` como dominio principal con el dominio sin `www` redirigiendo a él (en Vercel → Settings → Domains), enviar el sitemap en Search Console y verificar la propiedad.
 
 ## Pendientes legales y de contenido
 

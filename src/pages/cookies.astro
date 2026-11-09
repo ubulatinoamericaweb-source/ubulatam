@@ -1,13 +1,15 @@
 ---
+// LEGAL EN BORRADOR: esta página es accesible pero lleva noindex y está fuera del sitemap hasta completar los datos [Pendiente].
+// Al completarla: quitar `noindex` de <Base> y quitar el nombre de LEGAL_PENDIENTES en astro.config.mjs y de vercel.json (X-Robots-Tag).
 import Base from '../layouts/Base.astro';
 import InnerHero from '../components/InnerHero.astro';
 ---
-<Base title="Política de cookies" description="Información sobre el uso de cookies y almacenamiento local en el sitio de UBU Latinoamérica.">
+<Base title="Política de cookies" description="Información sobre el uso de cookies y almacenamiento local en el sitio de UBU Latinoamérica." noindex>
   <InnerHero title="Política de cookies" lede="Documento en borrador: debe completarse con los datos pendientes y validarse con asesoría legal antes de publicarse." crumbs={[{ label: 'Política de cookies' }]} />
   <section class="band band--white"><div class="wrap"><div class="legal">
 <h2>Qué usamos hoy</h2>
-<ul><li><strong>Carrito</strong> (almacenamiento local del navegador, clave <code>ubu_quote</code>): guarda los productos que agregas. Es funcional, la activas tú al agregar productos y no se envía a nuestros servidores.</li></ul>
-<p>Este sitio no instala cookies de seguimiento. Las tipografías se entregan desde el propio sitio, sin solicitar archivos a terceros.</p>
+<ul><li><strong>Carrito</strong> (almacenamiento local del navegador, clave <code>ubu_quote</code>): guarda los productos, variantes y cantidades que agregas. Es funcional, la activas tú al agregar productos y no se envía a nuestros servidores. Los datos de entrega del pedido no se guardan.</li></ul>
+<p>Este sitio no instala cookies de seguimiento. En las páginas públicas, las tipografías, imágenes y el código se entregan desde el propio sitio, sin solicitar archivos a terceros. El panel administrativo (<code>/admin</code>), de uso interno, sí carga fuentes de Google y una librería desde jsDelivr.</p>
 <h2>Analítica y publicidad</h2><p>Actualmente no hay herramientas de analítica ni publicidad instaladas. Si se incorporan, por ejemplo un píxel publicitario, esta política se actualizará con el proveedor, la finalidad y la duración, y solo se activarán si las aceptas.</p>
 <h2>Cómo borrar los datos guardados</h2><p>Puedes vaciar tu carrito desde la página <a href="/carrito">Carrito</a> o borrar los datos del sitio desde la configuración de tu navegador.</p>
 <p>Última actualización: <mark class="pending">[Pendiente: fecha]</mark>.</p>

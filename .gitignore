@@ -6,3 +6,4 @@ dist/
 !.env.example
 source-private/
 .vercel/
+graphify-out/

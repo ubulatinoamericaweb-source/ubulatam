@@ -20,8 +20,11 @@ interface Props {
   bodyClass?: string;
 }
 const { title, description, noindex = false, image = '/og.png', type = 'website', jsonLd, bodyClass = '' } = Astro.props;
-const site = Astro.site ?? new URL('https://ubulatinoamerica.com');
-const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const site = Astro.site ?? new URL('https://www.ubulatinoamerica.com');
+// Ruta limpia: sin barra final, sin «index» y sin «.html» (el build genera archivos .html, pero las URLs públicas no los llevan)
+const path = Astro.url.pathname.replace(/\/$/, '').replace(/\/index(\.html)?$/, '').replace(/\.html$/, '') || '/';
+// Enlaces de comparación con /realista: solo en desarrollo (o si se compila con PUBLIC_ENABLE_REALISTA=1)
+const lab = import.meta.env.DEV || import.meta.env.PUBLIC_ENABLE_REALISTA === '1';
 const canonical = new URL(path, site).href;
 const ogImage = new URL(image, site).href;
 const fullTitle = path === '/' ? title : `${title} · UBU Latinoamérica`;
@@ -89,7 +92,7 @@ const ld = [org, ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [])]
       <nav class="menu-panel" id="menu-panel" aria-label="Menú móvil" hidden data-menu-panel>
         {nav.map((n) => <a href={n.href} aria-current={isCur(n.href) ? 'page' : undefined}>{n.label}</a>)}
         <a href="/catalogo">Catálogo completo</a>
-        {(path === '/' || path === '/realista') && <a href={path === '/' ? '/realista' : '/'}>{path === '/' ? 'Comparar: versión realista (prueba)' : 'Ver la versión animada actual'}</a>}
+        {lab && (path === '/' || path === '/realista') && <a href={path === '/' ? '/realista' : '/'}>{path === '/' ? 'Comparar: versión realista (prueba)' : 'Ver la versión animada actual'}</a>}
         <a class="btn btn--wa" href={waGeneric} target="_blank" rel="noopener">Cotizar por WhatsApp</a>
       </nav>
     </header>
@@ -143,7 +146,7 @@ const ld = [org, ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [])]
       <div class="footer-watermark" aria-hidden="true"><UbuFace tone="blanco" eyes={false} /></div>
     </footer>
 
-    {path === '/' && <a class="cmp-toggle" href="/realista">Comparar: versión realista (prueba) →</a>}
+    {lab && path === '/' && <a class="cmp-toggle" href="/realista">Comparar: versión realista (prueba) →</a>}
     <a class="wa-float" href={waGeneric} target="_blank" rel="noopener" aria-label="Cotizar por WhatsApp">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d={WA_PATH} fill="currentColor" /></svg>
     </a>

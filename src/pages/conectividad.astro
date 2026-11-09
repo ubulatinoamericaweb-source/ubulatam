@@ -8,7 +8,7 @@ const list = byCategory('conectividad');
 <Base
   title="Conectividad · catálogo 2026 con precios en COP"
   description={meta.intro + ' Precios de referencia en COP y cotización por WhatsApp.'}
-  jsonLd={{ '@context': 'https://schema.org', '@type': 'ItemList', name: 'Conectividad UBU Latinoamérica', itemListElement: list.filter((p) => !p.info).map((p, i) => ({ '@type': 'ListItem', position: i + 1, url: 'https://ubulatinoamerica.com/' + p.slug, name: p.name })) }}
+  jsonLd={{ '@context': 'https://schema.org', '@type': 'ItemList', name: 'Conectividad UBU Latinoamérica', itemListElement: list.filter((p) => !p.info).map((p, i) => ({ '@type': 'ListItem', position: i + 1, url: 'https://www.ubulatinoamerica.com/' + p.slug, name: p.name })) }}
 >
   <CategoryView category="conectividad" />
 </Base>
