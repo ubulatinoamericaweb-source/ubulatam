@@ -39,6 +39,11 @@ npm run preview    # sirve dist/ tal como saldrá a producción
 - «Nosotros» ya no explica el manual de marca (sin paleta, tipografías, reglas del logo ni espiral áurea): usa solo contenido comercial ya publicado (quiénes somos, qué ofrecemos, para quién, garantía de 365 días según el catálogo, Hayuelos).
 - El grupo de botones de contacto (pie de página) usa **solo canales reales del proyecto**: WhatsApp, ubicación en Google Maps y catálogo PDF. El proyecto no contiene perfiles de redes sociales (Instagram, Facebook, etc.); si UBU los tiene, hay que entregar las URL para añadirlos. La carpeta `source-private/referencias/` no incluye la imagen «Electronics» mencionada.
 
+## Contactos y zoom de fichas
+
+- **Contacto** (`/contacto`): datos en `src/data/contacts.ts`, agrupados por área (Gerencia, Ventas, Facturación y cartera). Cada teléfono es un enlace `tel:` y cada botón abre WhatsApp con ese número y un mensaje inicial según el área. El formulario permite elegir a quién escribir; por defecto usa la línea general de WhatsApp ya publicada (+57 304 372 4012).
+- **Zoom de imagen** (`src/scripts/zoom.ts`): solo en la imagen grande de cada ficha. Escritorio: sigue al cursor y vuelve al salir. Celular: un toque amplía, arrastrar recorre, pellizcar amplía/reduce, otro toque o «Quitar zoom» lo devuelve. Las tarjetas del catálogo no lo tienen.
+
 ## Comparar versiones y volver al punto de restauración
 
 | Qué | Dónde |

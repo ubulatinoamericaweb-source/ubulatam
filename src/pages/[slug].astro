@@ -36,11 +36,17 @@ const ld = {
       <nav aria-label="Ruta de navegación"><ol class="crumbs"><li><a href="/">Inicio</a></li><li><a href={`/${cat.slug}`}>{cat.name}</a></li><li aria-current="page">{p.name}</li></ol></nav>
       <div class="pdp__grid">
         <div class="pdp__gallery">
-          <div class={`pdp__stage ${imgs[0] && !imgs[0].alpha ? 'is-blend' : ''}`}>
+          <div class={`pdp__stage ${imgs[0] && !imgs[0].alpha ? 'is-blend' : ''}`} data-zoom={imgs[0] ? '' : undefined}>
             {imgs[0]
-              ? <Image src={productImage(imgs[0].file)} alt={p.name} widths={[420, 640, 900]} sizes="(max-width: 860px) 90vw, 520px" loading="eager" fetchpriority="high" />
+              ? <Image src={productImage(imgs[0].file)} alt={p.name} widths={[420, 640, 900, 1000]} sizes="(max-width: 860px) 90vw, 520px" loading="eager" fetchpriority="high" draggable="false" />
               : <div class="pdp__empty"><UbuFace tone="color" eyes={false} /><span>Sin fotografía en el catálogo</span></div>}
             {p.sticker && <span class="pcard__sticker">{p.sticker}</span>}
+            {imgs[0] && (
+              <>
+                <span class="pdp__hint" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5" /><path d="m16 16 4.5 4.5M11 8.5v5M8.5 11h5" /></svg><span class="h-fine">Pasa el cursor para ampliar</span><span class="h-touch">Toca para ampliar</span></span>
+                <button class="pdp__zoomreset" type="button" hidden>Quitar zoom</button>
+              </>
+            )}
           </div>
           <p class="pdp__cap">Catálogo 2026 · página {p.page}</p>
           {imgs.length > 1 && <ul class="pdp__thumbs">{imgs.slice(1).map((im) => <li class={!im.alpha ? 'is-blend' : ''}><Image src={productImage(im.file)} alt={`${p.name}, vista adicional`} widths={[200, 320]} sizes="140px" loading="lazy" /></li>)}</ul>}
@@ -93,6 +99,7 @@ const ld = {
       <p style="margin-top:28px"><a class="btn btn--dark" href={`/${cat.slug}`}>← Volver a {cat.name}</a> <a class="btn btn--line" href={waGeneric} target="_blank" rel="noopener">Consultar otra referencia</a></p>
     </div>
   </section>
+  <script>import '../scripts/zoom';</script>
 </Base>
 <style>
   .pdp { position: relative; padding: calc(var(--header-h) + 52px) 0 clamp(70px, 8vw, 120px); background: linear-gradient(180deg, #EAF6F7, #F7FBFC 60%, #fff); color: var(--texto); overflow: hidden; }
@@ -100,6 +107,14 @@ const ld = {
   .pdp :global(.crumbs) { color: var(--texto-suave); }
   .pdp__grid { position: relative; display: grid; grid-template-columns: 1.05fr .95fr; gap: clamp(24px, 5vw, 72px); align-items: start; }
   .pdp__stage { position: relative; aspect-ratio: 1 / 1; display: grid; place-items: center; padding: clamp(18px, 3vw, 36px); border-radius: var(--r-lg); background: radial-gradient(120% 90% at 50% 15%, #fff, var(--bruma) 65%, var(--bruma-2)); border: 1px solid var(--linea); box-shadow: 0 40px 80px -50px rgba(5,16,27,.5); overflow: hidden; }
+  .pdp__stage[data-zoom] { touch-action: pan-y; cursor: zoom-in; -webkit-user-select: none; user-select: none; }
+  .pdp__stage[data-zoom].is-zoomed { touch-action: none; cursor: zoom-out; }
+  .pdp__stage[data-zoom] img { transform-origin: center; will-change: transform; -webkit-user-drag: none; user-select: none; }
+  .pdp__hint { position: absolute; right: 12px; bottom: 12px; z-index: 2; display: inline-flex; align-items: center; gap: .45em; padding: .45em .9em; border-radius: var(--r-pill); background: rgba(5,16,27,.78); color: #fff; font-size: .8rem; font-family: var(--font-display); font-weight: 600; pointer-events: none; transition: opacity .25s; }
+  .is-zoomed .pdp__hint { opacity: 0; } .h-touch { display: none; }
+  @media (hover: none), (pointer: coarse) { .h-fine { display: none; } .h-touch { display: inline; } }
+  .pdp__zoomreset { position: absolute; top: 12px; right: 12px; z-index: 4; min-height: 44px; padding: 0 1.1em; border: 0; border-radius: var(--r-pill); background: var(--tinta-1); color: #fff; font-family: var(--font-display); font-weight: 600; cursor: pointer; box-shadow: 0 10px 24px -10px rgba(0,0,0,.6); }
+  .pdp__zoomreset[hidden] { display: none; }
   .pdp__stage img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 24px 24px rgba(10,26,41,.22)); }
   .pdp__stage.is-blend img { mix-blend-mode: multiply; filter: none; }
   .pdp__page { position: absolute; left: 14px; bottom: 12px; font-size: .78rem; color: var(--texto-suave); font-family: var(--font-display); }

@@ -124,15 +124,15 @@ const slim = Object.fromEntries(segments.flatMap((s) => s.kit).map((s) => [s, { 
   .bh__copy { align-self: center; padding-bottom: 60px; } .bh h1 { font-size: clamp(2.2rem, 5vw, 4.2rem); margin: 14px 0 18px; }
   .bh__cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
   .bh__scene { position: relative; min-height: 460px; }
-  .bh__fig { position: absolute; left: -2%; bottom: 8%; width: 40%; z-index: 1; }
-  .counter { position: absolute; left: 16%; right: -4%; bottom: 0; height: 100%; }
+  .bh__fig { position: absolute; left: -4%; bottom: 0; width: 27%; z-index: 1; line-height: 0; }
+  .counter { position: absolute; left: 30%; right: -2%; bottom: 0; height: 100%; }
   .counter__top { position: absolute; left: 0; right: 0; bottom: 74px; height: 22px; border-radius: 12px 12px 0 0; background: linear-gradient(180deg, #E8F7F9, #9FD6DC); box-shadow: 0 0 60px rgba(1,220,239,.45); }
   .counter__front { position: absolute; left: 0; right: 0; bottom: 0; height: 74px; background: linear-gradient(180deg, #17364D, #0A1A29); border-top: 1px solid rgba(255,255,255,.3); }
   .counter__glow { position: absolute; left: 4%; right: 4%; bottom: 70px; height: 6px; background: var(--cian-realidad-virtual); filter: blur(10px); opacity: .7; }
   .cp { position: absolute; bottom: 92px; height: auto; filter: drop-shadow(0 18px 18px rgba(0,0,0,.5)); animation: bob 7s ease-in-out infinite; }
   .cp--0 { width: 27%; left: 2%; } .cp--1 { width: 21%; left: 28%; animation-delay: -2s; } .cp--2 { width: 40%; left: 46%; bottom: 96px; animation-delay: -4s; } .cp--3 { width: 18%; left: 82%; animation-delay: -1s; } .cp--4 { width: 14%; left: 70%; bottom: 150px; animation-delay: -3s; }
   @keyframes bob { 50% { transform: translateY(-9px); } }
-  @media (max-width: 860px) { .bh__grid { grid-template-columns: 1fr; } .bh { min-height: 0; } .bh__copy { padding-bottom: 10px; } .bh__scene { min-height: 360px; } .bh__fig { width: 38%; } }
+  @media (max-width: 860px) { .bh__grid { grid-template-columns: 1fr; } .bh { min-height: 0; } .bh__copy { padding-bottom: 10px; } .bh__scene { min-height: 0; display: flex; flex-direction: column; } .counter { position: relative; left: auto; right: auto; bottom: auto; height: 290px; order: 1; } .bh__fig { position: relative; left: auto; bottom: auto; order: 2; width: 34%; max-width: 170px; margin: 6px 0 0 2%; } }
   @media (prefers-reduced-motion: reduce) { .cp { animation: none; } }
 
   .seg { padding: clamp(70px, 9vw, 120px) 0; background: linear-gradient(180deg, #EAF6F7, #F7FBFC); }
