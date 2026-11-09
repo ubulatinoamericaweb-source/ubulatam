@@ -1,48 +1,163 @@
 ---
+import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
-import InnerHero from '../components/InnerHero.astro';
 import PcHead from '../components/PcHead.astro';
-import { waAdvice } from '../data/catalog';
+import { bySlug, productImage, displayImages, priceLabel, waAdvice, waUrl } from '../data/catalog';
+
+const P = (s: string) => bySlug(s)!;
+const photo = (s: string) => productImage(displayImages(P(s))[0].file);
+const counter = ['cargador-pd-25w-carga-rapida-tc-tc', 'hidrogel-hd', 'maquina-de-hidrogel-11-9-sellado-automatico-uv-oemp2300', 'power-bank-10-000-mah-22-5w-multipuerto', 'cable-60w-tc-tc-reforzado-1-5-m'];
+const segments = [
+  { id: 'tiendas', name: 'Tiendas de accesorios', text: 'Suma la instalación de hidrogel a tu mostrador y complementa con cargadores, cables y vidrios.',
+    kit: ['maquina-de-hidrogel-11-9-sellado-automatico-uv-oemp2300', 'hidrogel-hd', 'pala-grande', 'cargador-pd-25w-carga-rapida-tc-tc', 'cable-60w-tc-tc-reforzado-1-5-m', 'vidrios-blindados-full-pega'] },
+  { id: 'tecnicos', name: 'Servicios técnicos', text: 'Máquinas de corte, laminación con bomba de vacío y baterías de reemplazo para iPhone.',
+    kit: ['maquina-de-hidrogel-21-pulgadas', 'maquina-de-laminacion-bomba-de-vacio-y-saca-burbujas', 'maquina-secado-inteligente-uv-g10u', 'bateria-con-flex-amperaje-real', 'cuchilla-para-maquina-de-hidrogel', 'pen-hidrogel'] },
+  { id: 'comercios', name: 'Comercios y distribuidores', text: 'Hidrogel por paquetes y accesorios para reponer inventario.',
+    kit: ['hidrogel-mate', 'hidrogel-antiblue', 'hidrogel-tablet-10-1-pulgadas', 'cargador-45w-tc-tc-carga-rapida', 'cable-tc-tc-9a-siliconado-reforzado', 'power-bank-10-000-mah-22-5w-multipuerto'] },
+];
+const slim = Object.fromEntries(segments.flatMap((s) => s.kit).map((s) => [s, { n: P(s).name, p: priceLabel(P(s)) }]));
 ---
 <Base title="Para tu negocio" description="Equipos e insumos UBU para tiendas de accesorios, servicios técnicos y comercios que instalan hidrogel o reponen surtido. Arma tu lista de cotización y envíala por WhatsApp.">
-  <InnerHero kicker="Para tu negocio" title="UBU para tu negocio." lede="Equipos e insumos para tiendas de accesorios, servicios técnicos y comercios que instalan hidrogel o reponen surtido." crumbs={[{ label: 'Para tu negocio' }]}>
-    <p style="margin-top:26px;display:flex;flex-wrap:wrap;gap:12px"><a class="btn btn--wa" href={waAdvice} target="_blank" rel="noopener">Recibir asesoría por WhatsApp</a><a class="btn btn--ghost" href="/cotizacion">Armar lista de cotización</a></p>
-  </InnerHero>
-  <section class="band band--light">
-    <div class="wrap split">
-      <div>
-        <p class="kicker">Para quién es</p>
-        <h2 class="h2">Tres tipos de negocio, un mismo proveedor.</h2>
-        <ul class="cards" style="grid-template-columns:1fr;margin-top:18px">
-          <li class="card" data-reveal><h3>Tiendas de accesorios</h3><p>Suma la instalación de hidrogel a tu mostrador y complementa con cargadores, cables y vidrios.</p></li>
-          <li class="card" data-reveal style="--i:1"><h3>Servicios técnicos</h3><p>Máquinas de corte, laminación con bomba de vacío y baterías de reemplazo para iPhone.</p></li>
-          <li class="card" data-reveal style="--i:2"><h3>Comercios y distribuidores</h3><p>Hidrogel por paquetes y accesorios para reponer inventario.</p></li>
-        </ul>
+
+  <!-- HERO: mostrador -->
+  <section class="bh on-dark" aria-labelledby="bh-t">
+    <div class="bh__bg" aria-hidden="true"></div>
+    <div class="wrap bh__grid">
+      <div class="bh__copy">
+        <nav aria-label="Ruta de navegación"><ol class="crumbs"><li><a href="/">Inicio</a></li><li aria-current="page">Para tu negocio</li></ol></nav>
+        <p class="kicker">Para tu negocio</p>
+        <h1 id="bh-t">Lo que necesita tu mostrador, en una sola lista.</h1>
+        <p class="lede">Equipos e insumos para tiendas de accesorios, servicios técnicos y comercios que instalan hidrogel o reponen surtido.</p>
+        <p class="bh__cta"><a class="btn btn--wa" href={waAdvice} target="_blank" rel="noopener">Recibir asesoría por WhatsApp</a><a class="btn btn--ghost" href="/cotizacion">Armar lista de cotización</a></p>
       </div>
-      <div style="max-width:380px;margin-inline:auto" aria-hidden="true"><PcHead pose="wave" /></div>
+      <div class="bh__scene" aria-hidden="true">
+        <div class="bh__fig"><PcHead pose="point" /></div>
+        <div class="counter">
+          {counter.map((s, i) => <Image class={`cp cp--${i}`} src={photo(s)} alt="" widths={[200, 360]} sizes="200px" loading="eager" />)}
+          <span class="counter__top"></span><span class="counter__front"></span><span class="counter__glow"></span>
+        </div>
+      </div>
     </div>
   </section>
-  <section class="band band--dark">
+
+  <!-- SELECTOR POR TIPO DE NEGOCIO -->
+  <section class="seg on-light" id="surtido" aria-labelledby="seg-t">
     <div class="wrap">
-      <p class="kicker">Qué podemos armar contigo</p>
-      <h2 class="h2">Equipamiento, insumos y surtido.</h2>
-      <ul class="cards">
-        <li class="card card--dark"><h3>Equipamiento</h3><p>Máquinas de corte de hidrogel, secado UV y laminación.</p><a class="more" style="color:var(--cian-realidad-virtual)" href="/hidrogel#maquinas">Ver máquinas →</a></li>
-        <li class="card card--dark"><h3>Reposición de insumos</h3><p>Láminas de hidrogel por paquete, cuchillas, pen y palas.</p><a class="more" style="color:var(--cian-realidad-virtual)" href="/hidrogel">Ver hidrogel →</a></li>
-        <li class="card card--dark"><h3>Surtido de mostrador</h3><p>Cargadores, cables, audio, vidrios blindados y baterías.</p><a class="more" style="color:var(--cian-realidad-virtual)" href="/conectividad">Ver conectividad →</a></li>
-      </ul>
+      <p class="kicker">Para quién es</p>
+      <h2 id="seg-t" class="h2" style="max-width:22ch">Elige tu tipo de negocio y arma tu lista.</h2>
+      <div class="seg__tabs" role="tablist" aria-label="Tipo de negocio">
+        {segments.map((s, i) => <button class="seg__tab" role="tab" type="button" id={`st-${s.id}`} aria-selected={i === 0 ? 'true' : 'false'} aria-controls={`sp-${s.id}`} data-seg={s.id}>{s.name}</button>)}
+      </div>
+      {segments.map((s, i) => (
+        <div class="seg__panel" role="tabpanel" id={`sp-${s.id}`} aria-labelledby={`st-${s.id}`} data-panel={s.id} hidden={i !== 0}>
+          <div class="seg__lead">
+            <h3>{s.name}</h3>
+            <p>{s.text}</p>
+            <p class="seg__note">Ejemplo de surtido armado con productos del catálogo 2026. Ajusta referencias y cantidades en tu lista.</p>
+            <div class="seg__actions">
+              <button class="btn btn--dark" type="button" data-kit={s.kit.join(',')}>Agregar este surtido a mi lista</button>
+              <a class="btn btn--wa" href={waUrl('Hola UBU Latinoamérica, tengo ' + s.name.toLowerCase() + ' y quiero cotizar este surtido:\n' + s.kit.map((k) => '• ' + P(k).name).join('\n'))} target="_blank" rel="noopener">Cotizar por WhatsApp</a>
+            </div>
+            <p class="seg__done" role="status" aria-live="polite" hidden>Agregado a tu lista. <a href="/cotizacion">Ver lista de cotización →</a></p>
+          </div>
+          <ul class="kit">
+            {s.kit.map((k, j) => {
+              const p = P(k);
+              return (
+                <li class="kit__item" style={`--i:${j}`}>
+                  <a href={`/${p.slug}`} class="kit__img"><Image src={photo(k)} alt={p.name} widths={[200, 320]} sizes="160px" loading="lazy" class={displayImages(p)[0].alpha ? '' : 'blend'} /></a>
+                  <div><a href={`/${p.slug}`}>{p.name}</a><span class="price">{priceLabel(p)} <small>COP</small></span></div>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      ))}
     </div>
   </section>
-  <section class="band band--white">
+
+  <!-- CÓMO COTIZAR -->
+  <section class="how on-dark" aria-labelledby="how-t">
     <div class="wrap">
       <p class="kicker">Cómo cotizar</p>
-      <h2 class="h2">Precios y disponibilidad se confirman con un asesor.</h2>
-      <ol class="cards" style="counter-reset:s">
-        <li class="card"><h3>1 · Arma tu lista</h3><p>Agrega productos desde el catálogo o desde cada ficha.</p></li>
-        <li class="card"><h3>2 · Envíala por WhatsApp</h3><p>Tu lista llega con cantidades y referencias en un solo mensaje.</p></li>
-        <li class="card"><h3>3 · Recibe la confirmación</h3><p>Un asesor te confirma precio final, disponibilidad y entrega.</p></li>
+      <h2 id="how-t" class="h2">Precios y disponibilidad se confirman con un asesor.</h2>
+      <ol class="how__steps">
+        <li data-reveal><b>1</b><h3>Arma tu lista</h3><p>Agrega productos desde el catálogo o desde cada ficha.</p></li>
+        <li data-reveal style="--i:1"><b>2</b><h3>Envíala por WhatsApp</h3><p>Tu lista llega con cantidades y referencias en un solo mensaje.</p></li>
+        <li data-reveal style="--i:2"><b>3</b><h3>Recibe la confirmación</h3><p>Un asesor te confirma precio final, disponibilidad y entrega.</p></li>
       </ol>
-      <p style="margin-top:28px"><a class="btn btn--dark" href={waAdvice} target="_blank" rel="noopener">Recibir asesoría</a></p>
+      <div class="how__go"><a class="btn" href="/cotizacion">Ver mi lista de cotización</a><a class="btn btn--wa" href={waAdvice} target="_blank" rel="noopener">Recibir asesoría</a></div>
     </div>
   </section>
+
+  <section class="to on-light">
+    <div class="wrap to__grid">
+      <a class="to__card" href="/hidrogel#maquinas" data-reveal><b>Equipamiento</b><span>Máquinas de corte de hidrogel, secado UV y laminación.</span><i>Ver máquinas →</i></a>
+      <a class="to__card" href="/hidrogel" data-reveal style="--i:1"><b>Reposición de insumos</b><span>Láminas de hidrogel por paquete, cuchillas, pen y palas.</span><i>Ver hidrogel →</i></a>
+      <a class="to__card" href="/conectividad" data-reveal style="--i:2"><b>Surtido de mostrador</b><span>Cargadores, cables, audio, vidrios blindados y baterías.</span><i>Ver conectividad →</i></a>
+    </div>
+  </section>
+
+  <script type="application/json" id="kit-data" set:html={JSON.stringify(slim)} />
+  <script>
+    import { qGet, qSet } from '../scripts/core';
+    const tabs = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-seg]'));
+    const panels = Array.from(document.querySelectorAll<HTMLElement>('[data-panel]'));
+    const show = (id: string) => { tabs.forEach((t) => t.setAttribute('aria-selected', String(t.dataset.seg === id))); panels.forEach((p) => { p.hidden = p.dataset.panel !== id; }); };
+    tabs.forEach((t, i) => {
+      t.addEventListener('click', () => show(t.dataset.seg!));
+      t.addEventListener('keydown', (e) => { if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return; const n = (i + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length; tabs[n].focus(); show(tabs[n].dataset.seg!); });
+    });
+    document.querySelectorAll<HTMLButtonElement>('[data-kit]').forEach((b) => b.addEventListener('click', () => {
+      const list = qGet();
+      b.dataset.kit!.split(',').forEach((id) => { if (!list.some((x) => x.id === id)) list.push({ id, qty: 1 }); });
+      qSet(list);
+      const done = b.closest('.seg__lead')!.querySelector<HTMLElement>('.seg__done'); if (done) done.hidden = false;
+    }));
+  </script>
 </Base>
+
+<style>
+  .bh { position: relative; padding: calc(var(--header-h) + 50px) 0 0; overflow: hidden; isolation: isolate; min-height: min(100svh, 860px); display: flex; align-items: flex-end; }
+  .bh__bg { position: absolute; inset: 0; z-index: -1; background: radial-gradient(60% 80% at 75% 40%, rgba(1,220,239,.28), transparent 70%), radial-gradient(40% 50% at 0% 0%, rgba(64,91,165,.6), transparent 70%), linear-gradient(170deg, #0B2236, #05101B); }
+  .bh__grid { display: grid; grid-template-columns: .95fr 1.05fr; gap: clamp(16px, 3vw, 50px); align-items: end; width: min(100% - var(--gut) * 2, var(--wrap)); }
+  .bh__copy { align-self: center; padding-bottom: 60px; } .bh h1 { font-size: clamp(2.2rem, 5vw, 4.2rem); margin: 14px 0 18px; }
+  .bh__cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+  .bh__scene { position: relative; min-height: 460px; }
+  .bh__fig { position: absolute; left: -2%; bottom: 8%; width: 40%; z-index: 1; }
+  .counter { position: absolute; left: 16%; right: -4%; bottom: 0; height: 100%; }
+  .counter__top { position: absolute; left: 0; right: 0; bottom: 74px; height: 22px; border-radius: 12px 12px 0 0; background: linear-gradient(180deg, #E8F7F9, #9FD6DC); box-shadow: 0 0 60px rgba(1,220,239,.45); }
+  .counter__front { position: absolute; left: 0; right: 0; bottom: 0; height: 74px; background: linear-gradient(180deg, #17364D, #0A1A29); border-top: 1px solid rgba(255,255,255,.3); }
+  .counter__glow { position: absolute; left: 4%; right: 4%; bottom: 70px; height: 6px; background: var(--cian-realidad-virtual); filter: blur(10px); opacity: .7; }
+  .cp { position: absolute; bottom: 92px; height: auto; filter: drop-shadow(0 18px 18px rgba(0,0,0,.5)); animation: bob 7s ease-in-out infinite; }
+  .cp--0 { width: 27%; left: 2%; } .cp--1 { width: 21%; left: 28%; animation-delay: -2s; } .cp--2 { width: 40%; left: 46%; bottom: 96px; animation-delay: -4s; } .cp--3 { width: 18%; left: 82%; animation-delay: -1s; } .cp--4 { width: 14%; left: 70%; bottom: 150px; animation-delay: -3s; }
+  @keyframes bob { 50% { transform: translateY(-9px); } }
+  @media (max-width: 860px) { .bh__grid { grid-template-columns: 1fr; } .bh { min-height: 0; } .bh__copy { padding-bottom: 10px; } .bh__scene { min-height: 360px; } .bh__fig { width: 38%; } }
+  @media (prefers-reduced-motion: reduce) { .cp { animation: none; } }
+
+  .seg { padding: clamp(70px, 9vw, 120px) 0; background: linear-gradient(180deg, #EAF6F7, #F7FBFC); }
+  .seg__tabs { display: flex; flex-wrap: wrap; gap: 10px; margin: 28px 0 24px; }
+  .seg__tab { all: unset; box-sizing: border-box; cursor: pointer; min-height: 48px; padding: 0 1.4em; display: inline-flex; align-items: center; border-radius: var(--r-pill); border: 1.5px solid var(--confianza-indigo); color: var(--confianza-indigo); font-family: var(--font-display); font-weight: 600; transition: background-color .25s, color .25s; }
+  .seg__tab:hover { background: rgba(64,91,165,.1); } .seg__tab:focus-visible { outline: 3px solid var(--cian-realidad-virtual); outline-offset: 3px; } .seg__tab[aria-selected="true"] { background: var(--confianza-indigo); color: #fff; }
+  .seg__panel { display: grid; grid-template-columns: .8fr 1.2fr; gap: clamp(20px, 4vw, 56px); align-items: start; padding: clamp(20px, 3vw, 38px); border-radius: var(--r-lg); background: #fff; border: 1px solid var(--linea); box-shadow: 0 40px 70px -50px rgba(5,16,27,.5); }
+  .seg__panel[hidden] { display: none; } .seg__lead { display: grid; gap: 14px; } .seg__lead h3 { font-size: clamp(1.6rem, 3vw, 2.3rem); } .seg__lead p { color: var(--texto-suave); }
+  .seg__note { font-size: .9rem; padding: 12px 14px; border-radius: 12px; background: var(--bruma); } .seg__actions { display: flex; flex-wrap: wrap; gap: 10px; } .seg__done a { font-weight: 700; color: var(--confianza-indigo); }
+  .kit { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); gap: 12px; }
+  .kit__item { display: grid; grid-template-columns: 84px 1fr; gap: 12px; align-items: center; padding: 12px; border-radius: var(--r-md); border: 1px solid var(--linea); background: linear-gradient(135deg, #fff, var(--bruma)); transition: transform .35s var(--ease); }
+  .kit__item:hover { transform: translateY(-4px); } .kit__img { display: grid; place-items: center; width: 84px; height: 84px; } .kit__img img { width: 100%; height: 100%; object-fit: contain; } .kit__img img.blend { mix-blend-mode: multiply; }
+  .kit__item > div { display: grid; gap: 4px; min-width: 0; } .kit__item a { text-decoration: none; font-family: var(--font-display); font-weight: 600; font-size: .95rem; line-height: 1.25; } .kit__item .price { font-size: 1.05rem; color: var(--tinta-1); }
+  @media (max-width: 860px) { .seg__panel { grid-template-columns: 1fr; } }
+
+  .how { padding: clamp(70px, 9vw, 120px) 0; background: radial-gradient(60% 70% at 15% 0%, rgba(1,220,239,.18), transparent 70%), var(--tinta-1); }
+  .how__steps { list-style: none; margin: 36px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; position: relative; counter-reset: s; }
+  .how__steps::before { content: ''; position: absolute; left: 8%; right: 8%; top: 31px; height: 2px; background: repeating-linear-gradient(90deg, var(--cian-realidad-virtual) 0 10px, transparent 10px 20px); opacity: .6; }
+  .how__steps li { position: relative; padding: 0 22px; display: grid; gap: 8px; } .how__steps b { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; background: linear-gradient(135deg, var(--asombro-turmalina), var(--azul-silicon-valley)); font-family: var(--font-display); font-size: 1.6rem; box-shadow: 0 0 0 8px rgba(1,220,239,.14); }
+  .how__steps h3 { font-size: 1.3rem; margin-top: 8px; } .how__steps p { color: rgba(255,255,255,.78); }
+  .how__go { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 40px; }
+  @media (max-width: 760px) { .how__steps { grid-template-columns: 1fr; gap: 26px; } .how__steps::before { left: 31px; right: auto; top: 0; bottom: 0; width: 2px; height: auto; background: repeating-linear-gradient(180deg, var(--cian-realidad-virtual) 0 10px, transparent 10px 20px); } .how__steps li { padding-left: 84px; } .how__steps b { position: absolute; left: 0; top: 0; } }
+
+  .to { padding: clamp(50px, 7vw, 90px) 0; background: #fff; }
+  .to__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 16px; }
+  .to__card { display: grid; gap: 8px; padding: 26px; border-radius: var(--r-md); background: linear-gradient(135deg, #F7FBFC, #D9EEF1); border: 1px solid var(--linea); text-decoration: none; transition: transform .4s var(--ease), box-shadow .4s var(--ease); }
+  .to__card:hover { transform: translateY(-6px); box-shadow: 0 26px 46px -28px rgba(5,16,27,.5); } .to__card b { font-family: var(--font-display); font-size: 1.3rem; } .to__card span { color: var(--texto-suave); } .to__card i { font-style: normal; font-family: var(--font-display); font-weight: 700; color: var(--confianza-indigo); }
+</style>

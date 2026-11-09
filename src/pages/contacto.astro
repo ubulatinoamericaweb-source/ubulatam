@@ -1,73 +1,136 @@
 ---
 import Base from '../layouts/Base.astro';
-import InnerHero from '../components/InnerHero.astro';
 import PcHead from '../components/PcHead.astro';
+import UbuFace from '../components/UbuFace.astro';
 import { products, WA_DISPLAY, waGeneric, WA_NUMBER } from '../data/catalog';
-const options = products.filter((p) => !p.info).map((p) => ({ slug: p.slug, name: p.name }));
+const options = products.filter((p) => !p.info).map((p) => p.name);
 const saves = !!(import.meta.env.PUBLIC_SUPABASE_URL && import.meta.env.PUBLIC_SUPABASE_ANON_KEY);
 ---
 <Base title="Contacto y cotización" description="Contacta a UBU Latinoamérica por WhatsApp: cuéntanos qué equipo o insumo necesitas y te respondemos. Formulario de cotización que continúa en WhatsApp.">
-  <InnerHero kicker="Contacto" title="Hablemos de tu pedido." lede="Cuéntanos qué equipo o insumo necesitas y te respondemos por WhatsApp." crumbs={[{ label: 'Contacto' }]} />
-  <section class="band band--light">
-    <div class="wrap split" style="align-items:start">
-      <div style="display:grid;gap:18px">
-        <ul class="cards" style="grid-template-columns:1fr;margin:0">
-          <li class="card"><h3>WhatsApp de ventas</h3><p style="font-size:1.4rem;font-family:var(--font-display);font-weight:700;color:var(--tinta-1)">{WA_DISPLAY}</p><a class="btn btn--wa" style="align-self:start" href={waGeneric} target="_blank" rel="noopener">Abrir WhatsApp</a></li>
-          <li class="card"><h3>Punto de atención</h3><p>Centro Empresarial Hayuelos</p><a class="more" href="/ubicacion">Ver ubicación →</a></li>
-        </ul>
-        <div style="max-width:300px" aria-hidden="true"><PcHead pose="point" /></div>
+  <section class="ct on-dark" aria-labelledby="ct-t">
+    <div class="ct__bg" aria-hidden="true"><i></i><i></i></div>
+    <div class="wrap">
+      <nav aria-label="Ruta de navegación"><ol class="crumbs"><li><a href="/">Inicio</a></li><li aria-current="page">Contacto</li></ol></nav>
+      <div class="ct__head">
+        <div>
+          <p class="kicker">Contacto</p>
+          <h1 id="ct-t">Hablemos de tu pedido.</h1>
+          <p class="lede">Cuéntanos qué equipo o insumo necesitas y te respondemos por WhatsApp.</p>
+        </div>
+        <div class="ct__fig" aria-hidden="true"><PcHead pose="wave" /></div>
       </div>
-      <form class="form" id="cform" novalidate data-wa={WA_NUMBER} data-saves={saves ? '1' : '0'}>
-        <h2 class="h2" style="margin:0">Solicita tu cotización</h2>
-        <p>Completa lo esencial y continúa en WhatsApp con tu mensaje listo.</p>
-        <div class="field"><label for="f-name">Nombre</label><input id="f-name" name="nombre" autocomplete="name" required maxlength="80" /><span class="err" id="e-name" aria-live="polite"></span></div>
-        <div class="field"><label for="f-city">Ciudad (opcional)</label><input id="f-city" name="ciudad" autocomplete="address-level2" maxlength="60" /></div>
-        <div class="field"><label for="f-type">Tipo de cliente (opcional)</label>
-          <select id="f-type" name="tipo"><option value="">Selecciona</option><option>Tienda de accesorios</option><option>Servicio técnico</option><option>Distribuidor</option><option>Cliente final</option><option>Otro</option></select></div>
-        <div class="field"><label for="f-prod">Producto de interés (opcional)</label>
-          <select id="f-prod" name="producto"><option value="">Selecciona</option>{options.map((o) => <option>{o.name}</option>)}<option>Otro producto del catálogo</option></select></div>
-        <div class="field"><label for="f-msg">Mensaje (opcional)</label><textarea id="f-msg" name="mensaje" maxlength="600"></textarea></div>
-        <label class="check"><input type="checkbox" id="f-list" /> <span>Incluir mi lista de cotización, si tengo productos agregados.</span></label>
-        <label class="check"><input type="checkbox" id="f-consent" required /> <span>Autorizo a UBU Latinoamérica a tratar mis datos para responder esta solicitud, según la <a href="/privacidad">Política de tratamiento de datos</a>.</span></label>
-        <span class="err" id="e-consent" aria-live="polite"></span>
-        <label class="check"><input type="checkbox" id="f-mkt" /> <span>Quiero recibir información comercial y novedades de UBU por WhatsApp (opcional).</span></label>
-        <button class="btn btn--wa" type="submit">Continuar en WhatsApp</button>
-        <p style="font-size:.9rem;color:var(--texto-suave)">Se abrirá WhatsApp con tu mensaje para que lo envíes.{saves && ' Guardamos una copia de tu solicitud para darle seguimiento, según la política de datos.'}</p>
-      </form>
+
+      <div class="ct__channels">
+        <a class="chan chan--wa" href={waGeneric} target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.5 3.5A11 11 0 0 0 3.2 17.3L2 22l4.8-1.2A11 11 0 1 0 20.5 3.5Zm-8.5 17a9 9 0 0 1-4.6-1.3l-.3-.2-2.8.7.8-2.7-.2-.3A9 9 0 1 1 12 20.5Zm5-6.7c-.3-.1-1.6-.8-1.9-.9s-.5-.1-.7.1-.8.9-1 1.1-.4.2-.6.1a7.4 7.4 0 0 1-3.7-3.2c-.3-.5.3-.5.8-1.5.1-.2 0-.4 0-.5l-.9-2.1c-.2-.5-.5-.5-.7-.5h-.6a1.2 1.2 0 0 0-.9.4 3.6 3.6 0 0 0-1.1 2.7 6.3 6.3 0 0 0 1.3 3.3 14.4 14.4 0 0 0 5.5 4.9c2 .8 2.8.9 3.8.7a3.2 3.2 0 0 0 2.1-1.5 2.6 2.6 0 0 0 .2-1.5c-.1-.1-.3-.2-.6-.3Z"/></svg>
+          <span><small>WhatsApp de ventas</small><b>{WA_DISPLAY}</b></span><i aria-hidden="true">Abrir →</i>
+        </a>
+        <a class="chan chan--loc" href="/ubicacion">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 1 1 14 0c0 4.8-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg>
+          <span><small>Punto de atención</small><b>Centro Empresarial Hayuelos</b></span><i aria-hidden="true">Ver ubicación →</i>
+        </a>
+      </div>
+
+      <div class="ct__main">
+        <form class="form ct__form" id="cform" novalidate data-wa={WA_NUMBER} data-saves={saves ? '1' : '0'}>
+          <h2 class="h2" style="margin:0;font-size:1.7rem">Solicita tu cotización</h2>
+          <p>Completa lo esencial y continúa en WhatsApp con tu mensaje listo.</p>
+          <div class="field"><label for="f-name">Nombre</label><input id="f-name" name="nombre" autocomplete="name" required maxlength="80" /><span class="err" id="e-name" aria-live="polite"></span></div>
+          <div class="ct__two">
+            <div class="field"><label for="f-city">Ciudad (opcional)</label><input id="f-city" name="ciudad" autocomplete="address-level2" maxlength="60" /></div>
+            <div class="field"><label for="f-type">Tipo de cliente (opcional)</label>
+              <select id="f-type" name="tipo"><option value="">Selecciona</option><option>Tienda de accesorios</option><option>Servicio técnico</option><option>Distribuidor</option><option>Cliente final</option><option>Otro</option></select></div>
+          </div>
+          <div class="field"><label for="f-prod">Producto de interés (opcional)</label>
+            <select id="f-prod" name="producto"><option value="">Selecciona</option>{options.map((o) => <option>{o}</option>)}<option>Otro producto del catálogo</option></select></div>
+          <div class="field"><label for="f-msg">Mensaje (opcional)</label><textarea id="f-msg" name="mensaje" maxlength="600"></textarea></div>
+          <label class="check"><input type="checkbox" id="f-list" /> <span>Incluir mi lista de cotización, si tengo productos agregados.</span></label>
+          <label class="check"><input type="checkbox" id="f-consent" required /> <span>Autorizo a UBU Latinoamérica a tratar mis datos para responder esta solicitud, según la <a href="/privacidad">Política de tratamiento de datos</a>.</span></label>
+          <span class="err" id="e-consent" aria-live="polite"></span>
+          <label class="check"><input type="checkbox" id="f-mkt" /> <span>Quiero recibir información comercial y novedades de UBU por WhatsApp (opcional).</span></label>
+          <button class="btn btn--wa" type="submit">Continuar en WhatsApp</button>
+          <p style="font-size:.9rem;color:var(--texto-suave)">Se abrirá WhatsApp con tu mensaje para que lo envíes.{saves && ' Guardamos una copia de tu solicitud para darle seguimiento, según la política de datos.'}</p>
+        </form>
+
+        <div class="phone" aria-hidden="false">
+          <div class="phone__body">
+            <div class="phone__bar"><span class="phone__av"><UbuFace tone="blanco" eyes={false} /></span><span><b>UBU Latinoamérica</b><small>{WA_DISPLAY}</small></span></div>
+            <div class="phone__chat">
+              <p class="phone__label" id="pv-label">Vista previa de tu mensaje</p>
+              <div class="bubble" id="pv" role="status" aria-live="off" aria-labelledby="pv-label">Hola UBU Latinoamérica, quiero cotizar.</div>
+              <span class="phone__tick" aria-hidden="true">✓✓</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
+
   <script>
     import { qGet } from '../scripts/core';
     import { products } from '../data/catalog';
     const f = document.getElementById('cform') as HTMLFormElement | null;
     if (f) {
-      const byslug = new Map(products.map((p) => [p.slug, p]));
+      const byname = new Map(products.map((p) => [p.slug, p]));
+      const $ = (id: string) => document.getElementById(id) as HTMLInputElement & HTMLSelectElement & HTMLTextAreaElement;
+      const build = () => {
+        const name = $('f-name').value.trim();
+        const lines = ['Hola UBU Latinoamérica, quiero cotizar.'];
+        if (name) lines.push(`Nombre: ${name}`);
+        if ($('f-city').value.trim()) lines.push(`Ciudad: ${$('f-city').value.trim()}`);
+        if ($('f-type').value) lines.push(`Tipo de cliente: ${$('f-type').value}`);
+        if ($('f-prod').value) lines.push(`Producto de interés: ${$('f-prod').value}`);
+        if ($('f-msg').value.trim()) lines.push(`Mensaje: ${$('f-msg').value.trim()}`);
+        let listTxt = '';
+        if ($('f-list').checked) {
+          const items = qGet().map((i) => ({ p: byname.get(i.id), qty: i.qty })).filter((x) => x.p);
+          if (items.length) { listTxt = items.map((x) => `• ${x.qty} x ${x.p!.name}`).join('\n'); lines.push('Mi lista:\n' + listTxt); }
+        }
+        if ($('f-mkt').checked) lines.push('Acepto recibir información comercial por WhatsApp.');
+        return { text: lines.join('\n'), name, listTxt };
+      };
+      const pv = document.getElementById('pv')!;
+      const refresh = () => { pv.textContent = build().text; };
+      f.addEventListener('input', refresh); f.addEventListener('change', refresh); refresh();
       f.addEventListener('submit', (e) => {
         e.preventDefault();
-        const g = (id: string) => (document.getElementById(id) as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement);
-        const name = g('f-name').value.trim();
-        const consent = (g('f-consent') as HTMLInputElement).checked;
+        const { text, name, listTxt } = build();
+        const consent = $('f-consent').checked;
         document.getElementById('e-name')!.textContent = name ? '' : 'Escribe tu nombre.';
         document.getElementById('e-consent')!.textContent = consent ? '' : 'Debes autorizar el tratamiento de tus datos para continuar.';
         if (!name || !consent) return;
-        const lines = ['Hola UBU Latinoamérica, quiero cotizar.', `Nombre: ${name}`];
-        if (g('f-city').value.trim()) lines.push(`Ciudad: ${g('f-city').value.trim()}`);
-        if (g('f-type').value) lines.push(`Tipo de cliente: ${g('f-type').value}`);
-        if (g('f-prod').value) lines.push(`Producto de interés: ${g('f-prod').value}`);
-        if (g('f-msg').value.trim()) lines.push(`Mensaje: ${g('f-msg').value.trim()}`);
-        let listTxt = '';
-        if ((g('f-list') as HTMLInputElement).checked) {
-          const items = qGet().map((i) => ({ p: byslug.get(i.id), qty: i.qty })).filter((x) => x.p);
-          if (items.length) { listTxt = items.map((x) => `• ${x.qty} x ${x.p!.name}`).join('\n'); lines.push('Mi lista:\n' + listTxt); }
-        }
-        if ((g('f-mkt') as HTMLInputElement).checked) lines.push('Acepto recibir información comercial por WhatsApp.');
         const sbUrl = import.meta.env.PUBLIC_SUPABASE_URL as string | undefined, sbKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY as string | undefined;
         if (f.dataset.saves === '1' && sbUrl && sbKey) {
           fetch(`${sbUrl}/rest/v1/solicitudes`, { method: 'POST', keepalive: true, headers: { apikey: sbKey, Authorization: `Bearer ${sbKey}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
-            body: JSON.stringify({ tipo: 'contacto', nombre: name, ciudad: g('f-city').value.trim() || null, tipo_cliente: g('f-type').value || null, productos: g('f-prod').value || listTxt || null, mensaje: g('f-msg').value.trim() || null, acepta_comercial: (g('f-mkt') as HTMLInputElement).checked }) }).catch(() => {});
+            body: JSON.stringify({ tipo: 'contacto', nombre: name, ciudad: $('f-city').value.trim() || null, tipo_cliente: $('f-type').value || null, productos: $('f-prod').value || listTxt || null, mensaje: $('f-msg').value.trim() || null, acepta_comercial: $('f-mkt').checked }) }).catch(() => {});
         }
-        window.open(`https://wa.me/${f.dataset.wa}?text=${encodeURIComponent(lines.join('\n'))}`, '_blank', 'noopener');
+        window.open(`https://wa.me/${f.dataset.wa}?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
       });
     }
   </script>
 </Base>
+
+<style>
+  .ct { position: relative; padding: calc(var(--header-h) + 50px) 0 clamp(70px, 8vw, 120px); overflow: hidden; isolation: isolate; background: linear-gradient(165deg, #0B2236, #05101B); }
+  .ct__bg i { position: absolute; border-radius: 50%; filter: blur(70px); z-index: -1; } .ct__bg i:nth-child(1) { width: 50vw; aspect-ratio: 1; right: -10vw; top: -8vw; background: rgba(65,185,193,.4); } .ct__bg i:nth-child(2) { width: 40vw; aspect-ratio: 1; left: -12vw; bottom: 10%; background: rgba(64,91,165,.55); }
+  .ct__head { display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: end; } .ct h1 { font-size: clamp(2.4rem, 6vw, 5rem); margin: 14px 0 16px; }
+  .ct__fig { width: clamp(120px, 18vw, 230px); margin-bottom: -6px; }
+  .ct__channels { display: grid; grid-template-columns: 1.2fr 1fr; gap: 14px; margin: 30px 0 clamp(36px, 5vw, 64px); }
+  .chan { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 18px; min-height: 92px; padding: 18px 26px; border-radius: var(--r-lg); text-decoration: none; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.22); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); transition: transform .4s var(--ease), background-color .3s, box-shadow .4s; }
+  .chan svg { width: 38px; height: 38px; } .chan span { display: grid; gap: 2px; } .chan small { opacity: .75; font-size: .85rem; } .chan b { font-family: var(--font-display); font-size: clamp(1.15rem, 2.2vw, 1.7rem); } .chan i { font-style: normal; font-family: var(--font-display); font-weight: 700; }
+  .chan:hover, .chan:focus-visible { transform: translateY(-5px); }
+  .chan--wa { background: linear-gradient(135deg, #25D366, #12A150); color: #052E16; border-color: transparent; box-shadow: 0 24px 50px -24px rgba(37,211,102,.7); } .chan--wa small { opacity: .8; }
+  .chan--loc:hover { background: rgba(1,220,239,.14); border-color: var(--cian-realidad-virtual); }
+  .ct__main { display: grid; grid-template-columns: 1.1fr .9fr; gap: clamp(20px, 4vw, 60px); align-items: start; }
+  .ct__form { padding: clamp(20px, 3vw, 36px); border-radius: var(--r-lg); background: #fff; color: var(--texto); box-shadow: 0 40px 80px -40px rgba(0,0,0,.7); } .ct__form p { color: var(--texto-suave); }
+  .ct__two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .phone { position: sticky; top: 96px; width: min(100%, 360px); margin-inline: auto; padding: 12px; border-radius: 44px; background: linear-gradient(160deg, #26313b, #0b0f14); box-shadow: 0 40px 70px -30px rgba(0,0,0,.8), inset 0 0 0 2px rgba(255,255,255,.12); transform: rotate(2.5deg); }
+  .phone__body { border-radius: 34px; overflow: hidden; background: #E7E3DC; min-height: 480px; display: grid; grid-template-rows: auto 1fr; }
+  .phone__bar { display: flex; align-items: center; gap: 12px; padding: 16px 18px; background: #075E54; color: #fff; } .phone__bar span:last-child { display: grid; } .phone__bar small { opacity: .8; font-size: .78rem; }
+  .phone__av { width: 40px; height: 40px; padding: 8px; border-radius: 50%; background: var(--gris-guernica); }
+  .phone__chat { padding: 18px 14px; display: grid; align-content: start; gap: 6px; background-image: radial-gradient(rgba(0,0,0,.05) 1px, transparent 1px); background-size: 14px 14px; }
+  .phone__label { font-size: .76rem; text-align: center; color: #5b6770; background: rgba(255,255,255,.7); border-radius: 10px; padding: .35em .8em; justify-self: center; }
+  .bubble { justify-self: end; max-width: 92%; white-space: pre-wrap; word-break: break-word; padding: 10px 14px; border-radius: 14px 14px 4px 14px; background: #DCF8C6; color: #14222E; font-size: .95rem; line-height: 1.4; box-shadow: 0 1px 2px rgba(0,0,0,.2); }
+  .phone__tick { justify-self: end; font-size: .78rem; color: #4FC3F7; }
+  @media (max-width: 900px) { .ct__main { grid-template-columns: 1fr; } .phone { position: static; transform: none; } .ct__channels { grid-template-columns: 1fr; } .ct__head { grid-template-columns: 1fr; } .ct__fig { display: none; } .ct__two { grid-template-columns: 1fr; } .chan i { display: none; } .chan { grid-template-columns: auto 1fr; } }
+</style>

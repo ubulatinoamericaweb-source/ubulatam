@@ -1,7 +1,10 @@
 ---
 import Base from '../layouts/Base.astro';
 import InnerHero from '../components/InnerHero.astro';
-import { categories, byCategory, cop, priceLabel } from '../data/catalog';
+import { Image } from 'astro:assets';
+import { categories, byCategory, priceLabel, bySlug, productImage } from '../data/catalog';
+const shots: Record<string, string[]> = { conectividad: ['cargador-pd-45w-gan-super-carga-rapida-tc-tc', 'power-bank-10-000-mah-22-5w-multipuerto', 'audifonos-oseos-con-pantalla'], hidrogel: ['maquina-de-hidrogel-21-pulgadas', 'hidrogel-mate', 'pala-grande'] };
+const pimg = (s: string) => productImage(bySlug(s)!.images[0].file);
 const cats = (['conectividad', 'hidrogel'] as const).map((c) => ({ ...categories[c], list: byCategory(c) }));
 ---
 <Base title="Catálogo 2026 con precios en COP" description="Lista completa del catálogo UBU Latinoamérica 2026, en el orden del catálogo: Conectividad e Hidrogel, con precios de referencia en pesos colombianos (COP).">
@@ -11,6 +14,16 @@ const cats = (['conectividad', 'hidrogel'] as const).map((c) => ({ ...categories
       <a class="btn btn--ghost" href="/descargas/catalogo-ubu-2026.pdf" download>Descargar catálogo PDF</a>
     </p>
   </InnerHero>
+  <section class="pick" aria-label="Elegir línea">
+    <div class="wrap pick__grid">
+      {cats.map((c, k) => (
+        <a class={`pk pk--${c.slug}`} href={`/${c.slug}`} data-reveal style={`--i:${k}`}>
+          <span class="pk__imgs" aria-hidden="true">{shots[c.slug].map((s, i) => <Image class={`pi pi--${i}`} src={pimg(s)} alt="" widths={[200, 320]} sizes="150px" loading="lazy" />)}</span>
+          <span class="pk__body"><b>{c.name}</b><span>{c.short}</span><em>{c.list.length} entradas · Ver con fotos →</em></span>
+        </a>
+      ))}
+    </div>
+  </section>
   {cats.map((c, k) => (
     <section class={`band ${k ? 'band--white' : 'band--light'}`} aria-labelledby={`l-${c.slug}`}>
       <div class="wrap">
@@ -38,6 +51,14 @@ const cats = (['conectividad', 'hidrogel'] as const).map((c) => ({ ...categories
   ))}
 </Base>
 <style>
+  .pick { position: relative; z-index: 2; margin-top: -54px; }
+  .pick__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .pk { position: relative; display: block; min-height: 250px; border-radius: var(--r-lg); overflow: hidden; text-decoration: none; isolation: isolate; border: 1px solid rgba(255,255,255,.2); box-shadow: 0 40px 70px -40px rgba(5,16,27,.7); transition: transform .5s var(--ease); }
+  .pk:hover { transform: translateY(-6px); } .pk--conectividad { background: linear-gradient(150deg, #1F2F66, #0A1530); color: #fff; } .pk--hidrogel { background: linear-gradient(150deg, #F7FEFF, #8FD4DC); color: var(--tinta-1); }
+  .pk__imgs { position: absolute; right: 2%; top: 8%; width: 58%; height: 84%; } .pi { position: absolute; height: auto; filter: drop-shadow(0 16px 16px rgba(0,0,0,.4)); transition: transform .6s var(--ease); }
+  .pi--0 { width: 56%; right: 24%; top: 4%; } .pi--1 { width: 38%; right: 0; top: 30%; } .pi--2 { width: 30%; right: 52%; bottom: 0; } .pk:hover .pi--0 { transform: translateY(-8px) rotate(-2deg); } .pk:hover .pi--1 { transform: translateY(-5px) rotate(3deg); }
+  .pk__body { position: absolute; left: 22px; bottom: 20px; display: grid; gap: 4px; max-width: 46%; } .pk__body b { font-family: var(--font-display); font-size: clamp(1.5rem, 3vw, 2.2rem); } .pk__body span { font-size: .95rem; opacity: .85; } .pk__body em { font-style: normal; font-family: var(--font-display); font-weight: 700; color: var(--cian-realidad-virtual); } .pk--hidrogel .pk__body em { color: var(--confianza-indigo); }
+  @media (max-width: 760px) { .pick__grid { grid-template-columns: 1fr; } .pk { min-height: 270px; } .pk__body { max-width: 52%; } }
   .tbl { overflow: auto; border-radius: var(--r-md); border: 1px solid var(--linea); background: #fff; color: var(--texto); }
   table { width: 100%; border-collapse: collapse; min-width: 640px; } th, td { padding: .75em 1em; text-align: left; border-bottom: 1px solid var(--linea); }
   thead th { background: var(--tinta-1); color: #fff; font-family: var(--font-display); font-size: .76rem; letter-spacing: .1em; text-transform: uppercase; }

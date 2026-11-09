@@ -1,52 +1,135 @@
 ---
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
-import InnerHero from '../components/InnerHero.astro';
-import { waUrl } from '../data/catalog';
+import UbuFace from '../components/UbuFace.astro';
+import { waUrl, waGeneric, WA_DISPLAY } from '../data/catalog';
 import seal from '../assets/sello-365.webp';
+
 const groups = [
-  { t: 'Equipos', q: [
+  { id: 'equipos', t: 'Equipos', q: [
     ['¿Qué diferencia hay entre la máquina de 21" y la de 11,9"?', 'Ambas son libres de códigos y tienen pantalla de 9 pulgadas. La de 21 pulgadas ofrece el formato más amplio. La de 11,9" (OEMP2300) tiene sellado automático e incluye UV.'],
     ['¿Venden repuestos para la máquina?', 'El catálogo incluye la cuchilla para máquina de hidrogel. Para otros repuestos, consúltanos por WhatsApp.'],
   ] },
-  { t: 'Hidrogel y compatibilidad', q: [
+  { id: 'hidrogel', t: 'Hidrogel y compatibilidad', q: [
     ['¿Cómo sé qué hidrogel es compatible con mi equipo?', 'Cada referencia indica su uso: las de tablet especifican la medida (10.1, 14 y 16,9 pulgadas), el diseño de tapa trasera es para tablet de 11 pulgadas, las referencias VT8PRO son para esa máquina y la 360 especial está indicada para Z Fold. Si tu caso no aparece, envíanos la referencia de tu equipo por WhatsApp.'],
     ['¿Qué necesito para el hidrogel UV?', 'El empaque del hidrogel UV indica curado UV (UV Curing). En el catálogo están la máquina de 11,9" que incluye UV y la máquina de secado inteligente UV G10U. Confirma con un asesor la combinación adecuada para tu trabajo.'],
   ] },
-  { t: 'Cotizaciones y precios', q: [
+  { id: 'cotizar', t: 'Cotizaciones y precios', q: [
     ['¿Cómo solicito una cotización?', 'Pulsa «Cotizar por WhatsApp» en cualquier ficha, o agrega varios productos a tu lista de cotización y envíala en un solo mensaje.'],
     ['¿Los precios publicados están vigentes?', 'Son precios de referencia del catálogo de septiembre de 2026, en pesos colombianos (COP). El precio final y la disponibilidad se confirman al cotizar.'],
   ] },
-  { t: 'Garantía y entregas', q: [
+  { id: 'garantia', t: 'Garantía y entregas', q: [
     ['¿Qué garantía tienen los productos?', 'Todos los productos del catálogo cuentan con 365 días de garantía. Las máquinas de hidrogel indican garantía de 1 año.'],
     ['¿Hacen envíos?', 'Las condiciones de entrega se confirman al cotizar. Escríbenos con tu ciudad y te informamos.'],
   ] },
 ];
 const faqLd = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: groups.flatMap((g) => g.q).map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) };
+const maps = 'https://www.google.com/maps/search/?api=1&query=Centro%20Empresarial%20Hayuelos';
 ---
-<Base title="Soporte y preguntas frecuentes" description="Garantía, compatibilidad de hidrogel, cotizaciones y recursos del catálogo UBU Latinoamérica 2026." jsonLd={faqLd}>
-  <InnerHero kicker="Soporte" title="Soporte y preguntas frecuentes." lede="Garantía, compatibilidad, cotizaciones y recursos del catálogo." crumbs={[{ label: 'Soporte' }]} />
-  <section class="band band--light">
-    <div class="wrap split" style="align-items:start">
-      <div>
-        <div class="stat"><Image src={seal} alt="" width={76} height={69} /><div><strong>365 días de garantía en todos los productos</strong><p>Así lo indica el catálogo 2026 para cada referencia. Las máquinas de corte de 21" y 11,9" indican garantía de 1 año.</p></div></div>
-        <h2 class="h2" style="margin-top:34px">Cómo usar tu garantía</h2>
-        <p>Escríbenos por WhatsApp con la referencia del producto y te indicamos el proceso y las condiciones de cobertura.</p>
-        <p style="margin-top:20px"><a class="btn btn--wa" href={waUrl('Hola UBU Latinoamérica, quiero consultar la garantía de un producto. Referencia: ')} target="_blank" rel="noopener">Consultar garantía</a></p>
-        <h2 class="h2" style="margin-top:44px">Recursos</h2>
-        <ul class="cards" style="grid-template-columns:1fr">
-          <li class="card"><h3>Catálogo 2026 en PDF</h3><p>Todas las referencias con fotografía y precio de referencia.</p><a class="more" href="/descargas/catalogo-ubu-2026.pdf" download>Descargar catálogo PDF →</a></li>
-          <li class="card"><h3>Fichas de producto</h3><p>Presentación y datos de cada referencia, en el orden del catálogo.</p><a class="more" href="/catalogo">Ir al catálogo →</a></li>
-        </ul>
+<Base title="Soporte y preguntas frecuentes" description="Canales de atención, garantía paso a paso, compatibilidad de hidrogel y preguntas frecuentes de UBU Latinoamérica." jsonLd={faqLd}>
+
+  <!-- HERO: mapa de canales -->
+  <section class="sh on-dark" aria-labelledby="sh-t">
+    <div class="sh__bg" aria-hidden="true"></div>
+    <div class="wrap sh__grid">
+      <div class="sh__copy">
+        <nav aria-label="Ruta de navegación"><ol class="crumbs"><li><a href="/">Inicio</a></li><li aria-current="page">Soporte</li></ol></nav>
+        <p class="kicker">Soporte</p>
+        <h1 id="sh-t">Elige cómo quieres que te atendamos.</h1>
+        <p class="lede">Garantía, compatibilidad, cotizaciones y recursos del catálogo, en un solo lugar.</p>
+        <p class="sh__cta"><a class="btn btn--wa" href={waGeneric} target="_blank" rel="noopener">Escribir por WhatsApp</a><a class="btn btn--ghost" href="#preguntas">Ver preguntas frecuentes</a></p>
       </div>
-      <div>
-        <p class="kicker">Preguntas frecuentes</p>
-        {groups.map((g) => (
-          <div style="margin-top:22px"><h3 style="font-size:1.1rem">{g.t}</h3>
-            <div class="faq">{g.q.map(([q, a]) => <details><summary>{q}</summary><p>{a}</p></details>)}</div></div>
-        ))}
-        <p style="margin-top:22px">¿No encuentras tu respuesta? <a href="/contacto"><strong>Contáctanos</strong></a>.</p>
+      <div class="net">
+        <svg class="net__lines" viewBox="0 0 520 520" aria-hidden="true"><path d="M260 260 L100 110" /><path d="M260 260 L420 110" /><path d="M260 260 L100 410" /><path d="M260 260 L420 410" /></svg>
+        <div class="net__core" aria-hidden="true"><UbuFace tone="cian" /></div>
+        <a class="node node--wa" href={waGeneric} target="_blank" rel="noopener"><b>WhatsApp</b><span>{WA_DISPLAY}</span></a>
+        <a class="node node--loc" href="/ubicacion"><b>Punto de atención</b><span>Centro Empresarial Hayuelos</span></a>
+        <a class="node node--pdf" href="/descargas/catalogo-ubu-2026.pdf" download><b>Catálogo en PDF</b><span>Referencias y precios</span></a>
+        <a class="node node--list" href="/cotizacion"><b>Lista de cotización</b><span>Envíala en un solo mensaje</span></a>
       </div>
     </div>
   </section>
+
+  <!-- GARANTÍA PASO A PASO -->
+  <section class="wr on-light" aria-labelledby="wr-t">
+    <div class="wrap wr__grid">
+      <div class="wr__seal" data-reveal><Image src={seal} alt="365 días de garantía" width={150} height={136} /><p><strong>365 días de garantía</strong> en todos los productos, según el catálogo 2026. Las máquinas de corte de 21" y 11,9" indican garantía de 1 año.</p></div>
+      <div>
+        <p class="kicker">Garantía</p>
+        <h2 id="wr-t" class="h2">Cómo usar tu garantía.</h2>
+        <ol class="steps">
+          <li data-reveal><b>1</b><div><h3>Ten a la mano la referencia</h3><p>Identifica el producto por su nombre o referencia del catálogo.</p></div></li>
+          <li data-reveal style="--i:1"><b>2</b><div><h3>Escríbenos por WhatsApp</h3><p>Envíanos la referencia del producto.</p></div></li>
+          <li data-reveal style="--i:2"><b>3</b><div><h3>Te indicamos el proceso</h3><p>Te explicamos el proceso y las condiciones de cobertura.</p></div></li>
+        </ol>
+        <p style="margin-top:22px"><a class="btn btn--wa" href={waUrl('Hola UBU Latinoamérica, quiero consultar la garantía de un producto. Referencia: ')} target="_blank" rel="noopener">Consultar garantía</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PREGUNTAS FRECUENTES -->
+  <section class="fq on-light" id="preguntas" aria-labelledby="fq-t">
+    <div class="wrap fq__grid">
+      <aside class="fq__nav" aria-label="Temas">
+        <p class="kicker">Preguntas frecuentes</p>
+        <h2 id="fq-t" class="h2" style="font-size:1.8rem">¿Tienes dudas?</h2>
+        <ul>{groups.map((g) => <li><a href={`#${g.id}`}>{g.t}</a></li>)}</ul>
+        <p style="font-size:.95rem">¿No encuentras tu respuesta? <a href="/contacto"><strong>Contáctanos</strong></a>.</p>
+      </aside>
+      <div class="fq__list">
+        {groups.map((g) => (
+          <section id={g.id} class="fq__group"><h3>{g.t}</h3>
+            <div class="faq">{g.q.map(([q, a]) => <details><summary>{q}</summary><p>{a}</p></details>)}</div></section>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- RECURSOS -->
+  <section class="rs on-dark">
+    <div class="wrap rs__grid">
+      <a class="rs__card" href="/descargas/catalogo-ubu-2026.pdf" download data-reveal><b>Catálogo 2026 en PDF</b><span>Todas las referencias con fotografía y precio de referencia.</span><i>Descargar PDF →</i></a>
+      <a class="rs__card" href="/catalogo" data-reveal style="--i:1"><b>Fichas de producto</b><span>Presentación y datos de cada referencia, en el orden del catálogo.</span><i>Ir al catálogo →</i></a>
+      <a class="rs__card" href={maps} target="_blank" rel="noopener" data-reveal style="--i:2"><b>Visítanos</b><span>Centro Empresarial Hayuelos. Confirma el horario por WhatsApp antes de ir.</span><i>Cómo llegar →</i></a>
+    </div>
+  </section>
 </Base>
+
+<style>
+  .sh { position: relative; padding: calc(var(--header-h) + 54px) 0 80px; overflow: hidden; isolation: isolate; }
+  .sh__bg { position: absolute; inset: 0; z-index: -1; background: radial-gradient(55% 70% at 78% 50%, rgba(65,185,193,.35), transparent 70%), radial-gradient(40% 55% at 0% 100%, rgba(64,91,165,.6), transparent 70%), linear-gradient(165deg, #0B2236, #05101B); }
+  .sh__grid { display: grid; grid-template-columns: .95fr 1.05fr; gap: clamp(20px, 4vw, 60px); align-items: center; }
+  .sh h1 { font-size: clamp(2.2rem, 5vw, 4.2rem); margin: 14px 0 18px; } .sh__cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+  .net { position: relative; width: min(100%, 560px); aspect-ratio: 1; margin-inline: auto; }
+  .net__lines { position: absolute; inset: 0; width: 100%; height: 100%; } .net__lines path { fill: none; stroke: var(--cian-realidad-virtual); stroke-width: 2; stroke-dasharray: 8 12; opacity: .7; animation: flow 3s linear infinite; }
+  @keyframes flow { to { stroke-dashoffset: -40; } }
+  .net__core { position: absolute; left: 50%; top: 50%; width: 30%; transform: translate(-50%, -50%); filter: drop-shadow(0 0 30px rgba(1,220,239,.6)); }
+  .node { position: absolute; width: 42%; min-height: 84px; padding: 14px 16px; display: grid; gap: 2px; align-content: center; border-radius: var(--r-md); text-decoration: none; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.28); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); transition: transform .4s var(--ease), background-color .3s, border-color .3s; box-shadow: inset 0 1px 0 rgba(255,255,255,.35); }
+  .node:hover, .node:focus-visible { transform: translateY(-5px); background: rgba(1,220,239,.16); border-color: var(--cian-realidad-virtual); }
+  .node b { font-family: var(--font-display); font-size: 1.02rem; } .node span { font-size: .84rem; opacity: .8; }
+  .node--wa { left: 0; top: 4%; border-color: #25D366; } .node--loc { right: 0; top: 4%; } .node--pdf { left: 0; bottom: 4%; } .node--list { right: 0; bottom: 4%; }
+  @media (max-width: 860px) { .sh__grid { grid-template-columns: 1fr; } }
+  @media (max-width: 480px) { .net { aspect-ratio: auto; display: grid; gap: 10px; } .net__lines, .net__core { display: none; } .node { position: static; width: auto; min-height: 64px; } }
+  @media (prefers-reduced-motion: reduce) { .net__lines path { animation: none; } }
+
+  .wr { padding: clamp(70px, 9vw, 120px) 0; background: linear-gradient(180deg, #F7FBFC, #EAF6F7); }
+  .wr__grid { display: grid; grid-template-columns: .8fr 1.2fr; gap: clamp(24px, 5vw, 80px); align-items: center; }
+  .wr__seal { display: grid; gap: 18px; justify-items: center; text-align: center; padding: 30px; border-radius: var(--r-lg); background: linear-gradient(160deg, #fff, #D9EEF1); border: 1px solid var(--linea); } .wr__seal img { width: 130px; height: auto; filter: drop-shadow(0 12px 16px rgba(80,60,0,.3)); } .wr__seal p { color: var(--texto-suave); }
+  .steps { list-style: none; margin: 24px 0 0; padding: 0; display: grid; gap: 0; position: relative; }
+  .steps::before { content: ''; position: absolute; left: 27px; top: 20px; bottom: 20px; width: 2px; background: repeating-linear-gradient(180deg, var(--asombro-turmalina) 0 8px, transparent 8px 16px); }
+  .steps li { position: relative; display: grid; grid-template-columns: 56px 1fr; gap: 18px; align-items: center; padding: 14px 0; }
+  .steps b { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; background: linear-gradient(135deg, var(--asombro-turmalina), var(--azul-silicon-valley)); color: #fff; font-family: var(--font-display); font-size: 1.4rem; box-shadow: 0 0 0 7px rgba(65,185,193,.18); z-index: 1; }
+  .steps h3 { font-size: 1.2rem; } .steps p { color: var(--texto-suave); }
+  @media (max-width: 760px) { .wr__grid { grid-template-columns: 1fr; } }
+
+  .fq { padding: clamp(70px, 9vw, 120px) 0; background: #fff; }
+  .fq__grid { display: grid; grid-template-columns: .55fr 1.45fr; gap: clamp(24px, 5vw, 70px); align-items: start; }
+  .fq__nav { position: sticky; top: 96px; display: grid; gap: 14px; } .fq__nav ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  .fq__nav li a { display: block; padding: .7em 1em; border-radius: 12px; text-decoration: none; font-family: var(--font-display); font-weight: 600; background: var(--bruma); transition: background-color .25s, transform .3s var(--ease); } .fq__nav li a:hover { background: var(--bruma-2); transform: translateX(4px); }
+  .fq__group { margin-bottom: 30px; scroll-margin-top: 96px; } .fq__group h3 { font-size: 1.3rem; margin-bottom: 8px; }
+  @media (max-width: 860px) { .fq__grid { grid-template-columns: 1fr; } .fq__nav { position: static; } .fq__nav ul { grid-template-columns: 1fr 1fr; } }
+
+  .rs { padding: clamp(50px, 7vw, 90px) 0; background: var(--tinta-1); } .rs__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 16px; }
+  .rs__card { display: grid; gap: 8px; padding: 26px; border-radius: var(--r-md); text-decoration: none; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.16); transition: transform .4s var(--ease), border-color .3s; } .rs__card:hover { transform: translateY(-6px); border-color: var(--cian-realidad-virtual); }
+  .rs__card b { font-family: var(--font-display); font-size: 1.25rem; } .rs__card span { opacity: .78; } .rs__card i { font-style: normal; color: var(--cian-realidad-virtual); font-family: var(--font-display); font-weight: 700; }
+</style>
