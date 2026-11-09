@@ -173,12 +173,26 @@ mm.add('(max-width: 899px) and ' + ANY_MOTION, () => {
   return () => { ro.disconnect(); dots.forEach((d) => d.remove()); gsap.set([face, ...parts, '.hero__road, .hero__speed, .truck__shadow', beam, '.truck .solid', '.truck .wire'], { clearProps: 'all' }); face.removeAttribute('style'); };
 });
 
-/* Móvil: destacados en secuencia vertical; cada producto entra de derecha a izquierda al bajar (sin carrusel horizontal) */
+/* Móvil: la sección se fija solo durante el recorrido; el scroll vertical desplaza los productos de derecha a izquierda
+   (misma mecánica que en escritorio, sin 3D para mantener fotos y textos legibles). Al terminar se libera el scroll. */
 mm.add('(max-width: 899px) and ' + ANY_MOTION, () => {
-  const items = $$('[data-sitem]');
-  const tw = items.map((it) => gsap.fromTo(it, { x: () => innerWidth * 0.7, opacity: 0 }, { x: 0, opacity: 1, ease: 'power2.out',
-    scrollTrigger: { trigger: it, start: 'top 94%', end: 'top 58%', scrub: 0.5, invalidateOnRefresh: true } }));
-  return () => { tw.forEach((a) => { a.scrollTrigger?.kill(); a.kill(); }); gsap.set(items, { clearProps: 'opacity,transform,x' }); };
+  const strip = $('[data-strip]')!, viewport = $('[data-viewport]')!, track = $('[data-track]')!;
+  const items = $$('[data-sitem]', track), bar = $('[data-strip-progress]')!;
+  const dist = () => Math.max(0, track.scrollWidth - viewport.clientWidth);
+  const len = () => Math.min(dist() * 0.8, innerHeight * 2.2);
+  const focus = () => { // el producto más cercano al centro se ve a tamaño completo; los demás, ligeramente menores
+    const vc = innerWidth / 2;
+    items.forEach((it) => {
+      const r = it.getBoundingClientRect();
+      const a = Math.min(1, Math.abs(r.left + r.width / 2 - vc) / innerWidth);
+      gsap.set(it, { scale: 1 - 0.08 * a, opacity: 1 - 0.18 * a });
+    });
+  };
+  focus();
+  const tw = gsap.to(track, { x: () => -dist(), ease: 'none',
+    scrollTrigger: { trigger: strip, start: 'top top', end: () => '+=' + len(), pin: true, scrub: 0.5, invalidateOnRefresh: true, anticipatePin: 1,
+      onUpdate: (st) => { focus(); gsap.set(bar, { scaleX: 0.15 + st.progress * 0.85 }); }, onRefresh: focus } });
+  return () => { tw.scrollTrigger?.kill(); tw.kill(); gsap.set([track, ...items, bar], { clearProps: 'all' }); };
 });
 
 /* ============ 2 · RECORRIDO LATERAL ============ */

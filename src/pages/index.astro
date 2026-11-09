@@ -340,12 +340,12 @@ const catImg = (slug: string, i = 0) => productImage(bySlug(slug)!.images[i].fil
   @media (max-width: 899px) {
     .strip__pin { min-height: 0; padding: 84px 0 56px; gap: 22px; }
     .strip__viewport { overflow: visible; scroll-snap-type: none; perspective: none; padding: 0; }
-    .strip__track { display: grid; grid-template-columns: minmax(0, 1fr); width: auto; max-width: 440px; margin-inline: auto; gap: 40px; padding: 0 var(--gut); transform: none !important; }
+    .strip__track { display: grid; grid-template-columns: minmax(0, 1fr); width: auto; max-width: 440px; margin-inline: auto; gap: 40px; padding: 0 var(--gut); }
     /* palabra decorativa «CATÁLOGO» detrás de los productos: acompaña el recorrido y queda completa en pantalla */
     .strip { overflow: clip; } /* clip no crea contenedor de scroll: permite que la palabra se quede fija (sticky) mientras se baja */
     .strip__yr { display: none; }
-    .strip__ghost { position: sticky; top: calc(50svh - 8vw); left: auto; right: auto; height: 16vw; margin: 0 0 calc(-16vw - 22px); z-index: 0; transform: none; font-size: 15.2vw; line-height: 16vw; text-transform: uppercase; text-align: center; -webkit-text-stroke: 2px rgba(64,91,165,.5); color: rgba(64,91,165,.12); font-size: 16vw; }
-    .sitem { width: auto; min-width: 0; scroll-snap-align: none; transform: none !important; }
+    .strip__ghost { position: sticky; top: calc(50svh - 8vw); left: auto; right: auto; height: 16vw; margin: 0 0 calc(-16vw - 22px); z-index: 0; transform: none; font-size: 15.2vw; line-height: 16vw; text-transform: uppercase; text-align: center; -webkit-text-stroke: 1.5px rgba(64,91,165,.13); color: transparent; font-size: 16vw; }
+    .sitem { width: auto; min-width: 0; scroll-snap-align: none; }
     .sitem__stage { aspect-ratio: 1 / 1; }
     .sitem__stage img { width: 84%; height: 84%; }
     .sitem__info { gap: 6px; }
@@ -355,6 +355,21 @@ const catImg = (slug: string, i = 0) => productImage(bySlug(slug)!.images[i].fil
     .sitem__actions .btn { flex: 1 1 0; min-width: 0; padding-inline: .6em; }
     .strip__bar { display: none; }
     .strip__head h2 { font-size: 1.6rem; }
+  }
+  /* móvil con movimiento: la sección se fija solo durante el recorrido y el scroll vertical mueve los productos de derecha a izquierda */
+  @media (max-width: 899px) and (prefers-reduced-motion: no-preference) {
+    .strip { overflow: hidden; }
+    .strip__pin { min-height: 100svh; padding: 78px 0 26px; gap: 14px; }
+    .strip__viewport { overflow: hidden; padding: 6px 0 4px; }
+    .strip__track { display: flex; width: max-content; max-width: none; margin-inline: 0; gap: 18px; padding: 0 var(--gut); }
+    .sitem { width: min(64vw, 260px); flex: none; will-change: transform; }
+    .sitem__stage img { width: 88%; height: 88%; }
+    .sitem__actions { width: auto; }
+    .sitem__actions .btn { flex: 0 0 auto; padding-inline: 1em; }
+    .strip__ghost { position: absolute; left: 0; right: 0; top: 47%; height: auto; margin: 0; transform: translateY(-50%); line-height: .8; z-index: 0; }
+    .strip__head, .strip__viewport, .strip__bar { z-index: 1; }
+    .strip__bar { display: block; }
+    .strip__head { gap: 12px; } .strip__head h2 { font-size: 1.4rem; margin-top: 6px; } .strip__head .btn { min-height: 44px; }
   }
 
   /* ---------- 3 · CRISTAL ---------- */
