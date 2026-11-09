@@ -98,11 +98,12 @@ mm.add(FULL, () => {
     .to(dots, { opacity: 0, scale: 0.4, duration: 0.5, ease: 'power1.in' }, 'c+=0.15')
     // 4) mensaje de marca
     .fromTo(copy2, { autoAlpha: 0, y: 36 }, { autoAlpha: 1, y: 0, duration: 1.0, ease: 'power2.out' }, 'c+=0.2')
+    .to('.hero__cta', { autoAlpha: 0, duration: 0.5, ease: 'power1.in' }, 'c') // los botones pasan a la columna del mensaje final (.cta2)
     .to({}, { duration: 0.8 }); // pausa de lectura
 
   gsap.set(face, { yPercent: -50, y: 0, scale: 0.85 });
 
-  return () => { dots.forEach((d) => d.parentNode?.removeChild(d)); hero.classList.remove('is-parked'); gsap.set([wrap, face, copy1, copy2, '.hero__cta > *'], { clearProps: 'all' }); };
+  return () => { dots.forEach((d) => d.parentNode?.removeChild(d)); hero.classList.remove('is-parked'); gsap.set([wrap, face, copy1, copy2, '.hero__cta', '.hero__cta > *'], { clearProps: 'all' }); };
 });
 
 /* En móvil con movimiento permitido: una entrada breve del camión, sin pin */

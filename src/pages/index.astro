@@ -51,6 +51,10 @@ const catImg = (slug: string, i = 0) => productImage(bySlug(slug)!.images[i].fil
         <p class="kicker">Catálogo 2026</p>
         <h2>Todo el surtido de tu mostrador, con un solo proveedor.</h2>
         <p class="lede">Dos líneas: <strong>Conectividad</strong> e <strong>Hidrogel</strong>, con precios de referencia en COP.</p>
+        <div class="cta2">
+          <a class="btn" href="/catalogo">Ver catálogo</a>
+          <a class="btn btn--wa" href={waGeneric} target="_blank" rel="noopener">Cotizar por WhatsApp</a>
+        </div>
       </div>
       <div class="hero__cta">
         <a class="btn" href="/catalogo">Ver catálogo</a>
@@ -297,6 +301,20 @@ const catImg = (slug: string, i = 0) => productImage(bySlug(slug)!.images[i].fil
     .hero__road { bottom: auto; top: 58%; } .hero__floor { height: 22%; }
   }
   @media (prefers-reduced-motion: reduce) { .hero__road i, .hero__speed i { animation: none; } .hero__speed { display: none; } }
+  .cta2 { display: none; }
+  /* Escritorio: el mensaje final (rótulo, título, párrafo y botones) forma una sola columna alineada al contenedor de la página y
+     centrada en vertical con la carita; sin posiciones absolutas por elemento (solo la capa de la escena). */
+  @media (min-width: 900px) and (prefers-reduced-motion: no-preference) {
+    .hero__copy--2 {
+      --cl: max(var(--gut), calc((100vw - var(--wrap)) / 2));
+      left: 0; top: 0; bottom: 0; transform: none; width: calc(var(--cl) + min(40vw, 540px) + 2vw);
+      padding: 0 0 5vh calc(var(--cl) + 2vw);
+      display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
+    }
+    .hero__copy--2 .kicker, .hero__copy--2 h2, .hero__copy--2 .lede { margin-left: 0; }
+    .hero__copy--2 .lede { max-width: 34em; }
+    .cta2 { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+  }
   /* Móvil con movimiento: el camión se desintegra en partículas que forman la carita en su mismo lugar (sin fijar la página) */
   @media (max-width: 899px) and (prefers-reduced-motion: no-preference) {
     .hero__particles { display: block; }
