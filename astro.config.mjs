@@ -6,8 +6,9 @@ export default defineConfig({
   site: 'https://ubulatinoamerica.com',
   trailingSlash: 'never',
   build: { format: 'file' },
-  integrations: [sitemap({ filter: (u) => !/\/(cotizacion|404|maquinas|accesorios|admin|realista)$/.test(u) })],
+  integrations: [sitemap({ filter: (u) => !/\/(carrito|404|maquinas|accesorios|admin|realista)$/.test(u) })],
   redirects: {
+    '/cotizacion': '/carrito',
     '/maquinas': '/hidrogel#maquinas',
     '/accesorios': '/conectividad',
   },

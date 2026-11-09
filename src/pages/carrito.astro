@@ -1,0 +1,137 @@
+---
+import Base from '../layouts/Base.astro';
+import { products, productImage, displayImages } from '../data/catalog';
+
+// Datos mínimos para pintar el carrito en el navegador (los productos agregados viven en localStorage del visitante).
+const data = Object.fromEntries(
+  products.filter((p) => !p.info).map((p) => {
+    const im = displayImages(p)[0];
+    const vars = p.table
+      ? p.table.rows.map((r) => ({ l: `${r.model} · ${r.capacity}`, p: r.price }))
+      : p.references ? p.references.map((r) => ({ l: r, p: p.price! })) : null;
+    return [p.slug, { n: p.name, price: p.price, unit: p.unit, img: im ? productImage(im.file).src : '', blend: im ? !im.alpha : false, vars, vlabel: p.table ? 'modelo' : 'referencia' }];
+  }),
+);
+const countries = ['Argentina', 'Bolivia', 'Brasil', 'Chile', 'Colombia', 'Costa Rica', 'Cuba', 'Ecuador', 'El Salvador', 'Guatemala', 'Honduras', 'México', 'Nicaragua', 'Panamá', 'Paraguay', 'Perú', 'República Dominicana', 'Uruguay', 'Venezuela'];
+---
+<Base title="Carrito de pedido" description="Arma tu pedido UBU: elige productos, variantes y cantidades, ingresa tus datos de entrega y envía el pedido por WhatsApp. No se procesan pagos en este sitio." noindex>
+  <section class="cart on-light" aria-labelledby="cart-t">
+    <div class="cart__hero on-dark">
+      <div class="wrap">
+        <nav aria-label="Ruta de navegación"><ol class="crumbs"><li><a href="/">Inicio</a></li><li aria-current="page">Carrito</li></ol></nav>
+        <h1 id="cart-t">Tu carrito de pedido</h1>
+        <p class="lede">Revisa tus productos, completa tus datos de entrega y envía el pedido por WhatsApp. En este sitio no se cobra nada.</p>
+        <ol class="stepper" data-stepper aria-label="Pasos del pedido">
+          <li data-s="1" aria-current="step"><b>1</b><span>Productos</span></li>
+          <li data-s="2"><b>2</b><span>Datos de entrega</span></li>
+          <li data-s="3"><b>3</b><span>Resumen</span></li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="wrap cart__grid">
+      <div class="cart__main">
+        <!-- 1 · PRODUCTOS -->
+        <section data-panel="1" aria-labelledby="p1-t">
+          <h2 id="p1-t" tabindex="-1">1 · Revisa tus productos</h2>
+          <div id="c-empty" hidden>
+            <p class="callout">Tu carrito está vacío. Agrega productos desde el catálogo o desde cada ficha.</p>
+            <p class="cart__actions"><a class="btn btn--dark" href="/conectividad">Ver Conectividad</a><a class="btn btn--dark" href="/hidrogel">Ver Hidrogel</a></p>
+          </div>
+          <div id="c-box" hidden>
+            <ul id="c-list" class="c-list"></ul>
+            <p id="c-warn" class="c-warn" role="alert"></p>
+            <p class="cart__actions"><a class="btn btn--line" href="/catalogo">Seguir viendo productos</a><button class="btn btn--dark" type="button" id="to2">Continuar con mis datos →</button></p>
+          </div>
+        </section>
+
+        <!-- 2 · DATOS DE ENTREGA -->
+        <section data-panel="2" aria-labelledby="p2-t" hidden>
+          <h2 id="p2-t" tabindex="-1">2 · Datos de entrega</h2>
+          <p class="c-privacy">Estos datos solo se usan para armar tu mensaje de WhatsApp. No se guardan en este sitio ni en ningún servidor.</p>
+          <form id="c-form" class="form" novalidate autocomplete="on">
+            <div class="c-two">
+              <div class="field"><label for="d-nombre">Nombre completo</label><input id="d-nombre" name="nombre" autocomplete="name" maxlength="80" required /><span class="err" id="e-nombre" aria-live="polite"></span></div>
+              <div class="field"><label for="d-tel">Teléfono (con indicativo)</label><input id="d-tel" name="tel" type="tel" inputmode="tel" autocomplete="tel" maxlength="24" placeholder="+57 300 000 0000" required /><span class="err" id="e-tel" aria-live="polite"></span></div>
+            </div>
+            <div class="c-two">
+              <div class="field"><label for="d-pais">País</label><input id="d-pais" name="pais" list="paises" autocomplete="country-name" maxlength="60" required /><datalist id="paises">{countries.map((c) => <option value={c} />)}</datalist><span class="err" id="e-pais" aria-live="polite"></span></div>
+              <div class="field"><label for="d-ciudad">Ciudad</label><input id="d-ciudad" name="ciudad" autocomplete="address-level2" maxlength="60" required /><span class="err" id="e-ciudad" aria-live="polite"></span></div>
+            </div>
+            <div class="field"><label for="d-dir">Dirección de entrega</label><textarea id="d-dir" name="dir" autocomplete="street-address" maxlength="200" rows="3" required></textarea><span class="err" id="e-dir" aria-live="polite"></span></div>
+            <label class="check"><input type="checkbox" id="d-ok" /> <span>Confirmo que mis datos de contacto y entrega son correctos.</span></label>
+            <span class="err" id="e-ok" aria-live="polite"></span>
+            <p class="cart__actions"><button class="btn btn--line" type="button" data-back="1">← Volver a productos</button><button class="btn btn--dark" type="submit">Revisar resumen →</button></p>
+          </form>
+        </section>
+
+        <!-- 3 · RESUMEN -->
+        <section data-panel="3" aria-labelledby="p3-t" hidden>
+          <h2 id="p3-t" tabindex="-1">3 · Resumen del pedido</h2>
+          <ul id="s-lines" class="s-lines"></ul>
+          <div class="s-card"><div><h3>Datos de entrega</h3><dl id="s-data"></dl></div><button class="btn btn--sm btn--line" type="button" data-back="2">Editar</button></div>
+          <p class="c-note"><strong>Envío:</strong> el costo y la disponibilidad de envío no están definidos en este sitio; se confirman por WhatsApp. Los precios son de referencia del catálogo 2026 y el valor final se confirma al cotizar.</p>
+          <p class="cart__actions"><button class="btn btn--line" type="button" data-back="2">← Editar mis datos</button><button class="btn btn--dark" type="button" id="confirm">Confirmar pedido</button></p>
+        </section>
+
+        <!-- 4 · LISTO PARA ENVIAR -->
+        <section data-panel="4" aria-labelledby="p4-t" hidden>
+          <h2 id="p4-t" tabindex="-1">Pedido confirmado. Envíalo por WhatsApp</h2>
+          <p>Se abrirá WhatsApp con tu pedido listo; solo tienes que pulsar enviar. Un asesor te confirmará precio final, disponibilidad y envío.</p>
+          <p class="cart__actions"><a class="btn btn--wa" id="send" href="#" target="_blank" rel="noopener">Enviar pedido por WhatsApp</a><button class="btn btn--line" type="button" id="copy">Copiar pedido</button><button class="btn btn--line" type="button" data-back="3">← Volver al resumen</button></p>
+          <p id="copy-msg" role="status" aria-live="polite" class="c-note"></p>
+          <p id="long-warn" class="c-warn" role="alert" hidden>Tu pedido es largo: si WhatsApp no muestra todo el mensaje, usa «Copiar pedido» y pégalo en la conversación.</p>
+          <details class="s-preview"><summary>Ver el mensaje que se enviará</summary><pre id="msg"></pre></details>
+          <p style="margin-top:18px"><button class="btn btn--sm btn--line" type="button" id="clear">Vaciar carrito</button></p>
+        </section>
+      </div>
+
+      <aside class="cart__aside" aria-label="Resumen de compra">
+        <h2>Resumen</h2>
+        <dl class="c-sum">
+          <div><dt>Productos</dt><dd id="sum-n">0</dd></div>
+          <div><dt>Subtotal</dt><dd id="sum-total">$0 <small>COP</small></dd></div>
+          <div><dt>Envío</dt><dd>Se confirma por WhatsApp</dd></div>
+        </dl>
+        <p class="c-note">Precios públicos de referencia (COP). No se procesan pagos en este sitio.</p>
+      </aside>
+    </div>
+  </section>
+  <script type="application/json" id="c-data" set:html={JSON.stringify(data)} />
+  <script>import '../scripts/cart';</script>
+</Base>
+
+<style>
+  .cart { background: linear-gradient(180deg, #EAF6F7, #F7FBFC 40%, #fff); min-height: 100svh; }
+  .cart__hero { padding: calc(var(--header-h) + 50px) 0 34px; background: radial-gradient(60% 90% at 85% 0%, rgba(65,185,193,.45), transparent 65%), linear-gradient(160deg, #0B2236, #05101B); }
+  .cart__hero h1 { font-size: clamp(2.1rem, 5vw, 3.8rem); margin: 8px 0 12px; }
+  .stepper { list-style: none; margin: 26px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; counter-reset: s; }
+  .stepper li { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: var(--r-pill); background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.2); font-family: var(--font-display); font-weight: 600; font-size: .95rem; opacity: .75; }
+  .stepper b { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: rgba(255,255,255,.18); flex: none; }
+  .stepper li[aria-current="step"] { opacity: 1; background: rgba(1,220,239,.16); border-color: var(--cian-realidad-virtual); } .stepper li[aria-current="step"] b { background: var(--cian-realidad-virtual); color: var(--tinta-1); }
+  .stepper li.is-done { opacity: 1; } .stepper li.is-done b { background: var(--verde-armonia); color: #04210f; }
+  .cart__grid { display: grid; grid-template-columns: 1fr 340px; gap: clamp(20px, 3vw, 40px); padding: 36px 0 clamp(70px, 8vw, 110px); align-items: start; }
+  .cart__main h2 { font-size: clamp(1.4rem, 2.6vw, 2rem); margin-bottom: 16px; } .cart__main h2:focus { outline: none; }
+  .cart__actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; margin-top: 22px; }
+  .cart__aside { position: sticky; top: 92px; padding: 22px; border-radius: var(--r-lg); background: #fff; border: 1px solid var(--linea); box-shadow: 0 30px 50px -36px rgba(5,16,27,.5); }
+  .cart__aside h2 { font-size: 1.3rem; margin-bottom: 12px; }
+  .c-sum { margin: 0 0 14px; display: grid; gap: 10px; } .c-sum div { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; border-bottom: 1px solid var(--linea); padding-bottom: 10px; } .c-sum dt { color: var(--texto-suave); } .c-sum dd { margin: 0; font-family: var(--font-display); font-weight: 700; text-align: right; } .c-sum small { opacity: .6; font-weight: 600; }
+  .c-note { font-size: .92rem; color: var(--texto-suave); } .c-privacy { padding: 12px 16px; border-radius: 12px; background: var(--bruma); color: var(--texto-suave); font-size: .95rem; margin-bottom: 16px; }
+  .c-warn { color: #B42318; font-weight: 600; min-height: 1.2em; margin-top: 10px; } .c-warn[hidden] { display: none; }
+  .c-two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .c-list, .s-lines { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+  .c-list :global(.crow) { display: grid; grid-template-columns: 88px 1fr; gap: 14px; padding: 14px; border-radius: var(--r-md); background: #fff; border: 1px solid var(--linea); box-shadow: 0 16px 30px -26px rgba(5,16,27,.5); }
+  .c-list :global(.crow img) { width: 88px; height: 88px; object-fit: contain; border-radius: 12px; background: var(--bruma); padding: 6px; }
+  .c-list :global(.crow__b) { display: grid; gap: 8px; min-width: 0; } .c-list :global(.crow__b a) { font-family: var(--font-display); font-weight: 600; text-decoration: none; line-height: 1.25; }
+  .c-list :global(.crow__v) { display: grid; gap: 4px; font-size: .88rem; font-weight: 600; font-family: var(--font-display); } .c-list :global(.crow__v select) { min-height: 44px; border-radius: 12px; border: 1.5px solid #B8C9D1; padding: 0 .7em; font: inherit; font-weight: 500; background: #fff; max-width: 100%; }
+  .c-list :global(.crow__v.is-missing select) { border-color: #B42318; box-shadow: 0 0 0 3px rgba(180,35,24,.15); }
+  .c-list :global(.crow__f) { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+  .c-list :global(.crow__p) { font-family: var(--font-display); font-weight: 700; font-size: 1.1rem; } .c-list :global(.crow__p small) { font-weight: 500; color: var(--texto-suave); font-size: .8rem; }
+  .s-lines :global(li) { display: grid; grid-template-columns: 1fr auto; gap: 4px 14px; padding: 14px 16px; border-radius: var(--r-md); background: #fff; border: 1px solid var(--linea); } .s-lines :global(li b) { font-family: var(--font-display); } .s-lines :global(li small) { color: var(--texto-suave); } .s-lines :global(.t) { text-align: right; font-family: var(--font-display); font-weight: 700; }
+  .s-card { display: flex; gap: 14px; justify-content: space-between; align-items: flex-start; margin-top: 16px; padding: 16px 18px; border-radius: var(--r-md); background: #fff; border: 1px solid var(--linea); } .s-card h3 { font-size: 1.05rem; margin-bottom: 8px; }
+  #s-data { margin: 0; display: grid; gap: 4px; } #s-data :global(div) { display: flex; gap: 8px; flex-wrap: wrap; } #s-data :global(dt) { color: var(--texto-suave); min-width: 5.5em; } #s-data :global(dd) { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+  .s-preview { margin-top: 16px; background: #fff; border: 1px solid var(--linea); border-radius: var(--r-md); padding: 0 16px; } .s-preview summary { cursor: pointer; padding: 14px 0; font-family: var(--font-display); font-weight: 600; min-height: 44px; }
+  .s-preview pre { white-space: pre-wrap; word-break: break-word; font: inherit; font-size: .92rem; color: var(--texto-suave); margin: 0 0 16px; }
+  @media (max-width: 900px) { .cart__grid { grid-template-columns: 1fr; } .cart__aside { position: static; order: -1; } }
+  @media (max-width: 600px) { .c-two { grid-template-columns: 1fr; } .stepper { gap: 6px; } .stepper li { padding: 8px 10px; justify-content: center; } .stepper li span { display: none; } .stepper li[aria-current] span { display: inline; } .stepper li[aria-current] { grid-column: span 1; } .c-list :global(.crow) { grid-template-columns: 68px 1fr; } .c-list :global(.crow img) { width: 68px; height: 68px; } .cart__actions .btn { flex: 1 1 100%; } .stepper li span { font-size: .92rem; } }
+</style>

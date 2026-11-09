@@ -20,11 +20,24 @@ npm run preview    # sirve dist/ tal como saldrá a producción
 | `src/data/brand-paths.json` | Trazos vectoriales del logo e isotipo, extraídos del manual de marca (no redibujados). |
 | `src/components/` | `Logo`, `UbuFace` (carita decorativa), `Truck`, `Hands`, `PcHead`, `ProductCard`, `CategoryView`, `InnerHero`. |
 | `src/pages/` | Inicio, `conectividad`, `hidrogel`, `catalogo`, `[slug]` (una ficha por producto), nosotros, para-tu-negocio, soporte, contacto, ubicación, cotización, legales, 404. |
-| `src/scripts/` | `core.ts` (menú, lista de cotización, ojos), `home.ts` (escenas GSAP), `quote.ts`. |
+| `src/scripts/` | `core.ts` (menú, carrito, ojos), `home.ts` (escenas GSAP), `cart.ts` (carrito de pedido), `inner.ts`. |
 | `public/admin.html` | Panel administrativo existente (Supabase Auth), conservado sin cambios. |
 | `supabase/schema.sql` | Esquema **sugerido**, no aplicado (ver «Supabase»). |
 | `legacy-site/` | Sitio anterior (HTML suelto) como respaldo. No se publica; puede borrarse cuando se valide el nuevo. |
 | `source-private/` | PDFs y referencias. Ignorada por git (`.gitignore` y `.git/info/exclude`); nada de ahí se copia a `public/`. |
+
+## Carrito de pedido (sin pagos)
+
+- Ruta `/carrito` (la antigua `/cotizacion` redirige). Acceso visible en el encabezado con contador.
+- Se agregan productos desde tarjetas y fichas; los productos con variantes (**modelo de batería**, **referencia de vidrio**) se agregan por fila/lista y se pueden cambiar en el carrito. Cantidades con +/−, subtotal con los precios públicos.
+- Pasos: 1 productos → 2 datos de entrega (nombre, teléfono, país, ciudad, dirección y confirmación) → 3 resumen → «Confirmar pedido» → botón **Enviar pedido por WhatsApp** (o «Copiar pedido»).
+- No cobra ni inventa tarifas: el mensaje indica que costo y disponibilidad de envío se confirman por WhatsApp.
+- **Privacidad:** solo los productos del carrito se guardan en `localStorage` (`ubu_quote`). Los datos de entrega viven en memoria y no se guardan ni se envían a Supabase ni a ningún servicio.
+
+## Páginas «Nosotros» y canales
+
+- «Nosotros» ya no explica el manual de marca (sin paleta, tipografías, reglas del logo ni espiral áurea): usa solo contenido comercial ya publicado (quiénes somos, qué ofrecemos, para quién, garantía de 365 días según el catálogo, Hayuelos).
+- El grupo de botones de contacto (pie de página) usa **solo canales reales del proyecto**: WhatsApp, ubicación en Google Maps y catálogo PDF. El proyecto no contiene perfiles de redes sociales (Instagram, Facebook, etc.); si UBU los tiene, hay que entregar las URL para añadirlos. La carpeta `source-private/referencias/` no incluye la imagen «Electronics» mencionada.
 
 ## Comparar versiones y volver al punto de restauración
 

@@ -29,7 +29,7 @@ mm.add(FULL, () => {
   const bar = $('[data-progress]')!;
 
   // Partículas decorativas (se crean aquí para no cargar el HTML)
-  const N = 54;
+  const N = 132;
   const dots = Array.from({ length: N }, () => { const i = document.createElement('i'); box.appendChild(i); return i; });
 
   // --- Entrada cinematográfica (al cargar) ---
@@ -42,56 +42,67 @@ mm.add(FULL, () => {
     .fromTo(copy1.children, { y: 36, opacity: 0 }, { y: 0, opacity: 1, duration: 1, stagger: 0.14 }, 0.5)
     .fromTo('.hero__cta > *', { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, stagger: 0.1 }, 1.2);
 
-  // --- Transformación al hacer scroll ---
-  const ringPoints = () => {
-    const cx = face.offsetLeft + face.offsetWidth / 2;
-    const cy = face.offsetTop + face.offsetHeight / 2;
-    const R = face.offsetWidth * 0.46;
-    return dots.map((_, i) => {
-      const a = (i / N) * Math.PI * 2;
-      const r = i % 6 === 0 ? R * 0.35 : R; // algunas partículas forman los "ojos"
-      const ox = i % 6 === 0 ? (i % 12 === 0 ? -R * 0.22 : R * 0.22) : 0;
-      return { x: cx + Math.cos(a) * r + ox, y: cy + Math.sin(a) * r };
+  // --- Destinos: puntos tomados del CONTORNO REAL del isotipo, para que las partículas dibujen la carita ---
+  const faceSvg = face.querySelector('svg') as SVGSVGElement;
+  const bodyPaths = $$<SVGPathElement>('.ubu-face__body path', face as unknown as ParentNode);
+  const eyePaths = $$<SVGPathElement>('.ubu-face__eye', face as unknown as ParentNode);
+  const targets = () => {
+    const vb = faceSvg.viewBox.baseVal;
+    const k = face.offsetWidth / vb.width;
+    const left = face.offsetLeft, top = face.offsetTop - face.offsetHeight / 2; // la carita termina centrada (yPercent -50)
+    const at = (path: SVGPathElement, len: number) => { const pt = path.getPointAtLength(len); return { x: left + (pt.x - vb.x) * k, y: top + (pt.y - vb.y) * k }; };
+    const eyeEach = 8, eyeTotal = eyePaths.length * eyeEach;
+    const lens = bodyPaths.map((q) => q.getTotalLength()), sum = lens.reduce((a, b) => a + b, 0);
+    const out: { x: number; y: number; eye: boolean }[] = [];
+    bodyPaths.forEach((q, qi) => {
+      const n = Math.max(2, Math.round((lens[qi] / sum) * (N - eyeTotal)));
+      for (let j = 0; j < n; j++) out.push({ ...at(q, ((j + 0.5) / n) * lens[qi]), eye: false });
     });
+    eyePaths.forEach((q) => { const L = q.getTotalLength(); for (let j = 0; j < eyeEach; j++) out.push({ ...at(q, ((j + 0.5) / eyeEach) * L), eye: true }); });
+    while (out.length < N) out.push(out[out.length % Math.max(1, out.length)]);
+    return out.slice(0, N);
   };
   const start = (i: number) => ({
-    x: wrap.offsetLeft + wrap.offsetWidth * (0.12 + 0.76 * ((i * 37) % 100) / 100),
-    y: wrap.offsetTop + wrap.offsetHeight * (0.22 + 0.55 * ((i * 53) % 100) / 100),
+    x: wrap.offsetLeft + wrap.offsetWidth * (0.14 + 0.72 * ((i * 37) % 100) / 100),
+    y: wrap.offsetTop + wrap.offsetHeight * (0.24 + 0.5 * ((i * 53) % 100) / 100),
   });
+  let T = targets();
+  const tag = () => dots.forEach((d, i) => d.classList.toggle('is-eye', !!T[i]?.eye));
+  tag();
 
   const tl = gsap.timeline({
     defaults: { ease: 'none' },
-    scrollTrigger: { trigger: hero, start: 'top top', end: '+=170%', pin: pin, scrub: 0.7, anticipatePin: 1, invalidateOnRefresh: true,
+    scrollTrigger: { trigger: hero, start: 'top top', end: '+=125%', pin: pin, scrub: 0.6, anticipatePin: 1, invalidateOnRefresh: true,
+      onRefresh: () => { T = targets(); tag(); },
       onUpdate: (st) => { gsap.set(bar, { scaleX: st.progress }); } },
   });
-  gsap.set(dots, { x: (i) => start(i).x, y: (i) => start(i).y, opacity: 0 });
+  gsap.set(dots, { x: (i) => start(i).x, y: (i) => start(i).y, opacity: 0, scale: 1 });
 
   tl.addLabel('a', 0)
-    // 1) el texto cede, el camión se abre en piezas y se vuelve plano técnico
-    .to(copy1, { opacity: 0, y: -50, duration: 1.4, ease: 'power1.in' }, 'a+=0.2')
-    .to('.hero__road, .hero__speed', { opacity: 0, duration: 1.2 }, 'a')
-    .to(beam, { opacity: 0, duration: 0.8 }, 'a')
-    .to('.truck__shadow', { opacity: 0, duration: 1.4 }, 'a+=0.4')
-    .to(parts, { x: (_, t) => Number(t.dataset.dx), y: (_, t) => Number(t.dataset.dy), rotation: (_, t) => Number(t.dataset.rz), duration: 2.4, ease: 'power2.out' }, 'a')
-    .to('.truck .solid', { opacity: 0.1, duration: 1.6 }, 'a+=0.6')
-    .to('.truck .wire', { opacity: 1, duration: 1.4, stagger: 0.12 }, 'a+=0.6')
-    // 2) las piezas se disuelven en partículas que viajan al centro de la marca
-    .addLabel('b', 2.6)
-    .to(parts, { scale: 0.55, opacity: 0, duration: 2, stagger: 0.1, ease: 'power2.in' }, 'b')
-    .to(dots, { opacity: 1, duration: 0.5, stagger: { each: 0.03, from: 'random' } }, 'b-=0.3')
-    .to(dots, { x: (i) => ringPoints()[i].x, y: (i) => ringPoints()[i].y, duration: 2.6, ease: 'power2.inOut', stagger: { each: 0.025, from: 'random' } }, 'b')
-    // 3) la carita decorativa se forma
-    .addLabel('c', 5.2)
-    .fromTo(face, { opacity: 0, scale: 0.55, yPercent: -50 }, { opacity: 1, scale: 1, yPercent: -50, duration: 1.8, ease: 'power3.out' }, 'c')
-    .to(dots, { opacity: 0, duration: 1.2, ease: 'power1.in' }, 'c+=0.6')
+    // 1) el texto cede y el camión se abre en piezas (plano técnico)
+    .to(copy1, { opacity: 0, y: -50, duration: 0.9, ease: 'power1.in' }, 'a+=0.1')
+    .to('.hero__road, .hero__speed', { opacity: 0, duration: 0.8 }, 'a')
+    .to(beam, { opacity: 0, duration: 0.6 }, 'a')
+    .to('.truck__shadow', { opacity: 0, duration: 0.9 }, 'a+=0.2')
+    .to(parts, { x: (_, t) => Number(t.dataset.dx), y: (_, t) => Number(t.dataset.dy), rotation: (_, t) => Number(t.dataset.rz), duration: 1.5, ease: 'power2.out' }, 'a')
+    .to('.truck .solid', { opacity: 0.1, duration: 1.0 }, 'a+=0.3')
+    .to('.truck .wire', { opacity: 1, duration: 0.9, stagger: 0.08 }, 'a+=0.3')
+    // 2) las piezas se disuelven en partículas que viajan al contorno de la carita
+    .addLabel('b', 1.5)
+    .to(parts, { scale: 0.6, opacity: 0, duration: 1.1, stagger: 0.06, ease: 'power2.in' }, 'b')
+    .to(dots, { opacity: 1, duration: 0.3, stagger: { each: 0.004, from: 'random' } }, 'b-=0.2')
+    .to(dots, { x: (i) => T[i].x, y: (i) => T[i].y, duration: 1.5, ease: 'power2.inOut', stagger: { each: 0.006, from: 'random' } }, 'b')
+    // 3) la carita se forma bajo las partículas y estas se apagan sin caer
+    .addLabel('c', 3.1)
+    .fromTo(face, { opacity: 0, scale: 0.85, yPercent: -50 }, { opacity: 1, scale: 1, yPercent: -50, duration: 0.9, ease: 'power2.out' }, 'c')
+    .to(dots, { opacity: 0, scale: 0.4, duration: 0.5, ease: 'power1.in' }, 'c+=0.15')
     // 4) mensaje de marca
-    .fromTo(copy2, { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: 1.6, ease: 'power2.out' }, 'c+=0.4')
-    .to({}, { duration: 1.4 }); // pausa de lectura
+    .fromTo(copy2, { autoAlpha: 0, y: 36 }, { autoAlpha: 1, y: 0, duration: 1.0, ease: 'power2.out' }, 'c+=0.2')
+    .to({}, { duration: 0.8 }); // pausa de lectura
 
-  // La carita parte de transform propio (translateY(-50%)): lo manejamos con yPercent
-  gsap.set(face, { yPercent: -50, y: 0 });
+  gsap.set(face, { yPercent: -50, y: 0, scale: 0.85 });
 
-  return () => { dots.forEach((d) => d.remove()); hero.classList.remove('is-parked'); gsap.set([wrap, face, copy1, copy2, '.hero__cta > *'], { clearProps: 'all' }); };
+  return () => { dots.forEach((d) => d.parentNode?.removeChild(d)); hero.classList.remove('is-parked'); gsap.set([wrap, face, copy1, copy2, '.hero__cta > *'], { clearProps: 'all' }); };
 });
 
 /* En móvil con movimiento permitido: una entrada breve del camión, sin pin */
@@ -132,6 +143,11 @@ mm.add(FULL, () => {
 
 /* ============ 3 · CRISTAL ============ */
 (() => {
+  const glassSec = $('[data-glass]');
+  if (glassSec) {
+    const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { glassSec.classList.add('is-lit'); io.disconnect(); } }), { rootMargin: '0px 0px -8% 0px', threshold: 0.02 });
+    io.observe(glassSec);
+  }
   const tabs = $$<HTMLButtonElement>('[data-gtab]');
   const panels = $$('[data-gprod]');
   const shards = $$('.shard');

@@ -1,7 +1,7 @@
 User-agent: *
 Allow: /
 Disallow: /admin
-Disallow: /cotizacion
+Disallow: /carrito
 Disallow: /realista
 
 Sitemap: https://ubulatinoamerica.com/sitemap-index.xml

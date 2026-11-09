@@ -28,7 +28,7 @@ const slim = Object.fromEntries(segments.flatMap((s) => s.kit).map((s) => [s, { 
         <p class="kicker">Para tu negocio</p>
         <h1 id="bh-t">Lo que necesita tu mostrador, en una sola lista.</h1>
         <p class="lede">Equipos e insumos para tiendas de accesorios, servicios técnicos y comercios que instalan hidrogel o reponen surtido.</p>
-        <p class="bh__cta"><a class="btn btn--wa" href={waAdvice} target="_blank" rel="noopener">Recibir asesoría por WhatsApp</a><a class="btn btn--ghost" href="/cotizacion">Armar lista de cotización</a></p>
+        <p class="bh__cta"><a class="btn btn--wa" href={waAdvice} target="_blank" rel="noopener">Recibir asesoría por WhatsApp</a><a class="btn btn--ghost" href="/carrito">Armar mi carrito</a></p>
       </div>
       <div class="bh__scene" aria-hidden="true">
         <div class="bh__fig"><PcHead pose="point" /></div>
@@ -53,12 +53,12 @@ const slim = Object.fromEntries(segments.flatMap((s) => s.kit).map((s) => [s, { 
           <div class="seg__lead">
             <h3>{s.name}</h3>
             <p>{s.text}</p>
-            <p class="seg__note">Ejemplo de surtido armado con productos del catálogo 2026. Ajusta referencias y cantidades en tu lista.</p>
+            <p class="seg__note">Ejemplo de surtido armado con productos del catálogo 2026. Ajusta referencias, variantes y cantidades en tu carrito.</p>
             <div class="seg__actions">
-              <button class="btn btn--dark" type="button" data-kit={s.kit.join(',')}>Agregar este surtido a mi lista</button>
+              <button class="btn btn--dark" type="button" data-kit={s.kit.join(',')}>Agregar este surtido al carrito</button>
               <a class="btn btn--wa" href={waUrl('Hola UBU Latinoamérica, tengo ' + s.name.toLowerCase() + ' y quiero cotizar este surtido:\n' + s.kit.map((k) => '• ' + P(k).name).join('\n'))} target="_blank" rel="noopener">Cotizar por WhatsApp</a>
             </div>
-            <p class="seg__done" role="status" aria-live="polite" hidden>Agregado a tu lista. <a href="/cotizacion">Ver lista de cotización →</a></p>
+            <p class="seg__done" role="status" aria-live="polite" hidden>Agregado al carrito. <a href="/carrito">Abrir mi carrito →</a></p>
           </div>
           <ul class="kit">
             {s.kit.map((k, j) => {
@@ -86,7 +86,7 @@ const slim = Object.fromEntries(segments.flatMap((s) => s.kit).map((s) => [s, { 
         <li data-reveal style="--i:1"><b>2</b><h3>Envíala por WhatsApp</h3><p>Tu lista llega con cantidades y referencias en un solo mensaje.</p></li>
         <li data-reveal style="--i:2"><b>3</b><h3>Recibe la confirmación</h3><p>Un asesor te confirma precio final, disponibilidad y entrega.</p></li>
       </ol>
-      <div class="how__go"><a class="btn" href="/cotizacion">Ver mi lista de cotización</a><a class="btn btn--wa" href={waAdvice} target="_blank" rel="noopener">Recibir asesoría</a></div>
+      <div class="how__go"><a class="btn" href="/carrito">Abrir mi carrito</a><a class="btn btn--wa" href={waAdvice} target="_blank" rel="noopener">Recibir asesoría</a></div>
     </div>
   </section>
 

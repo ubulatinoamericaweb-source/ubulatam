@@ -37,7 +37,7 @@ import { waGeneric } from '../data/catalog';
   <section class="rt-hands on-dark" aria-labelledby="rh-t">
     <div class="rt-hands__bg" aria-hidden="true"></div>
     <div class="wrap" style="position:relative;z-index:2;text-align:center">
-      <p class="kicker" style="justify-content:center;display:flex">Tecnología · reparación · negocio</p>
+      <p class="kicker kicker--c">Tecnología · reparación · negocio</p>
       <h2 id="rh-t" class="rt-h">Tecnología para quienes conectan y hacen crecer sus negocios</h2>
     </div>
     <div class="rt-hands__stage" aria-hidden="true"><canvas id="rt-hands"></canvas></div>
@@ -62,7 +62,7 @@ import { waGeneric } from '../data/catalog';
         <p class="kicker">Cotiza hoy</p>
         <h2 class="rt-h2">Arma tu lista y envíala en un solo mensaje.</h2>
         <p class="lede">El precio final y la disponibilidad se confirman al cotizar.</p>
-        <p style="display:flex;gap:12px;flex-wrap:wrap;margin-top:22px"><a class="btn btn--wa" href={waGeneric} target="_blank" rel="noopener">Cotizar por WhatsApp</a><a class="btn btn--ghost" href="/cotizacion">Ver mi lista</a></p>
+        <p style="display:flex;gap:12px;flex-wrap:wrap;margin-top:22px"><a class="btn btn--wa" href={waGeneric} target="_blank" rel="noopener">Cotizar por WhatsApp</a><a class="btn btn--ghost" href="/carrito">Ver mi carrito</a></p>
       </div>
       <div class="rt-char__fig rt-char__fig--b" aria-hidden="true"><canvas id="rt-char-b"></canvas></div>
     </div>
@@ -75,7 +75,7 @@ import { waGeneric } from '../data/catalog';
   :global(html.rt-nogl) .rt-nogl-note { display: block; } :global(html.rt-nogl) canvas { display: none; }
   .cmpbar { position: fixed; right: 88px; bottom: 16px; z-index: 96; display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; justify-content: center; max-width: min(92vw, 420px); padding: 10px 14px; border-radius: 22px; background: rgba(5,16,27,.9); color: #fff; border: 1px solid rgba(255,255,255,.22); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); font-size: .9rem; }
   .cmpbar strong { font-family: var(--font-display); color: var(--cian-realidad-virtual); } .cmpbar span { opacity: .8; }
-  @media (max-width: 640px) { .cmpbar { right: 12px; left: 12px; bottom: 82px; font-size: .82rem; max-width: none; } .cmpbar span { display: none; } }
+  @media (max-width: 760px) { .cmpbar { position: relative; right: auto; bottom: auto; margin: 86px 12px 0; max-width: none; font-size: .82rem; justify-content: flex-start; } .cmpbar span { display: none; } }
 
   .rt-hero { position: relative; background: var(--tinta-0); }
   .rt-pin { position: relative; height: 100svh; min-height: 620px; overflow: hidden; isolation: isolate; }

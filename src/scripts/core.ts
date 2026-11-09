@@ -24,13 +24,16 @@ panel?.addEventListener('click', (e) => { if ((e.target as HTMLElement).closest(
 addEventListener('keydown', (e) => { if (e.key === 'Escape' && panel && !panel.hidden) { setMenu(false); menuBtn?.focus(); } });
 matchMedia('(min-width:1061px)').addEventListener('change', (m) => m.matches && setMenu(false));
 
-/* ---------- Lista de cotización (localStorage) ---------- */
+/* ---------- Carrito de pedido (localStorage; sin pagos y sin datos personales) ---------- */
 const QKEY = 'ubu_quote';
-export interface QItem { id: string; qty: number }
+export interface QItem { id: string; qty: number; v?: string }
 export function qGet(): QItem[] {
   try {
     const v = JSON.parse(localStorage.getItem(QKEY) || '[]');
-    return Array.isArray(v) ? v.filter((i) => i && typeof i.id === 'string' && Number.isFinite(i.qty) && i.qty > 0).map((i) => ({ id: i.id, qty: Math.min(999, Math.floor(i.qty)) })) : [];
+    if (!Array.isArray(v)) return [];
+    return v
+      .filter((i) => i && typeof i.id === 'string' && Number.isFinite(i.qty) && i.qty > 0)
+      .map((i) => ({ id: i.id, qty: Math.min(999, Math.floor(i.qty)), ...(typeof i.v === 'string' && i.v ? { v: i.v.slice(0, 120) } : {}) }));
   } catch { return []; }
 }
 export function qSet(list: QItem[]) {
@@ -38,25 +41,45 @@ export function qSet(list: QItem[]) {
   qSync();
   document.dispatchEvent(new CustomEvent('ubu:quote'));
 }
+/** Agrega una unidad (o la suma si ya existe la misma combinación producto + variante). */
+export function qAdd(id: string, v?: string) {
+  const list = qGet();
+  const hit = list.find((x) => x.id === id && (x.v || '') === (v || ''));
+  if (hit) hit.qty = Math.min(999, hit.qty + 1); else list.push({ id, qty: 1, ...(v ? { v } : {}) });
+  qSet(list);
+}
 function qSync() {
   const list = qGet();
   const n = list.reduce((a, i) => a + i.qty, 0);
   $$('[data-quote-count]').forEach((e) => { e.textContent = String(n); e.dataset.n = String(n); });
+  $$<HTMLElement>('[data-cart-link]').forEach((a) => a.setAttribute('aria-label', n ? `Carrito, ${n} ${n === 1 ? 'producto' : 'productos'}` : 'Carrito, vacío'));
   $$<HTMLButtonElement>('[data-add]').forEach((b) => {
     const on = list.some((i) => i.id === b.dataset.add);
     b.setAttribute('aria-pressed', String(on));
     const t = $('.t', b);
-    if (t) t.textContent = on ? 'En tu lista' : (b.dataset.label || 'Agregar a cotización');
+    if (t) t.textContent = on ? 'En el carrito' : (b.dataset.label || 'Agregar al carrito');
   });
 }
+const flash = (b: HTMLElement) => { const t = $('.t', b) || b; const old = t.textContent; t.textContent = '¡Agregado!'; b.classList.add('is-added'); setTimeout(() => { t.textContent = old; b.classList.remove('is-added'); }, 1300); };
 document.addEventListener('click', (e) => {
-  const b = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-add]');
-  if (!b) return;
-  const id = b.dataset.add!;
-  const list = qGet();
-  const i = list.findIndex((x) => x.id === id);
-  if (i >= 0) list.splice(i, 1); else list.push({ id, qty: 1 });
-  qSet(list);
+  const el = e.target as HTMLElement;
+  const b = el.closest<HTMLButtonElement>('[data-add]');
+  if (b) {
+    const id = b.dataset.add!;
+    const list = qGet();
+    const i = list.findIndex((x) => x.id === id);
+    if (i >= 0) list.splice(i, 1); else list.push({ id, qty: 1 });
+    qSet(list);
+    return;
+  }
+  const row = el.closest<HTMLButtonElement>('[data-add-var]');
+  if (row) { qAdd(row.dataset.addVar!, row.dataset.v); flash(row); return; }
+  const pick = el.closest<HTMLButtonElement>('[data-add-pick]');
+  if (pick) {
+    const sel = pick.parentElement?.querySelector<HTMLSelectElement>('select');
+    if (!sel || !sel.value) { sel?.focus(); return; }
+    qAdd(pick.dataset.addPick!, sel.value); flash(pick);
+  }
 });
 qSync();
 

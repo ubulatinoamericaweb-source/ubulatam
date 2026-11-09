@@ -4,6 +4,8 @@ import '@fontsource/questrial';
 import '../styles/global.css';
 import Logo from '../components/Logo.astro';
 import UbuFace from '../components/UbuFace.astro';
+import Channels from '../components/Channels.astro';
+import { WA_PATH, CART_PATH } from '../data/icons';
 import { WA_DISPLAY, waGeneric } from '../data/catalog';
 
 interface Props {
@@ -77,10 +79,7 @@ const ld = [org, ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [])]
           {nav.map((n) => <a href={n.href} aria-current={isCur(n.href) ? 'page' : undefined}>{n.label}</a>)}
         </nav>
         <div class="header-actions">
-          <a class="quote-pill" href="/cotizacion" aria-label="Lista de cotización">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
-            <span class="t">Cotización</span><span class="quote-pill__n" data-quote-count data-n="0" aria-live="polite">0</span>
-          </a>
+          <a class="quote-pill" href="/carrito" data-cart-link aria-label="Carrito, vacío"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d={CART_PATH} /></svg><span class="t">Carrito</span><span class="quote-pill__n" data-quote-count data-n="0">0</span></a>
           <a class="btn btn--wa btn--sm" href={waGeneric} target="_blank" rel="noopener">WhatsApp</a>
           <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu-panel" aria-label="Abrir menú" data-menu-btn>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
@@ -90,6 +89,7 @@ const ld = [org, ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [])]
       <nav class="menu-panel" id="menu-panel" aria-label="Menú móvil" hidden data-menu-panel>
         {nav.map((n) => <a href={n.href} aria-current={isCur(n.href) ? 'page' : undefined}>{n.label}</a>)}
         <a href="/catalogo">Catálogo completo</a>
+        {(path === '/' || path === '/realista') && <a href={path === '/' ? '/realista' : '/'}>{path === '/' ? 'Comparar: versión realista (prueba)' : 'Ver la versión animada actual'}</a>}
         <a class="btn btn--wa" href={waGeneric} target="_blank" rel="noopener">Cotizar por WhatsApp</a>
       </nav>
     </header>
@@ -102,6 +102,7 @@ const ld = [org, ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [])]
           <div class="footer-brand">
             <Logo variant="blanco" />
             <p>Tecnología e insumos para tiendas y técnicos de celulares. Catálogo 2026 con precios de referencia en COP.</p>
+            <Channels />
           </div>
           <div>
             <h3>Catálogo</h3>
@@ -109,7 +110,7 @@ const ld = [org, ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [])]
               <li><a href="/conectividad">Conectividad</a></li>
               <li><a href="/hidrogel">Hidrogel</a></li>
               <li><a href="/catalogo">Catálogo completo</a></li>
-              <li><a href="/cotizacion">Lista de cotización</a></li>
+              <li><a href="/carrito">Carrito de pedido</a></li>
               <li><a href="/descargas/catalogo-ubu-2026.pdf" download>Catálogo en PDF</a></li>
             </ul>
           </div>
@@ -144,7 +145,7 @@ const ld = [org, ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [])]
 
     {path === '/' && <a class="cmp-toggle" href="/realista">Comparar: versión realista (prueba) →</a>}
     <a class="wa-float" href={waGeneric} target="_blank" rel="noopener" aria-label="Cotizar por WhatsApp">
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.5 3.5A11 11 0 0 0 3.2 17.3L2 22l4.8-1.2A11 11 0 1 0 20.5 3.5Zm-8.5 17a9 9 0 0 1-4.6-1.3l-.3-.2-2.8.7.8-2.7-.2-.3A9 9 0 1 1 12 20.5Zm5-6.7c-.3-.1-1.6-.8-1.9-.9s-.5-.1-.7.1-.8.9-1 1.1-.4.2-.6.1a7.4 7.4 0 0 1-3.7-3.2c-.3-.5.3-.5.8-1.5.1-.2 0-.4 0-.5l-.9-2.1c-.2-.5-.5-.5-.7-.5h-.6a1.2 1.2 0 0 0-.9.4 3.6 3.6 0 0 0-1.1 2.7 6.3 6.3 0 0 0 1.3 3.3 14.4 14.4 0 0 0 5.5 4.9c2 .8 2.8.9 3.8.7a3.2 3.2 0 0 0 2.1-1.5 2.6 2.6 0 0 0 .2-1.5c-.1-.1-.3-.2-.6-.3Z"/></svg>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d={WA_PATH} fill="currentColor" /></svg>
     </a>
     <script>import '../scripts/core';</script>
   </body>

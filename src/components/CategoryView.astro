@@ -67,17 +67,18 @@ const moreMachines = category === 'hidrogel';
                 {p.table && (
                   <div class="tbl" tabindex="0" role="region" aria-label={`Precios: ${p.name}`}>
                     <table>
-                      <thead><tr>{p.table.head.map((h) => <th scope="col">{h}</th>)}</tr></thead>
-                      <tbody>{p.table.rows.map((r) => <tr><th scope="row">{r.model}</th><td>{r.capacity}</td><td class="num">{cop(r.price)} <small>COP</small></td></tr>)}</tbody>
+                      <thead><tr>{p.table.head.map((h) => <th scope="col">{h}</th>)}<th scope="col"><span class="sr-only">Carrito</span></th></tr></thead>
+                      <tbody>{p.table.rows.map((r) => <tr><th scope="row">{r.model}</th><td>{r.capacity}</td><td class="num">{cop(r.price)} <small>COP</small></td><td class="act"><button class="btn btn--sm btn--line" type="button" data-add-var={p.slug} data-v={`${r.model} · ${r.capacity}`} aria-label={`Agregar ${p.name}, ${r.model}, al carrito`}><span class="t">Agregar</span></button></td></tr>)}</tbody>
                     </table>
                   </div>
                 )}
                 {p.references && (
                   <div class="refs"><p class="price"><span>{cop(p.price!)}</span><span class="unit">{p.unit}</span><small>COP</small></p>
-                    <ul>{p.references.map((r) => <li>{r}</li>)}</ul></div>
+                    <ul>{p.references.map((r) => <li>{r}</li>)}</ul>
+                    <div class="pick"><label>Elige la referencia<select><option value="">Selecciona</option>{p.references.map((r) => <option>{r}</option>)}</select></label><button class="btn btn--sm btn--dark" type="button" data-add-pick={p.slug}><span class="t">Agregar al carrito</span></button></div></div>
                 )}
                 <div class="wide__actions">
-                  <button class="btn btn--sm btn--line" type="button" data-add={p.slug} data-label="Agregar a cotización" aria-pressed="false"><span class="t">Agregar a cotización</span></button>
+                  
                   <a class="btn btn--sm btn--wa" href={waProduct(p)} target="_blank" rel="noopener">Cotizar por WhatsApp</a>
                   <a class="btn btn--sm btn--dark" href={`/${p.slug}`}>Ver ficha</a>
                 </div>
@@ -163,6 +164,7 @@ const moreMachines = category === 'hidrogel';
   tbody th { font-weight: 700; font-family: var(--font-display); }
   td.num { text-align: right; font-family: var(--font-display); font-weight: 700; white-space: nowrap; } td.num small { opacity: .55; font-weight: 600; }
   tbody tr:hover { background: var(--bruma); }
+  td.act { text-align: right; } .pick { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; margin-top: 14px; } .pick label { display: grid; gap: 4px; font-family: var(--font-display); font-weight: 600; font-size: .9rem; flex: 1 1 240px; } .pick select { min-height: 44px; border-radius: 12px; border: 1.5px solid #B8C9D1; padding: 0 .8em; font: inherit; background: #fff; color: var(--texto); }
   .refs .price { font-size: 1.8rem; color: var(--tinta-1); margin-bottom: 12px; }
   .refs ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0 20px; max-height: 340px; overflow: auto; border: 1px solid var(--linea); border-radius: var(--r-md); }
   .refs li { padding: .55em 1em; border-bottom: 1px solid var(--linea); font-size: .92rem; font-family: var(--font-display); font-weight: 500; }

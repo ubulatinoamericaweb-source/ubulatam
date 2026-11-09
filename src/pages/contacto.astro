@@ -3,6 +3,8 @@ import Base from '../layouts/Base.astro';
 import PcHead from '../components/PcHead.astro';
 import UbuFace from '../components/UbuFace.astro';
 import { products, WA_DISPLAY, waGeneric, WA_NUMBER } from '../data/catalog';
+import { WA_PATH } from '../data/icons';
+import Channels from '../components/Channels.astro';
 const options = products.filter((p) => !p.info).map((p) => p.name);
 const saves = !!(import.meta.env.PUBLIC_SUPABASE_URL && import.meta.env.PUBLIC_SUPABASE_ANON_KEY);
 ---
@@ -22,7 +24,7 @@ const saves = !!(import.meta.env.PUBLIC_SUPABASE_URL && import.meta.env.PUBLIC_S
 
       <div class="ct__channels">
         <a class="chan chan--wa" href={waGeneric} target="_blank" rel="noopener">
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.5 3.5A11 11 0 0 0 3.2 17.3L2 22l4.8-1.2A11 11 0 1 0 20.5 3.5Zm-8.5 17a9 9 0 0 1-4.6-1.3l-.3-.2-2.8.7.8-2.7-.2-.3A9 9 0 1 1 12 20.5Zm5-6.7c-.3-.1-1.6-.8-1.9-.9s-.5-.1-.7.1-.8.9-1 1.1-.4.2-.6.1a7.4 7.4 0 0 1-3.7-3.2c-.3-.5.3-.5.8-1.5.1-.2 0-.4 0-.5l-.9-2.1c-.2-.5-.5-.5-.7-.5h-.6a1.2 1.2 0 0 0-.9.4 3.6 3.6 0 0 0-1.1 2.7 6.3 6.3 0 0 0 1.3 3.3 14.4 14.4 0 0 0 5.5 4.9c2 .8 2.8.9 3.8.7a3.2 3.2 0 0 0 2.1-1.5 2.6 2.6 0 0 0 .2-1.5c-.1-.1-.3-.2-.6-.3Z"/></svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d={WA_PATH} fill="currentColor" /></svg>
           <span><small>WhatsApp de ventas</small><b>{WA_DISPLAY}</b></span><i aria-hidden="true">Abrir →</i>
         </a>
         <a class="chan chan--loc" href="/ubicacion">
@@ -44,7 +46,7 @@ const saves = !!(import.meta.env.PUBLIC_SUPABASE_URL && import.meta.env.PUBLIC_S
           <div class="field"><label for="f-prod">Producto de interés (opcional)</label>
             <select id="f-prod" name="producto"><option value="">Selecciona</option>{options.map((o) => <option>{o}</option>)}<option>Otro producto del catálogo</option></select></div>
           <div class="field"><label for="f-msg">Mensaje (opcional)</label><textarea id="f-msg" name="mensaje" maxlength="600"></textarea></div>
-          <label class="check"><input type="checkbox" id="f-list" /> <span>Incluir mi lista de cotización, si tengo productos agregados.</span></label>
+          <label class="check"><input type="checkbox" id="f-list" /> <span>Incluir los productos de mi carrito, si tengo alguno.</span></label>
           <label class="check"><input type="checkbox" id="f-consent" required /> <span>Autorizo a UBU Latinoamérica a tratar mis datos para responder esta solicitud, según la <a href="/privacidad">Política de tratamiento de datos</a>.</span></label>
           <span class="err" id="e-consent" aria-live="polite"></span>
           <label class="check"><input type="checkbox" id="f-mkt" /> <span>Quiero recibir información comercial y novedades de UBU por WhatsApp (opcional).</span></label>
@@ -83,8 +85,8 @@ const saves = !!(import.meta.env.PUBLIC_SUPABASE_URL && import.meta.env.PUBLIC_S
         if ($('f-msg').value.trim()) lines.push(`Mensaje: ${$('f-msg').value.trim()}`);
         let listTxt = '';
         if ($('f-list').checked) {
-          const items = qGet().map((i) => ({ p: byname.get(i.id), qty: i.qty })).filter((x) => x.p);
-          if (items.length) { listTxt = items.map((x) => `• ${x.qty} x ${x.p!.name}`).join('\n'); lines.push('Mi lista:\n' + listTxt); }
+          const items = qGet().map((i) => ({ p: byname.get(i.id), qty: i.qty, v: i.v })).filter((x) => x.p);
+          if (items.length) { listTxt = items.map((x) => `• ${x.qty} x ${x.p!.name}${x.v ? ' (' + x.v + ')' : ''}`).join('\n'); lines.push('Mi carrito:\n' + listTxt); }
         }
         if ($('f-mkt').checked) lines.push('Acepto recibir información comercial por WhatsApp.');
         return { text: lines.join('\n'), name, listTxt };

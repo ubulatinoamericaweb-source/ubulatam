@@ -16,6 +16,7 @@ const siblings = byCategory(p.category).filter((x) => !x.info);
 const idx = siblings.findIndex((x) => x.slug === p.slug);
 const prev = siblings[idx - 1], next = siblings[idx + 1];
 const hasPrice = p.price != null;
+const hasVariants = !!(p.table || p.references);
 const isBattery = p.type === 'Batería';
 const desc = `${p.name}${hasPrice ? ` · ${priceLabel(p)} COP` : ''}. Catálogo UBU Latinoamérica 2026, página ${p.page}. Cotiza por WhatsApp.`;
 const prices = p.table ? p.table.rows.map((r) => r.price) : null;
@@ -59,28 +60,29 @@ const ld = {
           <p class="pdp__note">Precio de referencia del catálogo 2026, en pesos colombianos. El precio final y la disponibilidad se confirman al cotizar.</p>
           <div class="pdp__actions">
             <a class="btn btn--wa" href={waProduct(p)} target="_blank" rel="noopener">Cotizar por WhatsApp</a>
-            <button class="btn btn--line" type="button" data-add={p.slug} data-label="Agregar a cotización" aria-pressed="false"><span class="t">Agregar a cotización</span></button>
+            {hasVariants ? <a class="btn btn--line" href="#variantes">Elegir modelo o referencia</a> : <button class="btn btn--line" type="button" data-add={p.slug} data-label="Agregar al carrito" aria-pressed="false"><span class="t">Agregar al carrito</span></button>}
           </div>
           <div class="stat"><Image src={seal} alt="" width={76} height={69} /><div><strong>365 días de garantía</strong><p>Según el catálogo 2026 para cada referencia.{p.features.some((f) => f.includes('Garantía de 1 año')) ? ' Esta máquina indica garantía de 1 año.' : ''}</p></div></div>
         </div>
       </div>
 
       {p.table && (
-        <div class="pdp__block">
+        <div class="pdp__block" id="variantes">
           <h2 class="h2">Modelos y precios</h2>
           <div class="tbl" tabindex="0" role="region" aria-label={`Tabla de precios: ${p.name}`}>
             <table>
-              <thead><tr>{p.table.head.map((h) => <th scope="col">{h}</th>)}</tr></thead>
-              <tbody>{p.table.rows.map((r) => <tr><th scope="row">{r.model}</th><td>{r.capacity}</td><td class="num">{cop(r.price)} <small>COP</small></td></tr>)}</tbody>
+              <thead><tr>{p.table.head.map((h) => <th scope="col">{h}</th>)}<th scope="col"><span class="sr-only">Carrito</span></th></tr></thead>
+              <tbody>{p.table.rows.map((r) => <tr><th scope="row">{r.model}</th><td>{r.capacity}</td><td class="num">{cop(r.price)} <small>COP</small></td><td class="act"><button class="btn btn--sm btn--line" type="button" data-add-var={p.slug} data-v={`${r.model} · ${r.capacity}`} aria-label={`Agregar ${r.model} al carrito`}><span class="t">Agregar</span></button></td></tr>)}</tbody>
             </table>
           </div>
           <p class="pdp__note">Los datos de la tabla se muestran tal como aparecen en el catálogo (p. {p.page}).</p>
         </div>
       )}
       {p.references && (
-        <div class="pdp__block">
+        <div class="pdp__block" id="variantes">
           <h2 class="h2">Referencias disponibles · {cop(p.price!)} {p.unit} <small style="font-size:.5em;opacity:.6">COP</small></h2>
           <ul class="refs-list">{p.references.map((r) => <li>{r}</li>)}</ul>
+          <div class="pick"><label>Elige la referencia<select><option value="">Selecciona</option>{p.references.map((r) => <option>{r}</option>)}</select></label><button class="btn btn--dark" type="button" data-add-pick={p.slug}><span class="t">Agregar al carrito</span></button></div>
         </div>
       )}
 
@@ -114,7 +116,7 @@ const ld = {
   .pdp__note { color: var(--texto-suave); font-size: .92rem; }
   .pdp__actions { display: flex; flex-wrap: wrap; gap: 12px; }
   .swatches span { font-size: .88rem; color: var(--texto-suave); margin-left: 6px; }
-  .pdp__block { margin-top: clamp(40px, 6vw, 80px); }
+  .pdp__block { margin-top: clamp(40px, 6vw, 80px); scroll-margin-top: 90px; } td.act { text-align: right; } .pick { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; margin-top: 14px; } .pick label { display: grid; gap: 4px; font-family: var(--font-display); font-weight: 600; font-size: .9rem; flex: 1 1 260px; } .pick select { min-height: 48px; border-radius: 12px; border: 1.5px solid #B8C9D1; padding: 0 .8em; font: inherit; background: #fff; }
   .refs-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); border: 1px solid var(--linea); border-radius: var(--r-md); background: #fff; overflow: hidden; }
   .refs-list li { padding: .7em 1em; border-bottom: 1px solid var(--linea); font-family: var(--font-display); font-weight: 500; font-size: .94rem; }
   .tbl { overflow: auto; border-radius: var(--r-md); border: 1px solid var(--linea); background: #fff; max-height: 560px; }

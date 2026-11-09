@@ -2,6 +2,7 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "redirects": [
+    { "source": "/cotizacion", "destination": "/carrito", "permanent": true },
     { "source": "/paginas/:page", "destination": "/:page", "permanent": true },
     { "source": "/productos/:page", "destination": "/:page", "permanent": true },
     { "source": "/legal/:page", "destination": "/:page", "permanent": true },

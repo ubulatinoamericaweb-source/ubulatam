@@ -3,6 +3,7 @@ import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import UbuFace from '../components/UbuFace.astro';
 import { waUrl, waGeneric, WA_DISPLAY } from '../data/catalog';
+import { WA_PATH, PIN_PATH, DL_PATH, CART_PATH } from '../data/icons';
 import seal from '../assets/sello-365.webp';
 
 const groups = [
@@ -15,7 +16,7 @@ const groups = [
     ['¿Qué necesito para el hidrogel UV?', 'El empaque del hidrogel UV indica curado UV (UV Curing). En el catálogo están la máquina de 11,9" que incluye UV y la máquina de secado inteligente UV G10U. Confirma con un asesor la combinación adecuada para tu trabajo.'],
   ] },
   { id: 'cotizar', t: 'Cotizaciones y precios', q: [
-    ['¿Cómo solicito una cotización?', 'Pulsa «Cotizar por WhatsApp» en cualquier ficha, o agrega varios productos a tu lista de cotización y envíala en un solo mensaje.'],
+    ['¿Cómo solicito una cotización?', 'Pulsa «Cotizar por WhatsApp» en cualquier ficha, o agrega productos al carrito y envía tu pedido por WhatsApp en un solo mensaje.'],
     ['¿Los precios publicados están vigentes?', 'Son precios de referencia del catálogo de septiembre de 2026, en pesos colombianos (COP). El precio final y la disponibilidad se confirman al cotizar.'],
   ] },
   { id: 'garantia', t: 'Garantía y entregas', q: [
@@ -39,13 +40,14 @@ const maps = 'https://www.google.com/maps/search/?api=1&query=Centro%20Empresari
         <p class="lede">Garantía, compatibilidad, cotizaciones y recursos del catálogo, en un solo lugar.</p>
         <p class="sh__cta"><a class="btn btn--wa" href={waGeneric} target="_blank" rel="noopener">Escribir por WhatsApp</a><a class="btn btn--ghost" href="#preguntas">Ver preguntas frecuentes</a></p>
       </div>
-      <div class="net">
-        <svg class="net__lines" viewBox="0 0 520 520" aria-hidden="true"><path d="M260 260 L100 110" /><path d="M260 260 L420 110" /><path d="M260 260 L100 410" /><path d="M260 260 L420 410" /></svg>
-        <div class="net__core" aria-hidden="true"><UbuFace tone="cian" /></div>
-        <a class="node node--wa" href={waGeneric} target="_blank" rel="noopener"><b>WhatsApp</b><span>{WA_DISPLAY}</span></a>
-        <a class="node node--loc" href="/ubicacion"><b>Punto de atención</b><span>Centro Empresarial Hayuelos</span></a>
-        <a class="node node--pdf" href="/descargas/catalogo-ubu-2026.pdf" download><b>Catálogo en PDF</b><span>Referencias y precios</span></a>
-        <a class="node node--list" href="/cotizacion"><b>Lista de cotización</b><span>Envíala en un solo mensaje</span></a>
+      <div class="sh__panel">
+        <div class="sh__face" aria-hidden="true"><UbuFace tone="cian" /></div>
+        <ul class="sh__cards">
+          <li><a class="sc sc--wa" href={waGeneric} target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d={WA_PATH} fill="currentColor" /></svg><span><b>WhatsApp</b><small>{WA_DISPLAY}</small></span></a></li>
+          <li><a class="sc" href="/ubicacion"><svg viewBox="0 0 24 24" aria-hidden="true"><path d={PIN_PATH} fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg><span><b>Punto de atención</b><small>Centro Empresarial Hayuelos</small></span></a></li>
+          <li><a class="sc" href="/descargas/catalogo-ubu-2026.pdf" download><svg viewBox="0 0 24 24" aria-hidden="true"><path d={DL_PATH} fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg><span><b>Catálogo en PDF</b><small>Referencias y precios</small></span></a></li>
+          <li><a class="sc" href="/carrito"><svg viewBox="0 0 24 24" aria-hidden="true"><path d={CART_PATH} fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg><span><b>Carrito de pedido</b><small>Se envía por WhatsApp</small></span></a></li>
+        </ul>
       </div>
     </div>
   </section>
@@ -58,9 +60,9 @@ const maps = 'https://www.google.com/maps/search/?api=1&query=Centro%20Empresari
         <p class="kicker">Garantía</p>
         <h2 id="wr-t" class="h2">Cómo usar tu garantía.</h2>
         <ol class="steps">
-          <li data-reveal><b>1</b><div><h3>Ten a la mano la referencia</h3><p>Identifica el producto por su nombre o referencia del catálogo.</p></div></li>
-          <li data-reveal style="--i:1"><b>2</b><div><h3>Escríbenos por WhatsApp</h3><p>Envíanos la referencia del producto.</p></div></li>
-          <li data-reveal style="--i:2"><b>3</b><div><h3>Te indicamos el proceso</h3><p>Te explicamos el proceso y las condiciones de cobertura.</p></div></li>
+          <li data-reveal><b>1</b><h3>Ten a la mano la referencia</h3><p>Identifica el producto por su nombre o referencia del catálogo.</p></li>
+          <li data-reveal style="--i:1"><b>2</b><h3>Escríbenos por WhatsApp</h3><p>Envíanos la referencia del producto.</p></li>
+          <li data-reveal style="--i:2"><b>3</b><h3>Te indicamos el proceso</h3><p>Te explicamos el proceso y las condiciones de cobertura.</p></li>
         </ol>
         <p style="margin-top:22px"><a class="btn btn--wa" href={waUrl('Hola UBU Latinoamérica, quiero consultar la garantía de un producto. Referencia: ')} target="_blank" rel="noopener">Consultar garantía</a></p>
       </div>
@@ -100,26 +102,25 @@ const maps = 'https://www.google.com/maps/search/?api=1&query=Centro%20Empresari
   .sh__bg { position: absolute; inset: 0; z-index: -1; background: radial-gradient(55% 70% at 78% 50%, rgba(65,185,193,.35), transparent 70%), radial-gradient(40% 55% at 0% 100%, rgba(64,91,165,.6), transparent 70%), linear-gradient(165deg, #0B2236, #05101B); }
   .sh__grid { display: grid; grid-template-columns: .95fr 1.05fr; gap: clamp(20px, 4vw, 60px); align-items: center; }
   .sh h1 { font-size: clamp(2.2rem, 5vw, 4.2rem); margin: 14px 0 18px; } .sh__cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
-  .net { position: relative; width: min(100%, 560px); aspect-ratio: 1; margin-inline: auto; }
-  .net__lines { position: absolute; inset: 0; width: 100%; height: 100%; } .net__lines path { fill: none; stroke: var(--cian-realidad-virtual); stroke-width: 2; stroke-dasharray: 8 12; opacity: .7; animation: flow 3s linear infinite; }
-  @keyframes flow { to { stroke-dashoffset: -40; } }
-  .net__core { position: absolute; left: 50%; top: 50%; width: 30%; transform: translate(-50%, -50%); filter: drop-shadow(0 0 30px rgba(1,220,239,.6)); }
-  .node { position: absolute; width: 42%; min-height: 84px; padding: 14px 16px; display: grid; gap: 2px; align-content: center; border-radius: var(--r-md); text-decoration: none; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.28); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); transition: transform .4s var(--ease), background-color .3s, border-color .3s; box-shadow: inset 0 1px 0 rgba(255,255,255,.35); }
-  .node:hover, .node:focus-visible { transform: translateY(-5px); background: rgba(1,220,239,.16); border-color: var(--cian-realidad-virtual); }
-  .node b { font-family: var(--font-display); font-size: 1.02rem; } .node span { font-size: .84rem; opacity: .8; }
-  .node--wa { left: 0; top: 4%; border-color: #25D366; } .node--loc { right: 0; top: 4%; } .node--pdf { left: 0; bottom: 4%; } .node--list { right: 0; bottom: 4%; }
-  @media (max-width: 860px) { .sh__grid { grid-template-columns: 1fr; } }
-  @media (max-width: 480px) { .net { aspect-ratio: auto; display: grid; gap: 10px; } .net__lines, .net__core { display: none; } .node { position: static; width: auto; min-height: 64px; } }
-  @media (prefers-reduced-motion: reduce) { .net__lines path { animation: none; } }
+  .sh__panel { display: grid; gap: 22px; justify-items: center; }
+  .sh__face { position: relative; width: min(78%, 400px); aspect-ratio: 1; display: grid; place-items: center; filter: drop-shadow(0 0 44px rgba(1,220,239,.5)); }
+  .sh__face::before { content: ''; position: absolute; inset: -8%; border-radius: 50%; background: radial-gradient(closest-side, rgba(1,220,239,.22), transparent 72%); z-index: -1; }
+  .sh__cards { list-style: none; margin: 0; padding: 0; width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .sc { display: flex; align-items: center; gap: 14px; min-height: 84px; height: 100%; padding: 16px 18px; border-radius: var(--r-md); text-decoration: none; color: #fff; background: linear-gradient(160deg, rgba(255,255,255,.12), rgba(255,255,255,.05)); border: 1px solid rgba(255,255,255,.2); box-shadow: 0 18px 36px -22px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.22); transition: transform .35s var(--ease), border-color .25s, background-color .25s; }
+  .sc svg { width: 28px; height: 28px; flex: none; color: var(--cian-realidad-virtual); } .sc span { display: grid; gap: 2px; min-width: 0; } .sc b { font-family: var(--font-display); font-size: 1rem; line-height: 1.2; } .sc small { font-size: .84rem; opacity: .8; }
+  .sc:hover, .sc:focus-visible { transform: translateY(-4px); border-color: var(--cian-realidad-virtual); }
+  .sc--wa { border-color: rgba(37,211,102,.7); } .sc--wa svg { color: #25D366; }
+  @media (max-width: 860px) { .sh__grid { grid-template-columns: 1fr; } .sh__face { width: min(62%, 300px); } }
+  @media (max-width: 480px) { .sh__cards { grid-template-columns: 1fr; } }
 
   .wr { padding: clamp(70px, 9vw, 120px) 0; background: linear-gradient(180deg, #F7FBFC, #EAF6F7); }
   .wr__grid { display: grid; grid-template-columns: .8fr 1.2fr; gap: clamp(24px, 5vw, 80px); align-items: center; }
   .wr__seal { display: grid; gap: 18px; justify-items: center; text-align: center; padding: 30px; border-radius: var(--r-lg); background: linear-gradient(160deg, #fff, #D9EEF1); border: 1px solid var(--linea); } .wr__seal img { width: 130px; height: auto; filter: drop-shadow(0 12px 16px rgba(80,60,0,.3)); } .wr__seal p { color: var(--texto-suave); }
-  .steps { list-style: none; margin: 24px 0 0; padding: 0; display: grid; gap: 0; position: relative; }
-  .steps::before { content: ''; position: absolute; left: 27px; top: 20px; bottom: 20px; width: 2px; background: repeating-linear-gradient(180deg, var(--asombro-turmalina) 0 8px, transparent 8px 16px); }
-  .steps li { position: relative; display: grid; grid-template-columns: 56px 1fr; gap: 18px; align-items: center; padding: 14px 0; }
-  .steps b { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; background: linear-gradient(135deg, var(--asombro-turmalina), var(--azul-silicon-valley)); color: #fff; font-family: var(--font-display); font-size: 1.4rem; box-shadow: 0 0 0 7px rgba(65,185,193,.18); z-index: 1; }
-  .steps h3 { font-size: 1.2rem; } .steps p { color: var(--texto-suave); }
+  .steps { list-style: none; margin: 24px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .steps li { display: grid; gap: 10px; align-content: start; padding: 20px; border-radius: var(--r-md); background: #fff; border: 1px solid var(--linea); box-shadow: 0 18px 36px -26px rgba(5,16,27,.5); }
+  .steps b { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: linear-gradient(135deg, var(--asombro-turmalina), var(--azul-silicon-valley)); color: #fff; font-family: var(--font-display); font-size: 1.2rem; }
+  .steps h3 { font-size: 1.1rem; } .steps p { color: var(--texto-suave); font-size: .95rem; }
+  @media (max-width: 960px) { .steps { grid-template-columns: 1fr; } }
   @media (max-width: 760px) { .wr__grid { grid-template-columns: 1fr; } }
 
   .fq { padding: clamp(70px, 9vw, 120px) 0; background: #fff; }

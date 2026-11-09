@@ -1,0 +1,22 @@
+---
+// Grupo ordenado de canales REALES de UBU (no hay perfiles de redes sociales publicados en el proyecto).
+import { WA_PATH, PIN_PATH, DL_PATH } from '../data/icons';
+import { waGeneric } from '../data/catalog';
+interface Props { tone?: 'dark' | 'light'; labels?: boolean }
+const { tone = 'dark', labels = true } = Astro.props;
+const maps = 'https://www.google.com/maps/search/?api=1&query=Centro%20Empresarial%20Hayuelos';
+---
+<ul class={`channels channels--${tone}`} aria-label="Canales de contacto">
+  <li><a class="ch ch--wa" href={waGeneric} target="_blank" rel="noopener" aria-label="Escribir por WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true"><path d={WA_PATH} fill="currentColor" /></svg>{labels && <span>WhatsApp</span>}</a></li>
+  <li><a class="ch" href={maps} target="_blank" rel="noopener" aria-label="Ver ubicación en Google Maps (Centro Empresarial Hayuelos)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d={PIN_PATH} fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>{labels && <span>Ubicación</span>}</a></li>
+  <li><a class="ch" href="/descargas/catalogo-ubu-2026.pdf" download aria-label="Descargar catálogo en PDF"><svg viewBox="0 0 24 24" aria-hidden="true"><path d={DL_PATH} fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>{labels && <span>Catálogo PDF</span>}</a></li>
+</ul>
+<style>
+  .channels { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+  .ch { display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 18px 0 14px; border-radius: 999px; text-decoration: none; font-family: var(--font-display); font-weight: 600; font-size: .95rem; color: #fff; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.22); transition: transform .3s var(--ease), background-color .25s, border-color .25s; }
+  .ch svg { width: 22px; height: 22px; flex: none; }
+  .ch:hover, .ch:focus-visible { transform: translateY(-3px); background: rgba(1,220,239,.16); border-color: var(--cian-realidad-virtual); }
+  .ch--wa { background: #25D366; color: #052E16; border-color: transparent; } .ch--wa:hover, .ch--wa:focus-visible { background: #3BE078; border-color: transparent; }
+  .channels--light .ch { color: var(--tinta-1); background: #fff; border-color: var(--linea); } .channels--light .ch--wa { color: #052E16; background: #25D366; }
+  @media (max-width: 480px) { .channels { display: grid; grid-template-columns: 1fr 1fr; } .channels li:first-child { grid-column: 1 / -1; } .ch { width: 100%; justify-content: flex-start; } }
+</style>
