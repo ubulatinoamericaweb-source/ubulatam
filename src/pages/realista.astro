@@ -1,0 +1,107 @@
+---
+// PRUEBA REVERSIBLE: alternativa de apariencia realista (3D) del camión, las manos y el personaje.
+// No reemplaza la portada animada (/). Se puede borrar este archivo y src/scripts/realista/ sin afectar nada más.
+import Base from '../layouts/Base.astro';
+import { waGeneric } from '../data/catalog';
+---
+<Base title="Versión realista (prueba)" description="Prueba interna de apariencia realista en 3D para el camión, las manos y el personaje de UBU Latinoamérica." noindex>
+  <div class="cmpbar" role="note">
+    <strong>Prueba de apariencia realista (3D)</strong>
+    <span>Estás comparando. Esta ruta no está publicada ni indexada.</span>
+    <a class="btn btn--sm" href="/">← Ver la versión animada actual</a>
+  </div>
+
+  <p class="rt-nogl-note" role="alert">Tu navegador no pudo iniciar las escenas 3D. <a href="/">Ver la versión animada actual</a>.</p>
+
+  <!-- 1 · CAMIÓN 3D -->
+  <section class="rt-hero on-dark" data-rt-hero aria-label="Presentación de UBU Latinoamérica (versión realista)">
+    <div class="rt-pin" data-rt-pin>
+      <div class="rt-sky" aria-hidden="true"></div>
+      <div class="rt-canvas" aria-hidden="true"><canvas id="rt-truck"></canvas></div>
+      <div class="rt-copy rt-copy--1" data-rt-copy="1">
+        <p class="kicker">UBU Latinoamérica</p>
+        <h1>Tecnología e insumos para impulsar tu negocio.</h1>
+        <p class="lede">Máquinas de hidrogel, láminas, cargadores, cables y accesorios para tiendas y técnicos de celulares.</p>
+      </div>
+      <div class="rt-copy rt-copy--2" data-rt-copy="2">
+        <p class="kicker">Catálogo 2026</p>
+        <h2>Todo el surtido de tu mostrador, con un solo proveedor.</h2>
+        <p class="lede">Dos líneas: <strong>Conectividad</strong> e <strong>Hidrogel</strong>, con precios de referencia en COP.</p>
+      </div>
+      <div class="rt-cta"><a class="btn" href="/catalogo">Ver catálogo</a><a class="btn btn--wa" href={waGeneric} target="_blank" rel="noopener">Cotizar por WhatsApp</a></div>
+      <div class="rt-bar" aria-hidden="true"><i data-rt-bar></i></div>
+    </div>
+  </section>
+
+  <!-- 2 · MANOS 3D -->
+  <section class="rt-hands on-dark" aria-labelledby="rh-t">
+    <div class="rt-hands__bg" aria-hidden="true"></div>
+    <div class="wrap" style="position:relative;z-index:2;text-align:center">
+      <p class="kicker" style="justify-content:center;display:flex">Tecnología · reparación · negocio</p>
+      <h2 id="rh-t" class="rt-h">Tecnología para quienes conectan y hacen crecer sus negocios</h2>
+    </div>
+    <div class="rt-hands__stage" aria-hidden="true"><canvas id="rt-hands"></canvas></div>
+  </section>
+
+  <!-- 3 · PERSONAJE 3D -->
+  <section class="rt-char on-light" aria-labelledby="rc-t">
+    <div class="wrap rt-char__grid">
+      <div class="rt-char__fig" aria-hidden="true"><canvas id="rt-char-a"></canvas></div>
+      <div>
+        <p class="kicker">Explora el catálogo</p>
+        <h2 id="rc-t" class="rt-h2">Dos líneas, un mismo estándar.</h2>
+        <p class="lede">Conectividad e Hidrogel, en el orden de nuestro catálogo 2026.</p>
+        <p style="display:flex;gap:12px;flex-wrap:wrap;margin-top:22px"><a class="btn btn--dark" href="/conectividad">Ver Conectividad</a><a class="btn btn--dark" href="/hidrogel">Ver Hidrogel</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="rt-close on-dark">
+    <div class="wrap rt-close__grid">
+      <div>
+        <p class="kicker">Cotiza hoy</p>
+        <h2 class="rt-h2">Arma tu lista y envíala en un solo mensaje.</h2>
+        <p class="lede">El precio final y la disponibilidad se confirman al cotizar.</p>
+        <p style="display:flex;gap:12px;flex-wrap:wrap;margin-top:22px"><a class="btn btn--wa" href={waGeneric} target="_blank" rel="noopener">Cotizar por WhatsApp</a><a class="btn btn--ghost" href="/cotizacion">Ver mi lista</a></p>
+      </div>
+      <div class="rt-char__fig rt-char__fig--b" aria-hidden="true"><canvas id="rt-char-b"></canvas></div>
+    </div>
+  </section>
+  <script>import '../scripts/realista/main';</script>
+</Base>
+
+<style>
+  .rt-nogl-note { display: none; position: relative; z-index: 120; margin: 0; padding: 90px var(--gut) 14px; background: #FFF2B8; color: #3B2F00; font-weight: 600; }
+  :global(html.rt-nogl) .rt-nogl-note { display: block; } :global(html.rt-nogl) canvas { display: none; }
+  .cmpbar { position: fixed; right: 88px; bottom: 16px; z-index: 96; display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; justify-content: center; max-width: min(92vw, 420px); padding: 10px 14px; border-radius: 22px; background: rgba(5,16,27,.9); color: #fff; border: 1px solid rgba(255,255,255,.22); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); font-size: .9rem; }
+  .cmpbar strong { font-family: var(--font-display); color: var(--cian-realidad-virtual); } .cmpbar span { opacity: .8; }
+  @media (max-width: 640px) { .cmpbar { right: 12px; left: 12px; bottom: 82px; font-size: .82rem; max-width: none; } .cmpbar span { display: none; } }
+
+  .rt-hero { position: relative; background: var(--tinta-0); }
+  .rt-pin { position: relative; height: 100svh; min-height: 620px; overflow: hidden; isolation: isolate; }
+  .rt-sky { position: absolute; inset: 0; background: radial-gradient(60% 55% at 74% 46%, rgba(65,185,193,.3), transparent 70%), radial-gradient(40% 40% at 12% 8%, rgba(64,91,165,.5), transparent 70%), linear-gradient(180deg, #06131E 0%, #0B2236 58%, #0F3446 100%); }
+  .rt-canvas, .rt-hands__stage { position: absolute; inset: 0; } .rt-canvas canvas, .rt-hands__stage canvas { width: 100%; height: 100%; display: block; }
+  .rt-copy { position: absolute; left: var(--gut); top: 50%; transform: translateY(-58%); width: min(44vw, 540px); z-index: 4; pointer-events: none; }
+  .rt-copy h1, .rt-copy h2 { font-size: clamp(2.1rem, 4.2vw, 4rem); margin: 18px 0 18px; } .rt-copy strong { color: var(--cian-realidad-virtual); font-weight: 600; }
+  .rt-copy--2 { opacity: 0; visibility: hidden; top: auto; bottom: clamp(104px, 17vh, 160px); transform: none; }
+  .rt-cta { position: absolute; left: var(--gut); bottom: clamp(22px, 5vh, 54px); z-index: 6; display: flex; flex-wrap: wrap; gap: 12px; }
+  .rt-bar { position: absolute; right: var(--gut); bottom: 30px; width: 120px; height: 3px; background: rgba(255,255,255,.18); border-radius: 3px; z-index: 6; overflow: hidden; } .rt-bar i { display: block; height: 100%; background: var(--cian-realidad-virtual); transform-origin: left; transform: scaleX(0); }
+  @media (max-width: 899px), (prefers-reduced-motion: reduce) {
+    .rt-pin { height: auto; min-height: 100svh; display: flex; flex-direction: column; padding: 108px 0 36px; }
+    .rt-copy, .rt-cta { position: relative; left: auto; top: auto; bottom: auto; transform: none; width: auto; padding: 0 var(--gut); }
+    .rt-copy--1 { order: 1; } .rt-canvas { order: 2; position: relative; inset: auto; height: 300px; margin: 8px 0; } .rt-cta { order: 3; margin-top: 12px; } .rt-copy--2 { order: 4; opacity: 1; visibility: visible; margin-top: 30px; } .rt-copy--2 h2 { font-size: 1.7rem; }
+    .rt-copy h1 { font-size: clamp(2rem, 8.4vw, 3rem); } .rt-bar { display: none; }
+  }
+
+  .rt-hands { position: relative; padding: clamp(80px, 9vw, 120px) 0 0; background: linear-gradient(180deg, #0A1A29, #0F2436); overflow: hidden; }
+  .rt-hands__bg { position: absolute; inset: 0; background: radial-gradient(50% 55% at 50% 70%, rgba(1,220,239,.22), transparent 70%); }
+  .rt-h { font-size: clamp(1.8rem, 4.2vw, 3.6rem); max-width: 22ch; margin: 14px auto 0; }
+  .rt-hands__stage { position: relative; inset: auto; height: clamp(300px, 46vw, 560px); margin-top: 10px; }
+  .rt-char { padding: clamp(60px, 8vw, 110px) 0; background: linear-gradient(180deg, #EAF6F7, #F7FBFC); }
+  .rt-char__grid { display: grid; grid-template-columns: .9fr 1.1fr; gap: clamp(20px, 4vw, 60px); align-items: center; }
+  .rt-char__fig { position: relative; aspect-ratio: 1 / 1; width: min(100%, 520px); margin-inline: auto; } .rt-char__fig canvas { width: 100%; height: 100%; display: block; -webkit-mask-image: linear-gradient(to bottom, #000 82%, transparent 99%); mask-image: linear-gradient(to bottom, #000 82%, transparent 99%); }
+  .rt-h2 { font-size: clamp(1.9rem, 3.8vw, 3.2rem); margin: 14px 0; max-width: 18ch; }
+  .rt-close { padding: clamp(60px, 8vw, 110px) 0; background: radial-gradient(60% 80% at 80% 30%, rgba(65,185,193,.4), transparent 65%), linear-gradient(135deg, #0B2236, #0D3145); }
+  .rt-close__grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: clamp(20px, 4vw, 60px); align-items: center; }
+  @media (max-width: 860px) { .rt-char__grid, .rt-close__grid { grid-template-columns: 1fr; } .rt-char__fig { max-width: 340px; } }
+</style>

@@ -26,6 +26,25 @@ npm run preview    # sirve dist/ tal como saldrá a producción
 | `legacy-site/` | Sitio anterior (HTML suelto) como respaldo. No se publica; puede borrarse cuando se valide el nuevo. |
 | `source-private/` | PDFs y referencias. Ignorada por git (`.gitignore` y `.git/info/exclude`); nada de ahí se copia a `public/`. |
 
+## Comparar versiones y volver al punto de restauración
+
+| Qué | Dónde |
+|---|---|
+| **Versión animada aprobada** (portada del camión en 2D, manos y personaje ilustrados) | `/` — intacta |
+| **Alternativa realista (prueba, 3D con three.js)** | `/realista` — ruta aparte, `noindex`, fuera del sitemap |
+| Botón de comparación | En `/` aparece «Comparar: versión realista (prueba)»; en `/realista`, la barra inferior «Ver la versión animada actual» |
+
+La alternativa vive solo en `src/pages/realista.astro` y `src/scripts/realista/` (más `three` en `package.json` y un enlace en `Base.astro`). Los recursos de la versión animada (`Truck`, `Hands`, `PcHead`, `home.ts`) no se tocaron. Para descartarla: borra esos archivos y `npm uninstall three`.
+
+**Punto de restauración local:** commit `01e6f91`, etiqueta `punto-restauracion-animada-v1` (rama `astro-rebuild`). Contiene la portada animada aprobada y no incluye `source-private`. Nada se ha subido a GitHub ni desplegado.
+
+```bash
+git tag                                        # ver etiquetas
+git diff --stat punto-restauracion-animada-v1  # ver qué cambió desde entonces
+git switch -c volver-a-animada punto-restauracion-animada-v1   # volver a esa versión en una rama nueva
+# o, para recuperar solo un archivo:  git restore --source punto-restauracion-animada-v1 -- src/pages/index.astro
+```
+
 ## Marca
 
 - **Colores** (valores exactos del manual): Azul Silicon Valley `#4293D0`, Confianza Índigo `#405BA5`, Verde Cobre Oxidado `#56B28E`, Verde Armonía `#56B28E`, Blanco Pureza `#FFFFFF`, Asombro Turmalina `#41B9C1`, Gris Guernica `#575756`, Cian Realidad Virtual `#01DCEF`.

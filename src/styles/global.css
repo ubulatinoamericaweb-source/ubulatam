@@ -245,3 +245,8 @@ mark.pending { background: #FFF2B8; color: #3B2F00; padding: .05em .4em; border-
   .footer-grid a { display: inline-block; padding: .35em 0; }
   .pcard__foot .price { font-size: 1.25rem; }
 }
+
+/* Selector de comparación de versiones (se puede quitar junto con /realista) */
+.cmp-toggle { position: fixed; right: 86px; bottom: 26px; z-index: 95; padding: .65em 1.1em; min-height: 44px; display: inline-flex; align-items: center; border-radius: var(--r-pill); background: rgba(5,16,27,.88); color: #fff; border: 1px solid rgba(255,255,255,.28); text-decoration: none; font-family: var(--font-display); font-weight: 600; font-size: .88rem; -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+.cmp-toggle:hover { border-color: var(--cian-realidad-virtual); color: var(--cian-realidad-virtual); }
+@media (max-width: 640px) { .cmp-toggle { bottom: 88px; right: 14px; font-size: .8rem; } }
