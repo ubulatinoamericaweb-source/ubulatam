@@ -1,0 +1,170 @@
+---
+import { Image } from 'astro:assets';
+import ProductCard from './ProductCard.astro';
+import UbuFace from './UbuFace.astro';
+import { type Category, categories, byCategory, bySlug, productImage, displayImages, cop, waProduct, waGeneric } from '../data/catalog';
+interface Props { category: Category }
+const { category } = Astro.props;
+const meta = categories[category];
+const list = byCategory(category);
+const types = [...new Set(list.map((p) => p.type))];
+const heroSlugs = category === 'conectividad'
+  ? ['cargador-pd-45w-gan-super-carga-rapida-tc-tc', 'power-bank-10-000-mah-22-5w-multipuerto', 'cable-240w-tc-tc-con-soporte-cable-plano-1-5-m']
+  : ['maquina-de-hidrogel-11-9-sellado-automatico-uv-oemp2300', 'hidrogel-mate', 'pala-grande'];
+const hero = heroSlugs.map((s) => bySlug(s)!);
+const isWide = (p: (typeof list)[number]) => !!(p.table || p.references);
+const moreMachines = category === 'hidrogel';
+---
+<div class={`cat-view cat-view--${category}`}>
+  <section class="chero" aria-labelledby="chero-t">
+    <div class="chero__bg" aria-hidden="true">
+      {category === 'conectividad' ? (
+        <svg viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice">
+          <path class="cl" d="M-20 120 H260 L310 170 H640 L690 120 H1220" /><path class="cl" d="M-20 260 H180 L240 320 H480 L530 270 H1220" />
+          <path class="cl" d="M-20 400 H380 L430 450 H900 L950 400 H1220" /><path class="cl" d="M-20 520 H140 L190 560 H1220" />
+          <circle cx="310" cy="170" r="6" /><circle cx="690" cy="120" r="6" /><circle cx="240" cy="320" r="6" /><circle cx="530" cy="270" r="6" /><circle cx="430" cy="450" r="6" /><circle cx="950" cy="400" r="6" />
+        </svg>
+      ) : (
+        <div class="films"><i></i><i></i><i></i><i></i></div>
+      )}
+    </div>
+    <div class="wrap chero__grid">
+      <div class="chero__copy">
+        <nav aria-label="Ruta de navegación"><ol class="crumbs"><li><a href="/">Inicio</a></li><li><a href="/catalogo">Catálogo</a></li><li aria-current="page">{meta.name}</li></ol></nav>
+        <h1 id="chero-t">{meta.name}</h1>
+        <p class="lede">{meta.intro}</p>
+        <div class="chero__actions">
+          <a class="btn" href="#lista">Ver productos</a>
+          <a class="btn btn--wa" href={waGeneric} target="_blank" rel="noopener">Cotizar por WhatsApp</a>
+        </div>
+        <p class="chero__note">{list.length} entradas · precios de referencia en COP · orden del catálogo 2026</p>
+      </div>
+      <div class="chero__art" aria-hidden="true">
+        <div class="chero__face"><UbuFace tone="blanco" eyes={true} /></div>
+        {hero.map((p, i) => <Image class={`hp hp--${i}`} src={productImage(p.images[0].file)} alt="" widths={[300, 480]} sizes="260px" loading="eager" />)}
+      </div>
+    </div>
+  </section>
+
+  <section class="clist" id="lista" aria-label={`Productos de ${meta.name}`}>
+    <div class="wrap">
+      <div class="filters" role="group" aria-label="Filtrar por tipo (el orden del catálogo no cambia)" data-filters>
+        <button type="button" class="chip is-on" data-type="all" aria-pressed="true">Todos <small>{list.length}</small></button>
+        {types.map((t) => <button type="button" class="chip" data-type={t} aria-pressed="false">{t} <small>{list.filter((p) => p.type === t).length}</small></button>)}
+      </div>
+      <ul class="pgrid" data-grid>
+        {list.map((p, i) => {
+          if (!isWide(p)) return <ProductCard p={p} index={i} eager={i < 4} />;
+          const img = displayImages(p)[0];
+          return (
+            <li class="wide" data-reveal data-product={p.slug} data-type={p.type}>
+              <div class={`wide__stage ${img && !img.alpha ? 'is-blend' : ''}`}>
+                {img ? <Image src={productImage(img.file)} alt={p.name} widths={[320, 480]} sizes="320px" loading="lazy" /> : <UbuFace tone="color" eyes={false} />}
+              </div>
+              <div class="wide__body">
+                <span class="pcard__type" style="position:static;display:inline-block;margin-bottom:10px">{p.type}</span>
+                <h3><a href={`/${p.slug}`}>{p.name}</a></h3>
+                {p.table && (
+                  <div class="tbl" tabindex="0" role="region" aria-label={`Precios: ${p.name}`}>
+                    <table>
+                      <thead><tr>{p.table.head.map((h) => <th scope="col">{h}</th>)}</tr></thead>
+                      <tbody>{p.table.rows.map((r) => <tr><th scope="row">{r.model}</th><td>{r.capacity}</td><td class="num">{cop(r.price)} <small>COP</small></td></tr>)}</tbody>
+                    </table>
+                  </div>
+                )}
+                {p.references && (
+                  <div class="refs"><p class="price"><span>{cop(p.price!)}</span><span class="unit">{p.unit}</span><small>COP</small></p>
+                    <ul>{p.references.map((r) => <li>{r}</li>)}</ul></div>
+                )}
+                <div class="wide__actions">
+                  <button class="btn btn--sm btn--line" type="button" data-add={p.slug} data-label="Agregar a cotización" aria-pressed="false"><span class="t">Agregar a cotización</span></button>
+                  <a class="btn btn--sm btn--wa" href={waProduct(p)} target="_blank" rel="noopener">Cotizar por WhatsApp</a>
+                  <a class="btn btn--sm btn--dark" href={`/${p.slug}`}>Ver ficha</a>
+                </div>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+      {moreMachines && <span id="maquinas" class="anchor"></span>}
+    </div>
+  </section>
+  <script>
+    // Filtro por tipo: solo oculta/muestra; nunca reordena.
+    const box = document.querySelector('[data-filters]');
+    const grid = document.querySelector('[data-grid]');
+    if (box && grid) {
+      box.addEventListener('click', (e) => {
+        const b = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-type]');
+        if (!b) return;
+        box.querySelectorAll('.chip').forEach((c) => { c.classList.toggle('is-on', c === b); c.setAttribute('aria-pressed', String(c === b)); });
+        const t = b.dataset.type;
+        grid.querySelectorAll<HTMLElement>('[data-product]').forEach((li) => {
+          const type = li.dataset.type || li.querySelector('.pcard__type')?.textContent;
+          const show = t === 'all' || type === t;
+          li.hidden = !show; li.classList.add('is-in');
+        });
+      });
+    }
+  </script>
+</div>
+<style>
+  .cat-view { background: var(--tinta-1); }
+  .chero { position: relative; padding: calc(var(--header-h) + 70px) 0 clamp(56px, 7vw, 100px); overflow: hidden; isolation: isolate; }
+  .cat-view--conectividad .chero { background: radial-gradient(60% 80% at 80% 30%, rgba(64,91,165,.55), transparent 70%), linear-gradient(160deg, #0B2236, #05101B); color: #fff; }
+  .cat-view--hidrogel .chero { background: radial-gradient(60% 80% at 80% 30%, rgba(1,220,239,.3), transparent 70%), linear-gradient(160deg, #F7FEFF, #BEE9EE 70%, #8FD4DC); color: var(--tinta-1); }
+  .chero__bg { position: absolute; inset: 0; z-index: -1; }
+  .chero__bg svg { width: 100%; height: 100%; }
+  .chero__bg .cl { fill: none; stroke: rgba(1,220,239,.4); stroke-width: 2; stroke-dasharray: 10 14; animation: flow 3.4s linear infinite; }
+  .chero__bg circle { fill: var(--cian-realidad-virtual); }
+  @keyframes flow { to { stroke-dashoffset: -48; } }
+  .films i { position: absolute; border-radius: 36px; border: 1.5px solid rgba(255,255,255,.75); background: linear-gradient(135deg, rgba(255,255,255,.6), rgba(255,255,255,.06)); box-shadow: 0 40px 60px -40px rgba(10,26,41,.4); animation: drift 9s ease-in-out infinite; }
+  .films i:nth-child(1) { width: 38vw; height: 26vw; right: -6vw; top: 8%; transform: rotate(10deg); }
+  .films i:nth-child(2) { width: 32vw; height: 22vw; right: 6vw; top: 18%; transform: rotate(-6deg); animation-delay: -2s; }
+  .films i:nth-child(3) { width: 26vw; height: 18vw; right: 14vw; top: 34%; transform: rotate(-16deg); animation-delay: -4s; }
+  .films i:nth-child(4) { width: 18vw; height: 12vw; left: -4vw; bottom: 8%; transform: rotate(8deg); animation-delay: -6s; }
+  @keyframes drift { 50% { translate: 0 -14px; } }
+  .chero__grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: clamp(20px, 4vw, 60px); align-items: center; }
+  .crumbs { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; padding: 0; margin: 0 0 22px; font-size: .9rem; opacity: .85; }
+  .crumbs li + li::before { content: '/'; margin-right: 8px; opacity: .5; }
+  .crumbs a { text-decoration: none; } .crumbs a:hover { text-decoration: underline; }
+  .chero h1 { font-size: clamp(2.8rem, 7.4vw, 6.4rem); margin-bottom: 18px; }
+  .chero__actions { display: flex; flex-wrap: wrap; gap: 12px; margin: 26px 0 16px; }
+  .chero__note { font-size: .92rem; opacity: .75; }
+  .chero__art { position: relative; aspect-ratio: 1.1 / 1; }
+  .chero__face { position: absolute; left: 50%; top: 50%; width: 82%; transform: translate(-50%, -50%); opacity: .14; }
+  .cat-view--hidrogel .chero__face { opacity: .3; filter: invert(1) brightness(.35); }
+  .hp { position: absolute; height: auto; object-fit: contain; filter: drop-shadow(0 28px 28px rgba(0,0,0,.4)); animation: bob 7s ease-in-out infinite; }
+  .hp--0 { width: 54%; left: 6%; top: 8%; } .hp--1 { width: 44%; right: 2%; top: 30%; animation-delay: -2s; } .hp--2 { width: 34%; left: 28%; bottom: 0; animation-delay: -4s; }
+  @keyframes bob { 50% { transform: translateY(-14px) rotate(1.5deg); } }
+  @media (max-width: 860px) { .chero__grid { grid-template-columns: 1fr; } .chero__art { max-width: 420px; margin-inline: auto; width: 100%; } }
+  @media (prefers-reduced-motion: reduce) { .chero__bg .cl, .films i, .hp { animation: none; } }
+
+  .clist { position: relative; padding: clamp(40px, 6vw, 80px) 0 clamp(80px, 9vw, 130px); background: linear-gradient(180deg, #EAF6F7, #F7FBFC); scroll-margin-top: 80px; }
+  .cat-view--conectividad .clist { background: linear-gradient(180deg, #0A1A29, #0F2436 40%, #EAF6F7 40.1%); }
+  .cat-view--conectividad .filters { color: #fff; }
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 26px; }
+  .chip { cursor: pointer; font-family: var(--font-display); font-weight: 600; font-size: .92rem; padding: .55em 1.1em; border-radius: var(--r-pill); border: 1.5px solid currentColor; background: transparent; color: inherit; transition: background-color .25s, color .25s; opacity: .9; }
+  .chip small { opacity: .7; margin-left: .3em; }
+  .chip:hover { background: rgba(127,127,127,.18); }
+  .chip.is-on { background: var(--cian-realidad-virtual); border-color: var(--cian-realidad-virtual); color: var(--tinta-1); opacity: 1; }
+  .anchor { display: block; }
+  .wide { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(220px, 340px) 1fr; gap: clamp(18px, 3vw, 40px); padding: clamp(18px, 2.6vw, 32px); border-radius: var(--r-lg); background: #fff; color: var(--texto); border: 1px solid var(--linea); box-shadow: 0 30px 60px -40px rgba(5,16,27,.5); }
+  .wide[hidden] { display: none; }
+  .wide__stage { display: grid; place-items: center; border-radius: var(--r-md); background: radial-gradient(120% 90% at 50% 20%, #fff, var(--bruma) 70%, var(--bruma-2)); padding: 16px; min-height: 260px; }
+  .wide__stage img { width: 100%; max-height: 360px; object-fit: contain; } .wide__stage.is-blend img { mix-blend-mode: multiply; }
+  .wide__stage :global(.ubu-face) { width: 40%; opacity: .5; }
+  .wide__body h3 { font-size: clamp(1.4rem, 2.4vw, 2rem); margin-bottom: 16px; } .wide__body h3 a { text-decoration: none; }
+  .wide__actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+  .tbl { overflow: auto; border-radius: var(--r-md); border: 1px solid var(--linea); max-height: 460px; }
+  table { width: 100%; border-collapse: collapse; font-size: .96rem; }
+  th, td { padding: .7em 1em; text-align: left; border-bottom: 1px solid var(--linea); }
+  thead th { position: sticky; top: 0; background: var(--tinta-1); color: #fff; font-family: var(--font-display); font-size: .78rem; letter-spacing: .1em; text-transform: uppercase; z-index: 1; }
+  tbody th { font-weight: 700; font-family: var(--font-display); }
+  td.num { text-align: right; font-family: var(--font-display); font-weight: 700; white-space: nowrap; } td.num small { opacity: .55; font-weight: 600; }
+  tbody tr:hover { background: var(--bruma); }
+  .refs .price { font-size: 1.8rem; color: var(--tinta-1); margin-bottom: 12px; }
+  .refs ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0 20px; max-height: 340px; overflow: auto; border: 1px solid var(--linea); border-radius: var(--r-md); }
+  .refs li { padding: .55em 1em; border-bottom: 1px solid var(--linea); font-size: .92rem; font-family: var(--font-display); font-weight: 500; }
+  @media (max-width: 760px) { .wide { grid-template-columns: 1fr; } }
+</style>

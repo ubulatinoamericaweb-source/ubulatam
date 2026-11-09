@@ -1,0 +1,71 @@
+---
+// Escena gráfica original: mano humana + mano robótica que se acercan.
+// Se construye con cápsulas (el mismo lenguaje redondeado de los ojos del isotipo).
+// Es una ilustración, no una fotografía; comunica el encuentro entre conocimiento técnico y tecnología.
+type Pt = [number, number];
+const mirror = (pts: Pt[]): Pt[] => pts.map(([x, y]) => [1000 - x, y]);
+
+// Dedos (de la palma hacia la punta). Dedo índice extendido; los demás, flexionados.
+const fingers: { name: string; w: number; pts: Pt[] }[] = [
+  { name: 'index', w: 40, pts: [[330, 206], [406, 208], [462, 212], [492, 216]] },
+  { name: 'middle', w: 38, pts: [[326, 246], [378, 242], [408, 256], [406, 284]] },
+  { name: 'ring', w: 35, pts: [[324, 282], [372, 282], [396, 296], [392, 320]] },
+  { name: 'pinky', w: 30, pts: [[322, 314], [356, 316], [374, 328], [370, 346]] },
+  { name: 'thumb', w: 42, pts: [[262, 186], [312, 150], [366, 142], [404, 160]] },
+];
+const poly = (pts: Pt[]) => 'M' + pts.map((p) => p.join(' ')).join(' L');
+const palmH = 'M-40 172 H176 Q200 150 262 150 H330 Q364 152 364 192 V318 Q364 350 330 352 H258 Q206 352 176 326 H-40 Z';
+const palmR = 'M1040 172 H824 Q800 150 738 150 H670 Q636 152 636 192 V318 Q636 350 670 352 H742 Q794 352 824 326 H1040 Z';
+---
+<svg class="hands" viewBox="0 0 1000 420" aria-hidden="true" focusable="false" data-hands>
+  <defs>
+    <linearGradient id="h-skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF" /><stop offset=".6" stop-color="#E7F4F6" /><stop offset="1" stop-color="#B9DCE3" /></linearGradient>
+    <linearGradient id="h-rob" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4C5B66" /><stop offset="1" stop-color="#1C2730" /></linearGradient>
+    <linearGradient id="h-ring" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4293D0" /><stop offset=".5" stop-color="#01DCEF" /><stop offset="1" stop-color="#56B28E" /></linearGradient>
+    <radialGradient id="h-glow"><stop offset="0" stop-color="#01DCEF" stop-opacity=".85" /><stop offset="1" stop-color="#01DCEF" stop-opacity="0" /></radialGradient>
+  </defs>
+
+  <g class="hands__halo" data-halo>
+    <circle cx="500" cy="212" r="150" fill="url(#h-glow)" opacity=".55" />
+    <circle cx="500" cy="212" r="126" fill="none" stroke="url(#h-ring)" stroke-width="3" />
+    <circle cx="500" cy="212" r="146" fill="none" stroke="url(#h-ring)" stroke-width="1.5" stroke-dasharray="4 10" opacity=".8" />
+  </g>
+
+  <!-- Mano humana (izquierda) -->
+  <g class="hands__human" data-hand="human">
+    <path d={palmH} fill="url(#h-skin)" />
+    {fingers.map((f) => <path d={poly(f.pts)} fill="none" stroke="url(#h-skin)" stroke-width={f.w} stroke-linecap="round" stroke-linejoin="round" />)}
+    {fingers.map((f) => <path d={poly(f.pts)} fill="none" stroke="rgba(66,147,208,.22)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" transform="translate(0 -9)" />)}
+    <path d="M-40 172 H176" stroke="rgba(64,91,165,.25)" stroke-width="2" />
+    <path d="M60 175v146M110 175v146" stroke="rgba(64,91,165,.1)" stroke-width="2" />
+    <circle class="hands__tip" data-tip="human" cx="494" cy="216" r="9" fill="#01DCEF" />
+  </g>
+
+  <!-- Mano robótica (derecha) -->
+  <g class="hands__robot" data-hand="robot">
+    <path d={palmR} fill="url(#h-rob)" />
+    <path d="M880 172v178M930 172v178" stroke="rgba(1,220,239,.4)" stroke-width="2" />
+    <rect x="800" y="206" width="60" height="22" rx="11" fill="rgba(1,220,239,.28)" />
+    <circle cx="830" cy="217" r="6" fill="#01DCEF" />
+    {fingers.map((f) => {
+      const m = mirror(f.pts);
+      return (
+        <g>
+          {m.slice(0, -1).map((p, i) => <line x1={p[0]} y1={p[1]} x2={m[i + 1][0]} y2={m[i + 1][1]} stroke={i % 2 ? '#3A4955' : 'url(#h-rob)'} stroke-width={f.w - i * 2} stroke-linecap="round" />)}
+          {m.slice(1, -1).map((p) => <circle cx={p[0]} cy={p[1]} r={f.w * 0.26} fill="#0A1A29" stroke="#01DCEF" stroke-width="2" />)}
+        </g>
+      );
+    })}
+    <circle class="hands__tip" data-tip="robot" cx="506" cy="216" r="9" fill="#01DCEF" />
+  </g>
+  <g class="hands__spark" data-spark>
+    <circle cx="500" cy="216" r="22" fill="url(#h-glow)" />
+    <path d="M500 186v60M470 216h60M479 195l42 42M521 195l-42 42" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" />
+  </g>
+</svg>
+<style>
+  .hands { display: block; width: 100%; height: auto; overflow: visible; }
+  .hands__halo { transform-box: fill-box; transform-origin: center; }
+  .hands__spark { transform-box: fill-box; transform-origin: center; opacity: 0; }
+  .hands__tip { opacity: .0; }
+</style>

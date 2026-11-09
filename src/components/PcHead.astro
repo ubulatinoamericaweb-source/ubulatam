@@ -1,0 +1,76 @@
+---
+// Figura gráfica secundaria: persona con cabeza de computador (inspirada en la referencia guardada, ilustrada de nuevo).
+// Es solo un recurso visual; NO es un asistente automatizado ni una mascota oficial de UBU.
+// La pantalla muestra dos ojos en forma de pastilla, como los del isotipo.
+interface Props { pose?: 'idle' | 'point' | 'hold' | 'wave'; class?: string }
+const { pose = 'idle', class: cls = '' } = Astro.props;
+const blazer = '#3B4C59', blazerDark = '#2C3A45', shirt = '#F3F8F9', plastic = '#DCE5E8', plasticDark = '#B7C4CA', hand = '#EAF3F5';
+---
+<svg class={`pchead pchead--${pose} ${cls}`} viewBox="-20 0 560 580" aria-hidden="true" focusable="false" draggable="false">
+  <defs>
+    <linearGradient id={`pc-screen-${pose}`} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#12303F" /><stop offset="1" stop-color="#06131C" /></linearGradient>
+    <linearGradient id={`pc-case-${pose}`} x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#EEF3F5" /><stop offset="1" stop-color="#C9D5DA" /></linearGradient>
+  </defs>
+  <ellipse cx="200" cy="572" rx="170" ry="9" fill="rgba(0,0,0,.28)" />
+
+  <!-- Brazos (detrás del torso) -->
+  {pose === 'idle' && <g>
+    <path d="M78 352 L52 520" stroke={blazerDark} stroke-width="56" stroke-linecap="round" />
+    <path d="M322 352 L348 520" stroke={blazerDark} stroke-width="56" stroke-linecap="round" />
+    <circle cx="50" cy="540" r="24" fill={hand} /><circle cx="350" cy="540" r="24" fill={hand} />
+  </g>}
+  {pose === 'point' && <g class="pchead__arm">
+    <path d="M78 352 L52 520" stroke={blazerDark} stroke-width="56" stroke-linecap="round" /><circle cx="50" cy="540" r="24" fill={hand} />
+    <path d="M326 350 L430 316 L500 270" stroke={blazerDark} stroke-width="52" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M500 270 L536 246" stroke={hand} stroke-width="22" stroke-linecap="round" />
+    <circle cx="500" cy="272" r="24" fill={hand} />
+  </g>}
+  {pose === 'wave' && <g>
+    <path d="M78 352 L52 520" stroke={blazerDark} stroke-width="56" stroke-linecap="round" /><circle cx="50" cy="540" r="24" fill={hand} />
+    <g class="pchead__wave"><path d="M326 350 L400 400 L430 300" stroke={blazerDark} stroke-width="52" stroke-linecap="round" stroke-linejoin="round" /><circle cx="432" cy="272" r="28" fill={hand} /></g>
+  </g>}
+  {pose === 'hold' && <g>
+    <path d="M78 352 L48 450 L150 482" stroke={blazerDark} stroke-width="52" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M322 352 L352 450 L250 482" stroke={blazerDark} stroke-width="52" stroke-linecap="round" stroke-linejoin="round" />
+  </g>}
+
+  <!-- Torso -->
+  <path d="M58 580 L66 372 Q76 308 150 288 L200 316 L250 288 Q324 308 334 372 L342 580 Z" fill={blazer} />
+  <path d="M150 288 L200 400 L250 288 L200 316 Z" fill={shirt} />
+  <path d="M150 288 L92 410 L186 440 L200 400 Z" fill={blazerDark} /><path d="M250 288 L308 410 L214 440 L200 400 Z" fill={blazerDark} />
+  <rect x="190" y="396" width="20" height="60" rx="8" fill="#41B9C1" />
+
+  <!-- Cuello / base del monitor -->
+  <rect x="160" y="248" width="80" height="48" rx="10" fill={plasticDark} />
+
+  <!-- Cabeza: monitor -->
+  <path d="M316 42 L360 66 L360 236 L316 256 Z" fill={plasticDark} />
+  <rect x="86" y="18" width="236" height="240" rx="26" fill={`url(#pc-case-${pose})`} />
+  <rect x="86" y="18" width="236" height="240" rx="26" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="2" />
+  <rect x="108" y="42" width="192" height="146" rx="22" fill={`url(#pc-screen-${pose})`} />
+  <path d="M120 54 L220 54 L150 172 L120 172Z" fill="rgba(255,255,255,.07)" />
+  <g data-eyes data-eyes-range="8,5" fill="#41B9C1" class="pchead__eyes">
+    <rect class="pchead__eye" x="150" y="78" width="32" height="54" rx="16" />
+    <rect class="pchead__eye" x="226" y="78" width="32" height="54" rx="16" />
+  </g>
+  <rect x="126" y="206" width="104" height="14" rx="5" fill={plasticDark} />
+  <rect x="136" y="210" width="84" height="6" rx="3" fill="#6B7A83" />
+  <circle cx="270" cy="213" r="8" fill={plasticDark} /><circle cx="270" cy="213" r="3.5" fill="#41B9C1" />
+
+  <!-- Panel de interfaz (pose "hold") -->
+  {pose === 'hold' && <g class="pchead__panel">
+    <rect x="118" y="426" width="164" height="104" rx="14" fill="rgba(255,255,255,.14)" stroke="rgba(255,255,255,.6)" stroke-width="2" />
+    <rect x="134" y="444" width="70" height="8" rx="4" fill="#01DCEF" /><rect x="134" y="462" width="124" height="6" rx="3" fill="rgba(255,255,255,.7)" /><rect x="134" y="478" width="104" height="6" rx="3" fill="rgba(255,255,255,.5)" />
+    <rect x="134" y="496" width="52" height="18" rx="9" fill="#56B28E" />
+    <circle cx="118" cy="486" r="22" fill={hand} /><circle cx="282" cy="486" r="22" fill={hand} />
+  </g>}
+</svg>
+<style>
+  .pchead { display: block; width: 100%; height: auto; overflow: visible; user-select: none; -webkit-user-drag: none; pointer-events: none; }
+  .pchead__eye { transform-box: fill-box; transform-origin: center; animation: pc-blink 7s infinite; }
+  @keyframes pc-blink { 0%, 93%, 100% { transform: scaleY(1); } 95.5% { transform: scaleY(.1); } }
+  .pchead__wave { transform-box: fill-box; transform-origin: 20% 90%; animation: pc-wave 2.4s ease-in-out infinite; }
+  @keyframes pc-wave { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-9deg); } }
+  .pchead__arm { transform-origin: 326px 350px; }
+  @media (prefers-reduced-motion: reduce) { .pchead__eye, .pchead__wave { animation: none; } }
+</style>

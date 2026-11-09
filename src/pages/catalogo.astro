@@ -1,0 +1,47 @@
+---
+import Base from '../layouts/Base.astro';
+import InnerHero from '../components/InnerHero.astro';
+import { categories, byCategory, cop, priceLabel } from '../data/catalog';
+const cats = (['conectividad', 'hidrogel'] as const).map((c) => ({ ...categories[c], list: byCategory(c) }));
+---
+<Base title="Catálogo 2026 con precios en COP" description="Lista completa del catálogo UBU Latinoamérica 2026, en el orden del catálogo: Conectividad e Hidrogel, con precios de referencia en pesos colombianos (COP).">
+  <InnerHero kicker="Catálogo 2026" title="Todo el catálogo, en el orden del catálogo." lede="Precios de referencia en pesos colombianos (COP). Se confirman al cotizar." crumbs={[{ label: 'Catálogo' }]}>
+    <p style="margin-top:26px;display:flex;flex-wrap:wrap;gap:12px">
+      <a class="btn" href="/conectividad">Ver Conectividad</a><a class="btn" href="/hidrogel">Ver Hidrogel</a>
+      <a class="btn btn--ghost" href="/descargas/catalogo-ubu-2026.pdf" download>Descargar catálogo PDF</a>
+    </p>
+  </InnerHero>
+  {cats.map((c, k) => (
+    <section class={`band ${k ? 'band--white' : 'band--light'}`} aria-labelledby={`l-${c.slug}`}>
+      <div class="wrap">
+        <p class="kicker">{c.short}</p>
+        <h2 class="h2" id={`l-${c.slug}`}>{c.name} · {c.list.length} entradas</h2>
+        <div class="tbl" tabindex="0" role="region" aria-label={`Lista de precios de ${c.name}`}>
+          <table>
+            <thead><tr><th scope="col">#</th><th scope="col">Producto</th><th scope="col">Tipo</th><th scope="col" class="num">Precio de referencia</th><th scope="col">Pág.</th></tr></thead>
+            <tbody>
+              {c.list.map((p, i) => (
+                <tr>
+                  <td>{i + 1}</td>
+                  <th scope="row">{p.info ? p.name : <a href={`/${p.slug}`}>{p.name}</a>}</th>
+                  <td>{p.type}</td>
+                  <td class="num">{p.price == null ? <small>Sin precio en el catálogo</small> : <>{priceLabel(p)} <small>COP</small></>}</td>
+                  <td>{p.page}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p style="margin-top:18px"><a class="btn btn--dark" href={`/${c.slug}`}>Ver {c.name} con fotos y fichas</a></p>
+      </div>
+    </section>
+  ))}
+</Base>
+<style>
+  .tbl { overflow: auto; border-radius: var(--r-md); border: 1px solid var(--linea); background: #fff; color: var(--texto); }
+  table { width: 100%; border-collapse: collapse; min-width: 640px; } th, td { padding: .75em 1em; text-align: left; border-bottom: 1px solid var(--linea); }
+  thead th { background: var(--tinta-1); color: #fff; font-family: var(--font-display); font-size: .76rem; letter-spacing: .1em; text-transform: uppercase; }
+  tbody th { font-family: var(--font-display); font-weight: 600; } tbody th a { text-decoration: none; } tbody th a:hover { color: var(--confianza-indigo); text-decoration: underline; }
+  .num { text-align: right; font-family: var(--font-display); font-weight: 700; white-space: nowrap; } .num small { opacity: .6; font-weight: 600; }
+  tbody tr:hover { background: var(--bruma); }
+</style>

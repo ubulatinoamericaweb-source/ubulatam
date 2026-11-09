@@ -1,0 +1,52 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import InnerHero from '../components/InnerHero.astro';
+import { waUrl } from '../data/catalog';
+import seal from '../assets/sello-365.webp';
+const groups = [
+  { t: 'Equipos', q: [
+    ['¿Qué diferencia hay entre la máquina de 21" y la de 11,9"?', 'Ambas son libres de códigos y tienen pantalla de 9 pulgadas. La de 21 pulgadas ofrece el formato más amplio. La de 11,9" (OEMP2300) tiene sellado automático e incluye UV.'],
+    ['¿Venden repuestos para la máquina?', 'El catálogo incluye la cuchilla para máquina de hidrogel. Para otros repuestos, consúltanos por WhatsApp.'],
+  ] },
+  { t: 'Hidrogel y compatibilidad', q: [
+    ['¿Cómo sé qué hidrogel es compatible con mi equipo?', 'Cada referencia indica su uso: las de tablet especifican la medida (10.1, 14 y 16,9 pulgadas), el diseño de tapa trasera es para tablet de 11 pulgadas, las referencias VT8PRO son para esa máquina y la 360 especial está indicada para Z Fold. Si tu caso no aparece, envíanos la referencia de tu equipo por WhatsApp.'],
+    ['¿Qué necesito para el hidrogel UV?', 'El empaque del hidrogel UV indica curado UV (UV Curing). En el catálogo están la máquina de 11,9" que incluye UV y la máquina de secado inteligente UV G10U. Confirma con un asesor la combinación adecuada para tu trabajo.'],
+  ] },
+  { t: 'Cotizaciones y precios', q: [
+    ['¿Cómo solicito una cotización?', 'Pulsa «Cotizar por WhatsApp» en cualquier ficha, o agrega varios productos a tu lista de cotización y envíala en un solo mensaje.'],
+    ['¿Los precios publicados están vigentes?', 'Son precios de referencia del catálogo de septiembre de 2026, en pesos colombianos (COP). El precio final y la disponibilidad se confirman al cotizar.'],
+  ] },
+  { t: 'Garantía y entregas', q: [
+    ['¿Qué garantía tienen los productos?', 'Todos los productos del catálogo cuentan con 365 días de garantía. Las máquinas de hidrogel indican garantía de 1 año.'],
+    ['¿Hacen envíos?', 'Las condiciones de entrega se confirman al cotizar. Escríbenos con tu ciudad y te informamos.'],
+  ] },
+];
+const faqLd = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: groups.flatMap((g) => g.q).map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) };
+---
+<Base title="Soporte y preguntas frecuentes" description="Garantía, compatibilidad de hidrogel, cotizaciones y recursos del catálogo UBU Latinoamérica 2026." jsonLd={faqLd}>
+  <InnerHero kicker="Soporte" title="Soporte y preguntas frecuentes." lede="Garantía, compatibilidad, cotizaciones y recursos del catálogo." crumbs={[{ label: 'Soporte' }]} />
+  <section class="band band--light">
+    <div class="wrap split" style="align-items:start">
+      <div>
+        <div class="stat"><Image src={seal} alt="" width={76} height={69} /><div><strong>365 días de garantía en todos los productos</strong><p>Así lo indica el catálogo 2026 para cada referencia. Las máquinas de corte de 21" y 11,9" indican garantía de 1 año.</p></div></div>
+        <h2 class="h2" style="margin-top:34px">Cómo usar tu garantía</h2>
+        <p>Escríbenos por WhatsApp con la referencia del producto y te indicamos el proceso y las condiciones de cobertura.</p>
+        <p style="margin-top:20px"><a class="btn btn--wa" href={waUrl('Hola UBU Latinoamérica, quiero consultar la garantía de un producto. Referencia: ')} target="_blank" rel="noopener">Consultar garantía</a></p>
+        <h2 class="h2" style="margin-top:44px">Recursos</h2>
+        <ul class="cards" style="grid-template-columns:1fr">
+          <li class="card"><h3>Catálogo 2026 en PDF</h3><p>Todas las referencias con fotografía y precio de referencia.</p><a class="more" href="/descargas/catalogo-ubu-2026.pdf" download>Descargar catálogo PDF →</a></li>
+          <li class="card"><h3>Fichas de producto</h3><p>Presentación y datos de cada referencia, en el orden del catálogo.</p><a class="more" href="/catalogo">Ir al catálogo →</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="kicker">Preguntas frecuentes</p>
+        {groups.map((g) => (
+          <div style="margin-top:22px"><h3 style="font-size:1.1rem">{g.t}</h3>
+            <div class="faq">{g.q.map(([q, a]) => <details><summary>{q}</summary><p>{a}</p></details>)}</div></div>
+        ))}
+        <p style="margin-top:22px">¿No encuentras tu respuesta? <a href="/contacto"><strong>Contáctanos</strong></a>.</p>
+      </div>
+    </div>
+  </section>
+</Base>

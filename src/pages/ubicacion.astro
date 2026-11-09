@@ -1,0 +1,23 @@
+---
+import Base from '../layouts/Base.astro';
+import InnerHero from '../components/InnerHero.astro';
+import { WA_DISPLAY, waUrl } from '../data/catalog';
+const maps = 'https://www.google.com/maps/search/?api=1&query=Centro%20Empresarial%20Hayuelos';
+---
+<Base title="Ubicación" description="Visita a UBU Latinoamérica en el Centro Empresarial Hayuelos. Escríbenos antes por WhatsApp para confirmar disponibilidad y horario.">
+  <InnerHero kicker="Ubicación" title="Visítanos o escríbenos antes de tu visita." lede="Confirma disponibilidad y horario por WhatsApp antes de ir." crumbs={[{ href: '/contacto', label: 'Contacto' }, { label: 'Ubicación' }]} />
+  <section class="band band--light">
+    <div class="wrap split">
+      <ul class="cards" style="grid-template-columns:1fr;margin:0">
+        <li class="card"><h3>Dirección</h3><p>Centro Empresarial Hayuelos</p></li>
+        <li class="card"><h3>Horario</h3><p>Confirma el horario de atención por WhatsApp antes de tu visita.</p></li>
+        <li class="card"><h3>WhatsApp</h3><p>{WA_DISPLAY}</p></li>
+        <li><a class="btn btn--dark" href={maps} target="_blank" rel="noopener">Cómo llegar (Google Maps)</a> <a class="btn btn--wa" href={waUrl('Hola UBU Latinoamérica, quiero confirmar disponibilidad y horario antes de visitarlos.')} target="_blank" rel="noopener">Confirmar visita</a></li>
+      </ul>
+      <div class="mapcard" aria-hidden="true"><svg viewBox="0 0 400 300"><defs><pattern id="g" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="rgba(64,91,165,.18)" /></pattern></defs><rect width="400" height="300" fill="url(#g)" /><path d="M-10 220 C100 160 180 240 420 120" stroke="#41B9C1" stroke-width="10" fill="none" opacity=".5" /><circle cx="250" cy="156" r="46" fill="rgba(1,220,239,.2)" /><path d="M250 118c-16 0-28 12-28 28 0 22 28 48 28 48s28-26 28-48c0-16-12-28-28-28Z" fill="#405BA5" /><circle cx="250" cy="146" r="10" fill="#fff" /></svg></div>
+    </div>
+  </section>
+</Base>
+<style>
+  .mapcard { border-radius: var(--r-lg); background: linear-gradient(135deg, #EAF6F7, #D9EEF1); border: 1px solid var(--linea); overflow: hidden; } .mapcard svg { display: block; width: 100%; height: auto; }
+</style>

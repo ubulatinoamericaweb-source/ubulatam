@@ -1,0 +1,82 @@
+---
+// Camión de la portada (reutiliza la geometría de la escena original y la mejora:
+// faros, reflejos, logo oficial en blanco sobre el furgón, y capas separables para la transformación por scroll).
+import paths from '../data/brand-paths.json';
+const { bbox, gray, eyes, tag, regFill, regStroke } = paths.logo;
+const [x0, y0, x1, y1] = bbox;
+const lw = x1 - x0, lh = y1 - y0;
+const s = 0.82;                      // escala del logo sobre el furgón
+const tx = 540, ty = 168;
+const wheels = [200, 470, 570, 930, 1030];
+---
+<svg class="truck" viewBox="0 0 1200 520" aria-hidden="true" focusable="false" data-truck>
+  <defs>
+    <linearGradient id="tr-trailer" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6FDCE3" /><stop offset=".5" stop-color="#41B9C1" /><stop offset="1" stop-color="#2A8C99" />
+    </linearGradient>
+    <linearGradient id="tr-cab" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3A4B58" /><stop offset="1" stop-color="#1E2A33" /></linearGradient>
+    <linearGradient id="tr-glass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#BDF3F7" /><stop offset="1" stop-color="#5FB6C4" /></linearGradient>
+    <radialGradient id="tr-beam" cx="0" cy="0.5" r="1"><stop offset="0" stop-color="#FFF4C2" stop-opacity=".75" /><stop offset="1" stop-color="#FFF4C2" stop-opacity="0" /></radialGradient>
+  </defs>
+  <ellipse class="truck__shadow" cx="620" cy="474" rx="540" ry="22" />
+  <path class="truck__beam" d="M96 372 L-380 300 L-380 460 Z" fill="url(#tr-beam)" />
+
+  <g class="part" data-part="chassis" data-dx="0" data-dy="60" data-rz="0">
+    <g class="solid"><rect x="110" y="388" width="990" height="24" rx="9" fill="#1B262E" /><rect x="330" y="372" width="760" height="18" fill="#2A3A46" /></g>
+    <g class="wire"><rect x="110" y="388" width="990" height="24" rx="9" /><rect x="330" y="372" width="760" height="18" /></g>
+  </g>
+
+  <g class="part" data-part="trailer" data-dx="40" data-dy="-96" data-rz="1.5">
+    <g class="solid">
+      <rect x="330" y="118" width="760" height="272" rx="22" fill="url(#tr-trailer)" />
+      <rect x="330" y="118" width="760" height="272" rx="22" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="2" />
+      <path d="M350 150h720M350 360h720" stroke="rgba(255,255,255,.35)" stroke-width="2" />
+      <path d="M350 130 L900 130 L700 380 L350 380Z" fill="rgba(255,255,255,.08)" />
+      <g transform={`translate(${tx} ${ty}) scale(${s}) translate(${-x0} ${-y0})`} fill="#FFFFFF" class="truck__logo">
+        {gray.map((p) => <path d={p.d} />)}{eyes.map((p) => <path d={p.d} />)}{tag.map((p) => <path d={p.d} />)}{regFill.map((p) => <path d={p.d} />)}
+        {regStroke.map((p) => <path d={p.d} fill="none" stroke="#FFFFFF" stroke-width="0.9" />)}
+      </g>
+    </g>
+    <g class="wire"><rect x="330" y="118" width="760" height="272" rx="22" /><path d="M350 150h720M350 360h720M520 118v272M710 118v272M900 118v272" /></g>
+  </g>
+
+  <g class="part" data-part="door" data-dx="180" data-dy="-40" data-rz="7">
+    <g class="solid"><rect x="1068" y="130" width="34" height="250" rx="8" fill="#2A7E88" /><path d="M1078 160h14M1078 350h14" stroke="#fff" stroke-width="3" stroke-linecap="round" /></g>
+    <g class="wire"><rect x="1068" y="130" width="34" height="250" rx="8" /><path d="M1085 130v250" /></g>
+  </g>
+
+  <g class="part" data-part="cab" data-dx="-200" data-dy="-30" data-rz="-5">
+    <g class="solid">
+      <path d="M120 390V222c0-32 20-52 52-52h108c24 0 42 18 42 42v178Z" fill="url(#tr-cab)" />
+      <path d="M150 192h116c15 0 26 11 26 26v44H140v-56c0-8 4-14 10-14Z" fill="url(#tr-glass)" />
+      <path d="M160 200l60 0 -34 58h-46z" fill="rgba(255,255,255,.35)" />
+      <rect x="120" y="302" width="200" height="14" rx="6" fill="#41B9C1" />
+      <circle cx="138" cy="372" r="10" fill="#FFF4C2" /><circle cx="138" cy="372" r="16" fill="#FFF4C2" opacity=".25" />
+      <rect x="96" y="330" width="40" height="58" rx="10" fill="#1E2A33" />
+      <rect x="300" y="200" width="30" height="190" rx="6" fill="#161F26" />
+    </g>
+    <g class="wire"><path d="M120 390V222c0-32 20-52 52-52h108c24 0 42 18 42 42v178Z" /><path d="M150 192h116c15 0 26 11 26 26v44H140v-56c0-8 4-14 10-14Z" /><rect x="120" y="302" width="200" height="14" rx="6" /><circle cx="138" cy="372" r="10" /><rect x="96" y="330" width="40" height="58" rx="10" /></g>
+  </g>
+
+  <g class="part" data-part="wheels" data-dx="0" data-dy="110" data-rz="0">
+    <g class="solid">
+      {wheels.map((cx) => (
+        <g class="wheel">
+          <circle cx={cx} cy="420" r="46" fill="#141C22" /><circle cx={cx} cy="420" r="26" fill="#C9D3D8" /><circle cx={cx} cy="420" r="8" fill="#41B9C1" />
+          <path d={`M${cx - 22} 420h44M${cx} 398v44`} stroke="#7D8C96" stroke-width="3" />
+        </g>
+      ))}
+    </g>
+    <g class="wire">
+      {wheels.map((cx) => <g><circle cx={cx} cy="420" r="46" /><circle cx={cx} cy="420" r="26" /><path d={`M${cx - 22} 420h44M${cx} 398v44`} /></g>)}
+    </g>
+  </g>
+</svg>
+<style>
+  .truck { display: block; width: 100%; height: auto; overflow: visible; }
+  .truck__shadow { fill: rgba(0, 0, 0, .35); filter: blur(10px); }
+  .truck__beam { opacity: 0; }
+  .part { transform-box: fill-box; transform-origin: center; will-change: transform; }
+  .wire { fill: none; stroke: #01DCEF; stroke-width: 1.6; stroke-linejoin: round; stroke-linecap: round; opacity: 0; }
+  .wheel { transform-box: fill-box; transform-origin: center; }
+</style>

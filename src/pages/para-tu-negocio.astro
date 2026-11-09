@@ -1,0 +1,48 @@
+---
+import Base from '../layouts/Base.astro';
+import InnerHero from '../components/InnerHero.astro';
+import PcHead from '../components/PcHead.astro';
+import { waAdvice } from '../data/catalog';
+---
+<Base title="Para tu negocio" description="Equipos e insumos UBU para tiendas de accesorios, servicios técnicos y comercios que instalan hidrogel o reponen surtido. Arma tu lista de cotización y envíala por WhatsApp.">
+  <InnerHero kicker="Para tu negocio" title="UBU para tu negocio." lede="Equipos e insumos para tiendas de accesorios, servicios técnicos y comercios que instalan hidrogel o reponen surtido." crumbs={[{ label: 'Para tu negocio' }]}>
+    <p style="margin-top:26px;display:flex;flex-wrap:wrap;gap:12px"><a class="btn btn--wa" href={waAdvice} target="_blank" rel="noopener">Recibir asesoría por WhatsApp</a><a class="btn btn--ghost" href="/cotizacion">Armar lista de cotización</a></p>
+  </InnerHero>
+  <section class="band band--light">
+    <div class="wrap split">
+      <div>
+        <p class="kicker">Para quién es</p>
+        <h2 class="h2">Tres tipos de negocio, un mismo proveedor.</h2>
+        <ul class="cards" style="grid-template-columns:1fr;margin-top:18px">
+          <li class="card" data-reveal><h3>Tiendas de accesorios</h3><p>Suma la instalación de hidrogel a tu mostrador y complementa con cargadores, cables y vidrios.</p></li>
+          <li class="card" data-reveal style="--i:1"><h3>Servicios técnicos</h3><p>Máquinas de corte, laminación con bomba de vacío y baterías de reemplazo para iPhone.</p></li>
+          <li class="card" data-reveal style="--i:2"><h3>Comercios y distribuidores</h3><p>Hidrogel por paquetes y accesorios para reponer inventario.</p></li>
+        </ul>
+      </div>
+      <div style="max-width:380px;margin-inline:auto" aria-hidden="true"><PcHead pose="wave" /></div>
+    </div>
+  </section>
+  <section class="band band--dark">
+    <div class="wrap">
+      <p class="kicker">Qué podemos armar contigo</p>
+      <h2 class="h2">Equipamiento, insumos y surtido.</h2>
+      <ul class="cards">
+        <li class="card card--dark"><h3>Equipamiento</h3><p>Máquinas de corte de hidrogel, secado UV y laminación.</p><a class="more" style="color:var(--cian-realidad-virtual)" href="/hidrogel#maquinas">Ver máquinas →</a></li>
+        <li class="card card--dark"><h3>Reposición de insumos</h3><p>Láminas de hidrogel por paquete, cuchillas, pen y palas.</p><a class="more" style="color:var(--cian-realidad-virtual)" href="/hidrogel">Ver hidrogel →</a></li>
+        <li class="card card--dark"><h3>Surtido de mostrador</h3><p>Cargadores, cables, audio, vidrios blindados y baterías.</p><a class="more" style="color:var(--cian-realidad-virtual)" href="/conectividad">Ver conectividad →</a></li>
+      </ul>
+    </div>
+  </section>
+  <section class="band band--white">
+    <div class="wrap">
+      <p class="kicker">Cómo cotizar</p>
+      <h2 class="h2">Precios y disponibilidad se confirman con un asesor.</h2>
+      <ol class="cards" style="counter-reset:s">
+        <li class="card"><h3>1 · Arma tu lista</h3><p>Agrega productos desde el catálogo o desde cada ficha.</p></li>
+        <li class="card"><h3>2 · Envíala por WhatsApp</h3><p>Tu lista llega con cantidades y referencias en un solo mensaje.</p></li>
+        <li class="card"><h3>3 · Recibe la confirmación</h3><p>Un asesor te confirma precio final, disponibilidad y entrega.</p></li>
+      </ol>
+      <p style="margin-top:28px"><a class="btn btn--dark" href={waAdvice} target="_blank" rel="noopener">Recibir asesoría</a></p>
+    </div>
+  </section>
+</Base>

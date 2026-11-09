@@ -1,0 +1,29 @@
+---
+// Ilustración DECORATIVA basada fielmente en el isotipo del manual (p. 7).
+// Es una pieza separada del logo oficial: aquí solo los ojos (pastillas) se mueven.
+// No es arrastrable. El seguimiento del cursor lo hace scripts/core.ts (solo con mouse y sin movimiento reducido).
+import paths from '../data/brand-paths.json';
+interface Props { class?: string; tone?: 'color' | 'blanco' | 'cian'; eyes?: boolean }
+const { class: cls = '', tone = 'color', eyes = true } = Astro.props;
+const { bbox, gray, eyes: eyePaths } = paths.iso;
+const pad = 3;
+const [x0, y0, x1, y1] = bbox;
+const vb = `${x0 - pad} ${y0 - pad} ${x1 - x0 + pad * 2} ${y1 - y0 + pad * 2}`;
+const body = tone === 'blanco' ? '#FFFFFF' : tone === 'cian' ? '#01DCEF' : '#575756';
+const eye = tone === 'blanco' || tone === 'cian' ? '#FFFFFF' : '#41B9C1';
+---
+<svg class={`ubu-face ${cls}`} viewBox={vb} aria-hidden="true" focusable="false" draggable="false" xmlns="http://www.w3.org/2000/svg">
+  <g class="ubu-face__body" fill={body}>{gray.map((p) => <path d={p.d} />)}</g>
+  {eyes && (
+    <g class="ubu-face__eyes" data-eyes fill={eye}>
+      {eyePaths.map((p) => <path class="ubu-face__eye" d={p.d} />)}
+    </g>
+  )}
+</svg>
+<style>
+  .ubu-face { display: block; width: 100%; height: auto; user-select: none; -webkit-user-drag: none; pointer-events: none; }
+  .ubu-face__eyes { transform-box: fill-box; }
+  .ubu-face__eye { transform-box: fill-box; transform-origin: center; animation: ubu-blink 6s infinite; }
+  @keyframes ubu-blink { 0%, 94%, 100% { transform: scaleY(1); } 96.5% { transform: scaleY(.12); } }
+  @media (prefers-reduced-motion: reduce) { .ubu-face__eye { animation: none; } }
+</style>

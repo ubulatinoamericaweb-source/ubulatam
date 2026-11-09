@@ -1,0 +1,73 @@
+---
+import Base from '../layouts/Base.astro';
+import InnerHero from '../components/InnerHero.astro';
+import PcHead from '../components/PcHead.astro';
+import { products, WA_DISPLAY, waGeneric, WA_NUMBER } from '../data/catalog';
+const options = products.filter((p) => !p.info).map((p) => ({ slug: p.slug, name: p.name }));
+const saves = !!(import.meta.env.PUBLIC_SUPABASE_URL && import.meta.env.PUBLIC_SUPABASE_ANON_KEY);
+---
+<Base title="Contacto y cotización" description="Contacta a UBU Latinoamérica por WhatsApp: cuéntanos qué equipo o insumo necesitas y te respondemos. Formulario de cotización que continúa en WhatsApp.">
+  <InnerHero kicker="Contacto" title="Hablemos de tu pedido." lede="Cuéntanos qué equipo o insumo necesitas y te respondemos por WhatsApp." crumbs={[{ label: 'Contacto' }]} />
+  <section class="band band--light">
+    <div class="wrap split" style="align-items:start">
+      <div style="display:grid;gap:18px">
+        <ul class="cards" style="grid-template-columns:1fr;margin:0">
+          <li class="card"><h3>WhatsApp de ventas</h3><p style="font-size:1.4rem;font-family:var(--font-display);font-weight:700;color:var(--tinta-1)">{WA_DISPLAY}</p><a class="btn btn--wa" style="align-self:start" href={waGeneric} target="_blank" rel="noopener">Abrir WhatsApp</a></li>
+          <li class="card"><h3>Punto de atención</h3><p>Centro Empresarial Hayuelos</p><a class="more" href="/ubicacion">Ver ubicación →</a></li>
+        </ul>
+        <div style="max-width:300px" aria-hidden="true"><PcHead pose="point" /></div>
+      </div>
+      <form class="form" id="cform" novalidate data-wa={WA_NUMBER} data-saves={saves ? '1' : '0'}>
+        <h2 class="h2" style="margin:0">Solicita tu cotización</h2>
+        <p>Completa lo esencial y continúa en WhatsApp con tu mensaje listo.</p>
+        <div class="field"><label for="f-name">Nombre</label><input id="f-name" name="nombre" autocomplete="name" required maxlength="80" /><span class="err" id="e-name" aria-live="polite"></span></div>
+        <div class="field"><label for="f-city">Ciudad (opcional)</label><input id="f-city" name="ciudad" autocomplete="address-level2" maxlength="60" /></div>
+        <div class="field"><label for="f-type">Tipo de cliente (opcional)</label>
+          <select id="f-type" name="tipo"><option value="">Selecciona</option><option>Tienda de accesorios</option><option>Servicio técnico</option><option>Distribuidor</option><option>Cliente final</option><option>Otro</option></select></div>
+        <div class="field"><label for="f-prod">Producto de interés (opcional)</label>
+          <select id="f-prod" name="producto"><option value="">Selecciona</option>{options.map((o) => <option>{o.name}</option>)}<option>Otro producto del catálogo</option></select></div>
+        <div class="field"><label for="f-msg">Mensaje (opcional)</label><textarea id="f-msg" name="mensaje" maxlength="600"></textarea></div>
+        <label class="check"><input type="checkbox" id="f-list" /> <span>Incluir mi lista de cotización, si tengo productos agregados.</span></label>
+        <label class="check"><input type="checkbox" id="f-consent" required /> <span>Autorizo a UBU Latinoamérica a tratar mis datos para responder esta solicitud, según la <a href="/privacidad">Política de tratamiento de datos</a>.</span></label>
+        <span class="err" id="e-consent" aria-live="polite"></span>
+        <label class="check"><input type="checkbox" id="f-mkt" /> <span>Quiero recibir información comercial y novedades de UBU por WhatsApp (opcional).</span></label>
+        <button class="btn btn--wa" type="submit">Continuar en WhatsApp</button>
+        <p style="font-size:.9rem;color:var(--texto-suave)">Se abrirá WhatsApp con tu mensaje para que lo envíes.{saves && ' Guardamos una copia de tu solicitud para darle seguimiento, según la política de datos.'}</p>
+      </form>
+    </div>
+  </section>
+  <script>
+    import { qGet } from '../scripts/core';
+    import { products } from '../data/catalog';
+    const f = document.getElementById('cform') as HTMLFormElement | null;
+    if (f) {
+      const byslug = new Map(products.map((p) => [p.slug, p]));
+      f.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const g = (id: string) => (document.getElementById(id) as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement);
+        const name = g('f-name').value.trim();
+        const consent = (g('f-consent') as HTMLInputElement).checked;
+        document.getElementById('e-name')!.textContent = name ? '' : 'Escribe tu nombre.';
+        document.getElementById('e-consent')!.textContent = consent ? '' : 'Debes autorizar el tratamiento de tus datos para continuar.';
+        if (!name || !consent) return;
+        const lines = ['Hola UBU Latinoamérica, quiero cotizar.', `Nombre: ${name}`];
+        if (g('f-city').value.trim()) lines.push(`Ciudad: ${g('f-city').value.trim()}`);
+        if (g('f-type').value) lines.push(`Tipo de cliente: ${g('f-type').value}`);
+        if (g('f-prod').value) lines.push(`Producto de interés: ${g('f-prod').value}`);
+        if (g('f-msg').value.trim()) lines.push(`Mensaje: ${g('f-msg').value.trim()}`);
+        let listTxt = '';
+        if ((g('f-list') as HTMLInputElement).checked) {
+          const items = qGet().map((i) => ({ p: byslug.get(i.id), qty: i.qty })).filter((x) => x.p);
+          if (items.length) { listTxt = items.map((x) => `• ${x.qty} x ${x.p!.name}`).join('\n'); lines.push('Mi lista:\n' + listTxt); }
+        }
+        if ((g('f-mkt') as HTMLInputElement).checked) lines.push('Acepto recibir información comercial por WhatsApp.');
+        const sbUrl = import.meta.env.PUBLIC_SUPABASE_URL as string | undefined, sbKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY as string | undefined;
+        if (f.dataset.saves === '1' && sbUrl && sbKey) {
+          fetch(`${sbUrl}/rest/v1/solicitudes`, { method: 'POST', keepalive: true, headers: { apikey: sbKey, Authorization: `Bearer ${sbKey}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+            body: JSON.stringify({ tipo: 'contacto', nombre: name, ciudad: g('f-city').value.trim() || null, tipo_cliente: g('f-type').value || null, productos: g('f-prod').value || listTxt || null, mensaje: g('f-msg').value.trim() || null, acepta_comercial: (g('f-mkt') as HTMLInputElement).checked }) }).catch(() => {});
+        }
+        window.open(`https://wa.me/${f.dataset.wa}?text=${encodeURIComponent(lines.join('\n'))}`, '_blank', 'noopener');
+      });
+    }
+  </script>
+</Base>

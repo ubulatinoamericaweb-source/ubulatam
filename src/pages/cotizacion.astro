@@ -1,0 +1,32 @@
+---
+import Base from '../layouts/Base.astro';
+import InnerHero from '../components/InnerHero.astro';
+import { products, productImage, displayImages, priceLabel } from '../data/catalog';
+// Datos mínimos para pintar la lista en el navegador (la lista vive en localStorage del visitante).
+const data = Object.fromEntries(
+  products.filter((p) => !p.info).map((p) => {
+    const im = displayImages(p)[0];
+    return [p.slug, { n: p.name, p: priceLabel(p), t: p.price == null ? 0 : p.price, from: p.from, u: p.unit, img: im ? productImage(im.file).src : '', blend: im ? !im.alpha : false }];
+  }),
+);
+---
+<Base title="Lista de cotización" description="Arma tu lista de productos UBU y envíala por WhatsApp en un solo mensaje con cantidades y referencias. Precios de referencia en COP." noindex>
+  <InnerHero kicker="Cotización" title="Tu lista de cotización." lede="Ajusta cantidades y envía todo en un solo mensaje por WhatsApp. El precio final y la disponibilidad se confirman al cotizar." crumbs={[{ label: 'Lista de cotización' }]} />
+  <section class="band band--light">
+    <div class="wrap" style="max-width:920px">
+      <div id="q-empty" hidden>
+        <p class="callout">Tu lista está vacía. Agrega productos desde el catálogo o desde cada ficha.</p>
+        <p style="display:flex;gap:12px;flex-wrap:wrap"><a class="btn btn--dark" href="/conectividad">Ver Conectividad</a><a class="btn btn--dark" href="/hidrogel">Ver Hidrogel</a></p>
+      </div>
+      <div id="q-box" hidden>
+        <ul id="q-list" style="list-style:none;margin:0;padding:0;display:grid;gap:12px"></ul>
+        <div class="stat" style="margin-top:22px;justify-content:space-between;flex-wrap:wrap">
+          <div><strong id="q-sum">Total estimado</strong><p style="font-size:.9rem;color:var(--texto-suave)" id="q-note">Estimado con precios de referencia en COP. Las referencias «desde» y sin precio se confirman al cotizar.</p></div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap"><a class="btn btn--wa" id="q-send" href="#" target="_blank" rel="noopener">Enviar lista por WhatsApp</a><button class="btn btn--line" id="q-clear" type="button">Vaciar lista</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <script type="application/json" id="q-data" set:html={JSON.stringify(data)} />
+  <script>import '../scripts/quote';</script>
+</Base>

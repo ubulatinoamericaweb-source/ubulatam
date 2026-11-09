@@ -1,0 +1,14 @@
+---
+import Base from '../layouts/Base.astro';
+import CategoryView from '../components/CategoryView.astro';
+import { categories, byCategory } from '../data/catalog';
+const meta = categories['hidrogel'];
+const list = byCategory('hidrogel');
+---
+<Base
+  title="Hidrogel · catálogo 2026 con precios en COP"
+  description={meta.intro + ' Precios de referencia en COP y cotización por WhatsApp.'}
+  jsonLd={{ '@context': 'https://schema.org', '@type': 'ItemList', name: 'Hidrogel UBU Latinoamérica', itemListElement: list.filter((p) => !p.info).map((p, i) => ({ '@type': 'ListItem', position: i + 1, url: 'https://ubulatinoamerica.com/' + p.slug, name: p.name })) }}
+>
+  <CategoryView category="hidrogel" />
+</Base>

@@ -1,0 +1,130 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import UbuFace from '../components/UbuFace.astro';
+import { products, categories, byCategory, displayImages, productImage, cop, priceLabel, waProduct, waGeneric } from '../data/catalog';
+import seal from '../assets/sello-365.webp';
+
+export function getStaticPaths() {
+  return products.filter((p) => !p.info).map((p) => ({ params: { slug: p.slug }, props: { slug: p.slug } }));
+}
+const { slug } = Astro.props;
+const p = products.find((x) => x.slug === slug)!;
+const cat = categories[p.category];
+const imgs = displayImages(p);
+const siblings = byCategory(p.category).filter((x) => !x.info);
+const idx = siblings.findIndex((x) => x.slug === p.slug);
+const prev = siblings[idx - 1], next = siblings[idx + 1];
+const hasPrice = p.price != null;
+const isBattery = p.type === 'Batería';
+const desc = `${p.name}${hasPrice ? ` · ${priceLabel(p)} COP` : ''}. Catálogo UBU Latinoamérica 2026, página ${p.page}. Cotiza por WhatsApp.`;
+const prices = p.table ? p.table.rows.map((r) => r.price) : null;
+const offer = p.table && prices
+  ? { '@type': 'AggregateOffer', priceCurrency: 'COP', lowPrice: Math.min(...prices), highPrice: Math.max(...prices), offerCount: prices.length }
+  : hasPrice ? { '@type': 'Offer', priceCurrency: 'COP', price: p.price } : undefined;
+const ld = {
+  '@context': 'https://schema.org', '@type': 'Product', name: p.name, brand: { '@type': 'Brand', name: 'UBU' },
+  category: cat.name, ...(offer ? { offers: offer } : {}),
+  ...(imgs[0] ? { image: new URL(productImage(imgs[0].file).src, 'https://ubulatinoamerica.com').href } : {}),
+};
+---
+<Base title={p.name} description={desc} type="product" jsonLd={ld} image={imgs[0] ? productImage(imgs[0].file).src : '/og.png'}>
+  <section class="pdp">
+    <div class="pdp__bg" aria-hidden="true"></div>
+    <div class="wrap">
+      <nav aria-label="Ruta de navegación"><ol class="crumbs"><li><a href="/">Inicio</a></li><li><a href={`/${cat.slug}`}>{cat.name}</a></li><li aria-current="page">{p.name}</li></ol></nav>
+      <div class="pdp__grid">
+        <div class="pdp__gallery">
+          <div class={`pdp__stage ${imgs[0] && !imgs[0].alpha ? 'is-blend' : ''}`}>
+            {imgs[0]
+              ? <Image src={productImage(imgs[0].file)} alt={p.name} widths={[420, 640, 900]} sizes="(max-width: 860px) 90vw, 520px" loading="eager" fetchpriority="high" />
+              : <div class="pdp__empty"><UbuFace tone="color" eyes={false} /><span>Sin fotografía en el catálogo</span></div>}
+            {p.sticker && <span class="pcard__sticker">{p.sticker}</span>}
+          </div>
+          <p class="pdp__cap">Catálogo 2026 · página {p.page}</p>
+          {imgs.length > 1 && <ul class="pdp__thumbs">{imgs.slice(1).map((im) => <li class={!im.alpha ? 'is-blend' : ''}><Image src={productImage(im.file)} alt={`${p.name}, vista adicional`} widths={[200, 320]} sizes="140px" loading="lazy" /></li>)}</ul>}
+          {isBattery && imgs[0] && <p class="pdp__cap">Foto del catálogo: presentación de la batería (p. 24).</p>}
+        </div>
+
+        <div class="pdp__info">
+          <span class="pcard__type" style="position:static;display:inline-block">{p.type}</span>
+          <h1>{p.name}</h1>
+          {p.features.length > 0 && <ul class="pdp__feats">{p.features.map((f) => <li>{f}</li>)}</ul>}
+          {p.colors && <div class="swatches" role="img" aria-label="Disponible en los colores mostrados en el catálogo">{p.colors.map((c) => <i style={`background:${c}`} />)}<span>Disponible en estos colores</span></div>}
+          {hasPrice && (
+            <p class="pdp__price price" data-sb-price={p.sbSlug}>
+              <span data-num>{(p.from ? 'Desde ' : '') + cop(p.price!)}</span>{p.unit && <span class="unit">{p.unit}</span>}<small>COP</small>
+            </p>
+          )}
+          <p class="pdp__note">Precio de referencia del catálogo 2026, en pesos colombianos. El precio final y la disponibilidad se confirman al cotizar.</p>
+          <div class="pdp__actions">
+            <a class="btn btn--wa" href={waProduct(p)} target="_blank" rel="noopener">Cotizar por WhatsApp</a>
+            <button class="btn btn--line" type="button" data-add={p.slug} data-label="Agregar a cotización" aria-pressed="false"><span class="t">Agregar a cotización</span></button>
+          </div>
+          <div class="stat"><Image src={seal} alt="" width={76} height={69} /><div><strong>365 días de garantía</strong><p>Según el catálogo 2026 para cada referencia.{p.features.some((f) => f.includes('Garantía de 1 año')) ? ' Esta máquina indica garantía de 1 año.' : ''}</p></div></div>
+        </div>
+      </div>
+
+      {p.table && (
+        <div class="pdp__block">
+          <h2 class="h2">Modelos y precios</h2>
+          <div class="tbl" tabindex="0" role="region" aria-label={`Tabla de precios: ${p.name}`}>
+            <table>
+              <thead><tr>{p.table.head.map((h) => <th scope="col">{h}</th>)}</tr></thead>
+              <tbody>{p.table.rows.map((r) => <tr><th scope="row">{r.model}</th><td>{r.capacity}</td><td class="num">{cop(r.price)} <small>COP</small></td></tr>)}</tbody>
+            </table>
+          </div>
+          <p class="pdp__note">Los datos de la tabla se muestran tal como aparecen en el catálogo (p. {p.page}).</p>
+        </div>
+      )}
+      {p.references && (
+        <div class="pdp__block">
+          <h2 class="h2">Referencias disponibles · {cop(p.price!)} {p.unit} <small style="font-size:.5em;opacity:.6">COP</small></h2>
+          <ul class="refs-list">{p.references.map((r) => <li>{r}</li>)}</ul>
+        </div>
+      )}
+
+      <nav class="pdp__pager" aria-label="Producto anterior y siguiente en el catálogo">
+        {prev ? <a href={`/${prev.slug}`}><small>← Anterior en el catálogo</small><span>{prev.name}</span></a> : <span></span>}
+        {next ? <a href={`/${next.slug}`} class="is-next"><small>Siguiente en el catálogo →</small><span>{next.name}</span></a> : <span></span>}
+      </nav>
+      <p style="margin-top:28px"><a class="btn btn--dark" href={`/${cat.slug}`}>← Volver a {cat.name}</a> <a class="btn btn--line" href={waGeneric} target="_blank" rel="noopener">Consultar otra referencia</a></p>
+    </div>
+  </section>
+</Base>
+<style>
+  .pdp { position: relative; padding: calc(var(--header-h) + 52px) 0 clamp(70px, 8vw, 120px); background: linear-gradient(180deg, #EAF6F7, #F7FBFC 60%, #fff); color: var(--texto); overflow: hidden; }
+  .pdp__bg { position: absolute; right: -10%; top: -6%; width: 60vw; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(closest-side, rgba(1,220,239,.25), rgba(64,91,165,.1) 60%, transparent 72%); }
+  .pdp :global(.crumbs) { color: var(--texto-suave); }
+  .pdp__grid { position: relative; display: grid; grid-template-columns: 1.05fr .95fr; gap: clamp(24px, 5vw, 72px); align-items: start; }
+  .pdp__stage { position: relative; aspect-ratio: 1 / 1; display: grid; place-items: center; padding: clamp(18px, 3vw, 36px); border-radius: var(--r-lg); background: radial-gradient(120% 90% at 50% 15%, #fff, var(--bruma) 65%, var(--bruma-2)); border: 1px solid var(--linea); box-shadow: 0 40px 80px -50px rgba(5,16,27,.5); overflow: hidden; }
+  .pdp__stage img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 24px 24px rgba(10,26,41,.22)); }
+  .pdp__stage.is-blend img { mix-blend-mode: multiply; filter: none; }
+  .pdp__page { position: absolute; left: 14px; bottom: 12px; font-size: .78rem; color: var(--texto-suave); font-family: var(--font-display); }
+  .pdp__empty { display: grid; gap: 12px; place-items: center; color: var(--texto-suave); } .pdp__empty :global(.ubu-face) { width: 40%; opacity: .5; }
+  .pdp__thumbs { list-style: none; margin: 14px 0 0; padding: 0; display: flex; gap: 12px; }
+  .pdp__thumbs li { width: 120px; aspect-ratio: 1; border-radius: var(--r-md); background: var(--bruma); padding: 8px; border: 1px solid var(--linea); } .pdp__thumbs img { width: 100%; height: 100%; object-fit: contain; }
+  .pdp__thumbs li.is-blend img { mix-blend-mode: multiply; }
+  .pdp__cap { margin-top: 10px; font-size: .86rem; color: var(--texto-suave); }
+  .pdp__info { display: grid; gap: 18px; }
+  .pdp__info h1 { font-size: clamp(1.9rem, 3.8vw, 3.2rem); }
+  .pdp__feats { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+  .pdp__feats li { padding: .4em 1em; border-radius: var(--r-pill); background: #fff; border: 1px solid var(--linea); font-weight: 600; font-family: var(--font-display); font-size: .92rem; color: var(--confianza-indigo); }
+  .pdp__price { font-size: clamp(2.4rem, 5vw, 3.6rem); color: var(--tinta-1); }
+  .pdp__note { color: var(--texto-suave); font-size: .92rem; }
+  .pdp__actions { display: flex; flex-wrap: wrap; gap: 12px; }
+  .swatches span { font-size: .88rem; color: var(--texto-suave); margin-left: 6px; }
+  .pdp__block { margin-top: clamp(40px, 6vw, 80px); }
+  .refs-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); border: 1px solid var(--linea); border-radius: var(--r-md); background: #fff; overflow: hidden; }
+  .refs-list li { padding: .7em 1em; border-bottom: 1px solid var(--linea); font-family: var(--font-display); font-weight: 500; font-size: .94rem; }
+  .tbl { overflow: auto; border-radius: var(--r-md); border: 1px solid var(--linea); background: #fff; max-height: 560px; }
+  table { width: 100%; border-collapse: collapse; } th, td { padding: .8em 1.1em; text-align: left; border-bottom: 1px solid var(--linea); }
+  thead th { position: sticky; top: 0; background: var(--tinta-1); color: #fff; font-family: var(--font-display); font-size: .78rem; letter-spacing: .1em; text-transform: uppercase; }
+  tbody th { font-family: var(--font-display); } td.num { text-align: right; font-family: var(--font-display); font-weight: 700; white-space: nowrap; } td.num small { opacity: .55; }
+  tbody tr:hover { background: var(--bruma); }
+  .pdp__pager { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: clamp(40px, 6vw, 70px); }
+  .pdp__pager a { display: grid; gap: 4px; padding: 18px 22px; border-radius: var(--r-md); background: #fff; border: 1px solid var(--linea); text-decoration: none; transition: transform .35s var(--ease), border-color .25s; }
+  .pdp__pager a:hover { transform: translateY(-4px); border-color: var(--asombro-turmalina); } .pdp__pager a.is-next { text-align: right; }
+  .pdp__pager small { color: var(--confianza-indigo); font-family: var(--font-display); font-weight: 600; } .pdp__pager span { font-family: var(--font-display); font-weight: 600; }
+  @media (max-width: 860px) { .pdp__grid { grid-template-columns: 1fr; } .pdp__pager { grid-template-columns: 1fr; } .pdp__pager a.is-next { text-align: left; } }
+</style>

@@ -1,0 +1,63 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import InnerHero from '../components/InnerHero.astro';
+import UbuFace from '../components/UbuFace.astro';
+import Logo from '../components/Logo.astro';
+import { waAdvice } from '../data/catalog';
+import seal from '../assets/sello-365.webp';
+const colors = [
+  ['Asombro Turmalina', '#41B9C1', '#fff'], ['Cian Realidad Virtual', '#01DCEF', '#05101B'], ['Gris Guernica', '#575756', '#fff'],
+  ['Azul Silicon Valley', '#4293D0', '#fff'], ['Confianza Índigo', '#405BA5', '#fff'], ['Verde Armonía', '#56B28E', '#05101B'], ['Blanco Pureza', '#FFFFFF', '#05101B'],
+];
+---
+<Base title="Nosotros" description="UBU Latinoamérica es una marca de tecnología para el mercado de accesorios de celular: hidrogel, cargadores, cables, audio, vidrios y baterías. Atendemos por WhatsApp y en el Centro Empresarial Hayuelos.">
+  <InnerHero kicker="Nosotros" title="Lo necesario para instalar hidrogel y surtir tu mostrador." lede="UBU Latinoamérica reúne máquinas de corte, láminas de hidrogel e insumos de instalación, junto con accesorios de mostrador para celular." crumbs={[{ label: 'Nosotros' }]} />
+  <section class="band band--light">
+    <div class="wrap split">
+      <div>
+        <p class="kicker">Quiénes somos</p>
+        <h2 class="h2">Una marca de tecnología para el mercado de accesorios de celular.</h2>
+        <p>Nuestro catálogo 2026 se centra en la protección de hidrogel: equipos para cortarla a la medida, láminas en distintos acabados y las herramientas para instalarla.</p>
+        <p style="margin-top:14px">Lo complementamos con cargadores, cables, audio, vidrios blindados y baterías, para que una tienda o un servicio técnico encuentre su surtido en un solo proveedor. Atendemos por WhatsApp y en el Centro Empresarial Hayuelos.</p>
+        <p style="margin-top:22px"><a class="btn btn--dark" href="/ubicacion">Ver ubicación</a></p>
+      </div>
+      <div class="stat"><Image src={seal} alt="" width={76} height={69} /><div><strong>365 días de garantía</strong><p>Es el compromiso que, según el catálogo 2026, acompaña cada referencia. Las máquinas de hidrogel indican garantía de 1 año.</p></div></div>
+    </div>
+  </section>
+  <section class="band band--dark">
+    <div class="wrap">
+      <p class="kicker">Qué ofrecemos</p>
+      <h2 class="h2">Dos líneas que se complementan en el mostrador.</h2>
+      <ul class="cards">
+        <li class="card card--dark"><h3>Hidrogel</h3><p>Máquinas de corte libres de códigos, secado UV, laminación, láminas HD, mate, antiblue, antiespía, UV, 360, para tablet y para máquina VT8PRO.</p><a class="more" style="color:var(--cian-realidad-virtual)" href="/hidrogel">Ver hidrogel →</a></li>
+        <li class="card card--dark"><h3>Conectividad</h3><p>Cargadores, cables, power bank, audio, vidrios blindados, parlantes y baterías para iPhone.</p><a class="more" style="color:var(--cian-realidad-virtual)" href="/conectividad">Ver conectividad →</a></li>
+      </ul>
+    </div>
+  </section>
+  <section class="band band--white">
+    <div class="wrap split">
+      <div>
+        <p class="kicker">Nuestra identidad</p>
+        <h2 class="h2">El símbolo de UBU es una cara amable.</h2>
+        <p>Dos ojos turquesa sobre la letra u. El manual de identidad busca que la marca se vea consistente, legible y profesional en cualquier plataforma.</p>
+        <div class="swatch-row">{colors.map(([n, h, fg]) => <div class="swatch" style={`background:${h};color:${fg}`}>{n}<small>{h}</small></div>)}</div>
+      </div>
+      <div style="display:grid;gap:26px;justify-items:center">
+        <Logo class="" label="Logo UBU Latinoamérica" />
+        <div style="width:min(60%,220px)"><UbuFace tone="color" eyes={true} /></div>
+      </div>
+    </div>
+  </section>
+  <section class="band band--light">
+    <div class="wrap" style="text-align:center;display:grid;gap:18px;justify-items:center">
+      <h2 class="h2" style="max-width:20ch">Hablemos de tu negocio.</h2>
+      <p>Cuéntanos qué equipos o insumos necesitas y te asesoramos.</p>
+      <p style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center"><a class="btn btn--dark" href="/para-tu-negocio">Para tu negocio</a><a class="btn btn--wa" href={waAdvice} target="_blank" rel="noopener">Escribir por WhatsApp</a></p>
+    </div>
+  </section>
+</Base>
+<style>
+  .band--light p, .band--white p { color: var(--texto-suave); }
+  .stat p { color: var(--texto-suave); }
+</style>

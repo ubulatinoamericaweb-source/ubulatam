@@ -1,0 +1,12 @@
+---
+import Base from '../layouts/Base.astro';
+import InnerHero from '../components/InnerHero.astro';
+import UbuFace from '../components/UbuFace.astro';
+import { waGeneric } from '../data/catalog';
+---
+<Base title="Página no encontrada" description="La página que buscas no existe o cambió de dirección. Vuelve al catálogo de UBU Latinoamérica." noindex>
+  <InnerHero kicker="Error 404" title="No encontramos esa página." lede="Puede que haya cambiado de dirección. Te llevamos de vuelta al catálogo.">
+    <p style="margin-top:26px;display:flex;flex-wrap:wrap;gap:12px"><a class="btn" href="/">Ir al inicio</a><a class="btn btn--ghost" href="/catalogo">Ver catálogo</a><a class="btn btn--wa" href={waGeneric} target="_blank" rel="noopener">Escribir por WhatsApp</a></p>
+  </InnerHero>
+  <section class="band band--light"><div class="wrap" style="display:grid;place-items:center"><div style="width:min(260px,60vw)"><UbuFace tone="color" /></div></div></section>
+</Base>

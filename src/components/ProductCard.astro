@@ -1,0 +1,37 @@
+---
+import { Image } from 'astro:assets';
+import { type Product, displayImages, productImage, priceLabel, cop } from '../data/catalog';
+import UbuFace from './UbuFace.astro';
+interface Props { p: Product; eager?: boolean; index?: number }
+const { p, eager = false, index = 0 } = Astro.props;
+const img = displayImages(p)[0];
+const hasPrice = p.price != null;
+const label = hasPrice ? (p.from ? 'Desde ' : '') + cop(p.price!) : '';
+const href = p.info ? undefined : `/${p.slug}`;
+---
+<li class="pcard" data-reveal style={`--i:${Math.min(index % 8, 7)}`} data-product={p.slug}>
+  <div class={`pcard__stage ${img && !img.alpha ? 'pcard__stage--blend' : ''} ${!img ? 'pcard__stage--empty' : ''}`}>
+    <span class="pcard__type">{p.type}</span>
+    {p.sticker && <span class="pcard__sticker">{p.sticker}</span>}
+    {img
+      ? <Image src={productImage(img.file)} alt={p.name} widths={[240, 360, 520]} sizes="(max-width: 600px) 46vw, 280px" loading={eager ? 'eager' : 'lazy'} decoding="async" />
+      : <UbuFace tone="color" eyes={false} />}
+    {!img && <span class="sr-only">Sin fotografía en el catálogo</span>}
+  </div>
+  <div class="pcard__body">
+    <h3 class="pcard__name">{href ? <a href={href}>{p.name}</a> : p.name}</h3>
+    {p.features.length > 0 && <ul class="pcard__feats">{p.features.slice(0, 4).map((f) => <li>{f}</li>)}</ul>}
+    {p.colors && <div class="swatches" role="img" aria-label="Colores disponibles según el catálogo">{p.colors.map((c) => <i style={`background:${c}`} />)}</div>}
+    {p.references && <p class="pcard__note">{p.references.length} referencias de equipo listadas</p>}
+    {p.table && <p class="pcard__note">{p.table.rows.length} modelos de iPhone · tabla de precios en la ficha</p>}
+    <div class="pcard__foot">
+      {hasPrice
+        ? <span class="price" data-sb-price={p.sbSlug}><span data-num>{label}</span>{p.unit && <span class="unit">{p.unit}</span>}<small>COP</small></span>
+        : <span class="price"><small style="letter-spacing:.02em;opacity:.7">Sin precio en el catálogo</small></span>}
+      {!p.info && <button class="btn btn--sm btn--line" type="button" data-add={p.slug} data-label="Cotizar" aria-pressed="false"><span class="t">Cotizar</span></button>}
+    </div>
+  </div>
+</li>
+<style>
+  .pcard__note { font-size: .82rem; color: var(--texto-suave); }
+</style>

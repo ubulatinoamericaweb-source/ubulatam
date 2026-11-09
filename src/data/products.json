@@ -1,0 +1,1320 @@
+[
+ {
+  "order": 1,
+  "page": 2,
+  "category": "conectividad",
+  "type": "Cargador",
+  "slug": "cargador-pd-45w-gan-super-carga-rapida-tc-tc",
+  "sbSlug": "pd45",
+  "name": "Cargador PD 45W GaN súper carga rápida TC/TC",
+  "printedName": "CARGADOR PD45 W GAN SUPER CARGA RAPIDA TC/TC",
+  "price": 49000,
+  "unit": "",
+  "from": false,
+  "features": [],
+  "images": [
+   {
+    "file": "cargador-pd-45w-gan-super-carga-rapida-tc-tc-1.webp",
+    "alpha": true,
+    "w": 800,
+    "h": 533
+   }
+  ]
+ },
+ {
+  "order": 2,
+  "page": 3,
+  "category": "conectividad",
+  "type": "Cargador",
+  "slug": "cargador-pd-20w-gan-super-carga-rapida-tc-tc",
+  "sbSlug": "pd20",
+  "name": "Cargador PD 20W GaN súper carga rápida TC/TC",
+  "printedName": "CARGADOR PD 20 W GAN SUPER CARGA RAPIDA TC/TC",
+  "price": 27000,
+  "unit": "",
+  "from": false,
+  "features": [],
+  "images": [
+   {
+    "file": "cargador-pd-20w-gan-super-carga-rapida-tc-tc-1.webp",
+    "alpha": true,
+    "w": 800,
+    "h": 533
+   }
+  ]
+ },
+ {
+  "order": 3,
+  "page": 4,
+  "category": "conectividad",
+  "type": "Cargador",
+  "slug": "cargador-pd-18w-carga-rapida-tc-tc",
+  "sbSlug": "pd18",
+  "name": "Cargador PD 18W carga rápida TC/TC",
+  "printedName": "CARGADOR PD 18W CARGA RAPIDA TC/TC",
+  "price": 14000,
+  "unit": "",
+  "from": false,
+  "features": [],
+  "images": [
+   {
+    "file": "cargador-pd-18w-carga-rapida-tc-tc-1.webp",
+    "alpha": true,
+    "w": 745,
+    "h": 800
+   }
+  ]
+ },
+ {
+  "order": 4,
+  "page": 5,
+  "category": "conectividad",
+  "type": "Cargador",
+  "slug": "cargador-pd-25w-carga-rapida-tc-tc",
+  "sbSlug": "pd25",
+  "name": "Cargador PD 25W carga rápida TC/TC",
+  "printedName": "CARGADOR PD 25W CARGA RAPIDA TC/TC",
+  "price": 15000,
+  "unit": "",
+  "from": false,
+  "features": [],
+  "images": [
+   {
+    "file": "cargador-pd-25w-carga-rapida-tc-tc-1.webp",
+    "alpha": true,
+    "w": 762,
+    "h": 800
+   }
+  ]
+ },
+ {
+  "order": 5,
+  "page": 6,
+  "category": "conectividad",
+  "type": "Cable",
+  "slug": "cable-60w-tc-tc-reforzado-1-5-m",
+  "sbSlug": "cab60r",
+  "name": "Cable 60W TC/TC reforzado 1,5 m",
+  "printedName": "CABLE 60 W TC / TC REFORZADO 1,5 MTS",
+  "price": 7000,
+  "unit": "",
+  "from": false,
+  "features": [],
+  "images": [
+   {
+    "file": "cable-60w-tc-tc-reforzado-1-5-m-1.webp",
+    "alpha": true,
+    "w": 600,
+    "h": 800
+   }
+  ]
+ },
+ {
+  "order": 6,
+  "page": 7,
+  "category": "conectividad",
+  "type": "Cable",
+  "slug": "cable-60w-tc-tc-siliconado-1-5-m",
+  "sbSlug": "cab60s",
+  "name": "Cable 60W TC/TC siliconado 1,5 m",
+  "printedName": "CABLE 60 W TC / TC SILICONADO 1,5 MTS",
+  "price": 6000,
+  "unit": "",
+  "from": false,
+  "features": [],
+  "images": [
+   {
+    "file": "cable-60w-tc-tc-siliconado-1-5-m-1.webp",
+    "alpha": true,
+    "w": 769,
+    "h": 800
+   }
+  ]
+ },
+ {
+  "order": 7,
+  "page": 8,
+  "category": "conectividad",
+  "type": "Cable",
+  "slug": "cable-240w-tc-tc-con-soporte-cable-plano-1-5-m",
+  "sbSlug": "cab240",
+  "name": "Cable 240W TC/TC con soporte, cable plano 1,5 m",
+  "printedName": "CABLE 240 W TC / TC SOPORTE CABLE PLANO 1,5 MTS",
+  "price": 10000,
+  "unit": "",
+  "from": false,
+  "features": [],
+  "images": [
+   {
+    "file": "cable-240w-tc-tc-con-soporte-cable-plano-1-5-m-1.webp",
+    "alpha": true,
+    "w": 800,
+    "h": 731
+   }
+  ]
+ },
+ {
+  "order": 8,
+  "page": 9,
+  "category": "conectividad",
+  "type": "Power bank",
+  "slug": "power-bank-10-000-mah-22-5w-multipuerto",
+  "sbSlug": "powerbank",
+  "name": "Power bank 10.000 mAh 22,5W reales multipuerto",
+  "printedName": "POWER BANG 10.000 MIH 22,5 W REALES MULTIPUERTO",
+  "price": 40000,
+  "unit": "",
+  "from": false,
+  "features": [],
+  "images": [
+   {
+    "file": "power-bank-10-000-mah-22-5w-multipuerto-1.webp",
+    "alpha": true,
+    "w": 800,
+    "h": 533
+   }
+  ]
+ },
+ {
+  "order": 9,
+  "page": 10,
+  "category": "conectividad",
+  "type": "Cargador de carro",
+  "slug": "cargador-de-carro-2-puertos-tc-30w-tc-30w",
+  "sbSlug": "carro2",
+  "name": "Cargador de carro 2 puertos TC 30W / TC 30W",
+  "printedName": "CARGADOR CARRO 2 PUERTO TC 30 W / TC 30 W",
+  "price": 15000,
+  "unit": "",
+  "from": false,
+  "features": [],
+  "images": [
+   {
+    "file": "cargador-de-carro-2-puertos-tc-30w-tc-30w-1.webp",
+    "alpha": true,
+    "w": 774,
+    "h": 800
+   }
+  ]
+ },
+ {
+  "order": 10,
+  "page": 11,
+  "category": "conectividad",
+  "type": "Cargador de carro",
+  "slug": "cargador-de-carro-1-puerto-tc-30w",
+  "sbSlug": "carro1",
+  "name": "Cargador de carro 1 puerto TC 30W",
+  "printedName": "CARGADOR CARRO 1 PUERTO TC 30 W",
+  "price": 9000,
+  "unit": "",
+  "from": false,
+  "features": [],
+  "images": [
+   {
+    "file": "cargador-de-carro-1-puerto-tc-30w-1.webp",
+    "alpha": true,
+    "w": 800,
+    "h": 749
+   }
+  ]
+ },
+ {
+  "order": 11,
+  "page": 12,
+  "category": "conectividad",
+  "type": "Audio",
+  "slug": "audifonos-oseos-con-pantalla",
+  "sbSlug": "oseos",
+  "name": "Audífonos óseos con pantalla",
+  "printedName": "AUDIFONOS OSEOS PANTALLA",
+  "price": 28000,
+  "unit": "",
+  "from": false,
+  "features": [],
+  "images": [
+   {
+    "file": "audifonos-oseos-con-pantalla-1.webp",
+    "alpha": true,
+    "w": 800,
+    "h": 739
+   }
+  ],
+  "colors": [
+   "#E8D9C4",
+   "#151515",
+   "#F04438"
+  ]
+ },
+ {
+  "order": 12,
+  "page": 13,
+  "category": "conectividad",
+  "type": "Cargador",
+  "slug": "cargador-45w-tc-tc-carga-rapida",
+  "sbSlug": "c45",
+  "name": "Cargador 45W TC/TC carga rápida",
+  "printedName": "CARGADOR 45 W TC/TC CARGA RAPIDA",
+  "price": 13000,
+  "unit": "",
+  "from": false,
+  "features": [],
+  "images": [
+   {
+    "file": "cargador-45w-tc-tc-carga-rapida-1.webp",
+    "alpha": true,
+    "w": 693,
+    "h": 720
+   }
+  ]
+ },
+ {
+  "order": 13,
+  "page": 14,
+  "category": "conectividad",
+  "type": "Cargador",
+  "slug": "cargador-67w-tc-tc-gan-ultra-carga-rapida",
+  "sbSlug": "c67",
+  "name": "Cargador 67W TC/TC GaN ultra carga rápida",
+  "printedName": "CARGADOR 67 W TC/TC GAN ULTRA CARGA RAPIDA",
+  "price": 15000,
+  "unit": "",
+  "from": false,
+  "features": [],
+  "images": [
+   {
+    "file": "cargador-67w-tc-tc-gan-ultra-carga-rapida-1.webp",
+    "alpha": true,
+    "w": 762,
+    "h": 800
+   }
+  ]
+ },
+ {
+  "order": 14,
+  "page": 15,
+  "category": "conectividad",
+  "type": "Cargador",
+  "slug": "cargador-120w-tc-tc-gan-ultra-carga-rapida",
+  "sbSlug": "c120",
+  "name": "Cargador 120W TC/TC GaN ultra carga rápida Xiaomi",
+  "printedName": "CARGADOR 120W TC/TC GAN ULTRA CARGA RAPIDA XIAOMI",
+  "price": 20000,
+  "unit": "",
+  "from": false,
+  "features": [],
+  "images": [
+   {
+    "file": "cargador-120w-tc-tc-gan-ultra-carga-rapida-1.webp",
+    "alpha": true,
+    "w": 769,
+    "h": 800
+   }
+  ]
+ },
+ {
+  "order": 15,
+  "page": 16,
+  "category": "conectividad",
+  "type": "Cargador",
+  "slug": "cargador-180w-tc-tc-3-puertos-gan-ultra-carga-rapida",
+  "sbSlug": "c180",
+  "name": "Cargador 180W TC/TC 3 puertos GaN ultra carga rápida",
+  "printedName": "CARGADOR 180 W TC/TC 3 PUERTOS GAN ULTRA CARGA RAPIDA",
+  "price": 26000,
+  "unit": "",
+  "from": false,
+  "features": [],
+  "images": [
+   {
+    "file": "cargador-180w-tc-tc-3-puertos-gan-ultra-carga-rapida-1.webp",
+    "alpha": true,
+    "w": 749,
+    "h": 800
+   }
+  ]
+ },
+ {
+  "order": 16,
+  "page": 17,
+  "category": "conectividad",
+  "type": "Cargador",
+  "slug": "cargador-usb-6a-economico",
+  "sbSlug": "usb6a",
+  "name": "Cargador USB 6A económico",
+  "printedName": "CARGADOR USB 6A ECONOMICO",
+  "price": 5500,
+  "unit": "",
+  "from": false,
+  "features": [],
+  "images": [
+   {
+    "file": "cargador-usb-6a-economico-1.webp",
+    "alpha": true,
+    "w": 762,
+    "h": 800
+   }
+  ]
+ },
+ {
+  "order": 17,
+  "page": 18,
+  "category": "conectividad",
+  "type": "Cable",
+  "slug": "cable-tc-tc-9a-siliconado-reforzado",
+  "sbSlug": "cab9a",
+  "name": "Cable TC/TC 9A siliconado reforzado",
+  "printedName": "CABLE TC/TC 9 AMP SILICONADO REFORZADO",
+  "price": 2800,
+  "unit": "",
+  "from": false,
+  "features": [],
+  "images": [
+   {
+    "file": "cable-tc-tc-9a-siliconado-reforzado-1.webp",
+    "alpha": true,
+    "w": 685,
+    "h": 800
+   }
+  ]
+ },
+ {
+  "order": 18,
+  "page": 19,
+  "category": "conectividad",
+  "type": "Audio",
+  "slug": "balaca-p9-tipo-air-max-5-colores",
+  "sbSlug": "balaca",
+  "name": "Balaca P9 tipo Air Max, 5 colores",
+  "printedName": "BALACA P9 TIPO AIR MAX 5 COLORES",
+  "price": 13000,
+  "unit": "",
+  "from": false,
+  "features": [],
+  "images": [
+   {
+    "file": "balaca-p9-tipo-air-max-5-colores-1.webp",
+    "alpha": true,
+    "w": 800,
+    "h": 533
+   }
+  ],
+  "colors": [
+   "#8FE388",
+   "#B9BEC6",
+   "#F04438",
+   "#1737A6",
+   "#151515"
+  ]
+ },
+ {
+  "order": 19,
+  "page": 20,
+  "category": "conectividad",
+  "type": "Vidrio",
+  "slug": "vidrios-blindados-full-pega",
+  "sbSlug": "vidrios-full-pega",
+  "name": "Vidrios blindados full pega",
+  "printedName": "VIDRIOS BLINDADOS FULL PEGA",
+  "price": 800,
+  "unit": "c/u",
+  "from": false,
+  "features": [],
+  "images": [
+   {
+    "file": "vidrios-blindados-full-pega-1.webp",
+    "alpha": true,
+    "w": 533,
+    "h": 800
+   }
+  ]
+ },
+ {
+  "order": 20,
+  "page": 21,
+  "category": "conectividad",
+  "type": "Vidrio",
+  "slug": "vidrios-blindados-por-referencia",
+  "sbSlug": "vidrios-por-referencia",
+  "name": "Vidrios blindados por referencia",
+  "printedName": "VIDRIOS BLINDADOS X REFERENCIA",
+  "price": 800,
+  "unit": "c/u",
+  "from": false,
+  "features": [],
+  "images": [],
+  "references": [
+   "VIDRIO BLINDADO IPHONE 11",
+   "VIDRIO BLINDADO IPHONE 12 / 12 PRO",
+   "VIDRIO BLINDADO IPHONE 12 PRO MAX",
+   "VIDRIO BLINDADO IPHONE 13",
+   "VIDRIO BLINDADO IPHONE 13 PRO MAX",
+   "VIDRIO BLINDADO IPHONE 14",
+   "VIDRIO BLINDADO IPHONE 14 PRO",
+   "VIDRIO BLINDADO IPHONE 14 PRO MAX",
+   "VIDRIO BLINDADO IPHONE 15",
+   "VIDRIO BLINDADO IPHONE 15 PRO",
+   "VIDRIO BLINDADO IPHONE 15 PRO MAX",
+   "VIDRIO BLINDADO IPHONE 16",
+   "VIDRIO BLINDADO IPHONE 16 PRO",
+   "VIDRIO BLINDADO IPHONE 16 PRO MAX",
+   "VIDRIO BLINDADO IPHONE 17",
+   "VIDRIO BLINDADO IPHONE 17 AIR",
+   "VIDRIO BLINDADO IPHONE 17 PRO",
+   "VIDRIO BLINDADO IPHONE 17 PRO MAX",
+   "BLINDADO REDMI NOTE 12 OPPO A 58",
+   "BLINDADO SAMSUNG A 12",
+   "BLINDADO SANSUNG A 21S",
+   "BLINDADO NOTE 11"
+  ]
+ },
+ {
+  "order": 21,
+  "page": 22,
+  "category": "conectividad",
+  "type": "Parlante",
+  "slug": "parlante-harman-kardon",
+  "sbSlug": "harman",
+  "name": "Parlante Harman Kardon",
+  "printedName": "PARLANTE HARMAN KARDON",
+  "price": 220000,
+  "unit": "",
+  "from": false,
+  "features": [],
+  "images": [
+   {
+    "file": "parlante-harman-kardon-1.webp",
+    "alpha": true,
+    "w": 616,
+    "h": 640
+   },
+   {
+    "file": "parlante-harman-kardon-2.webp",
+    "alpha": true,
+    "w": 400,
+    "h": 400
+   }
+  ],
+  "newOnWeb": true
+ },
+ {
+  "order": 22,
+  "page": 23,
+  "category": "conectividad",
+  "type": "Parlante",
+  "slug": "parlante-x7-con-inteligencia-artificial",
+  "sbSlug": "x7",
+  "name": "Parlante X7 con inteligencia artificial",
+  "printedName": "X7 IA INTELIGENCIA ARTIFICIAL",
+  "price": 65000,
+  "unit": "",
+  "from": false,
+  "features": [],
+  "images": [
+   {
+    "file": "parlante-x7-con-inteligencia-artificial-1.webp",
+    "alpha": true,
+    "w": 533,
+    "h": 800
+   }
+  ]
+ },
+ {
+  "order": 23,
+  "page": 24,
+  "category": "conectividad",
+  "type": "Batería",
+  "slug": "bateria-y-su-presentacion",
+  "sbSlug": "",
+  "name": "Batería y su presentación",
+  "printedName": "BATERIA Y SU PRESENTACIÓN",
+  "price": null,
+  "unit": "",
+  "from": false,
+  "features": [],
+  "images": [
+   {
+    "file": "bateria-y-su-presentacion-1.webp",
+    "alpha": true,
+    "w": 600,
+    "h": 800
+   }
+  ],
+  "info": true
+ },
+ {
+  "order": 24,
+  "page": 25,
+  "category": "conectividad",
+  "type": "Batería",
+  "slug": "bateria-con-flex-amperaje-real",
+  "sbSlug": "bateria-con-flex",
+  "name": "Batería con flex, amperaje real, original",
+  "printedName": "BATERIA CON FLEX AMPERAJE REAL ORIGINAL",
+  "price": 32000,
+  "unit": "",
+  "from": true,
+  "features": [],
+  "images": [],
+  "table": {
+   "head": [
+    "Modelo",
+    "Original capacity",
+    "P/venta"
+   ],
+   "rows": [
+    {
+     "model": "IPHONE X",
+     "capacity": "2716mAh",
+     "price": 32000
+    },
+    {
+     "model": "IPHONE XR",
+     "capacity": "2942mAh",
+     "price": 35000
+    },
+    {
+     "model": "IPHONE XS",
+     "capacity": "2658mAh",
+     "price": 33000
+    },
+    {
+     "model": "IPHONE XS MAX",
+     "capacity": "3174mAh",
+     "price": 38000
+    },
+    {
+     "model": "IPHONE 11",
+     "capacity": "3110mAh",
+     "price": 32000
+    },
+    {
+     "model": "IPHONE 11 Pro",
+     "capacity": "3046mAh",
+     "price": 38000
+    },
+    {
+     "model": "IPHONE 11 Pro Max",
+     "capacity": "3696mAh",
+     "price": 40000
+    },
+    {
+     "model": "IPHONE 12/12 Pro",
+     "capacity": "2815mAh",
+     "price": 45000
+    },
+    {
+     "model": "IPHONE 12 Pro Max",
+     "capacity": "3687mAh",
+     "price": 49000
+    },
+    {
+     "model": "IPHONE 13",
+     "capacity": "3227mAh",
+     "price": 39000
+    },
+    {
+     "model": "IPHONE 13PRO",
+     "capacity": "3095mAh",
+     "price": 44000
+    },
+    {
+     "model": "IPHONE 13 PROMAX",
+     "capacity": "4352mAh",
+     "price": 55000
+    },
+    {
+     "model": "IPHONE 14 Pro max",
+     "capacity": "4323mAh",
+     "price": 55000
+    }
+   ]
+  }
+ },
+ {
+  "order": 25,
+  "page": 26,
+  "category": "conectividad",
+  "type": "Batería",
+  "slug": "bateria-sin-flex-amperaje-real",
+  "sbSlug": "bateria-sin-flex",
+  "name": "Batería sin flex, amperaje real, original",
+  "printedName": "BATERIA SIN FLEX AMPERAJE REAL ORIGINAL",
+  "price": 48000,
+  "unit": "",
+  "from": true,
+  "features": [],
+  "images": [],
+  "table": {
+   "head": [
+    "Modelo",
+    "Original capacity",
+    "P/venta"
+   ],
+   "rows": [
+    {
+     "model": "IPHONE 11",
+     "capacity": "3110mAh",
+     "price": 48000
+    },
+    {
+     "model": "IPHONE 11 Pro",
+     "capacity": "3046mAh",
+     "price": 50000
+    },
+    {
+     "model": "IPHONE 12 Pro Max",
+     "capacity": "3687mAh",
+     "price": 59000
+    },
+    {
+     "model": "IPHONE 13",
+     "capacity": "3227mAh",
+     "price": 48000
+    },
+    {
+     "model": "IPHONE 13 PRO",
+     "capacity": "3095mAh",
+     "price": 55000
+    },
+    {
+     "model": "IPHONE 13 PROMAX",
+     "capacity": "4352mAh",
+     "price": 57000
+    },
+    {
+     "model": "IPHONE 14",
+     "capacity": "3279mAh",
+     "price": 55000
+    },
+    {
+     "model": "IPHONE 14 Pro",
+     "capacity": "3200mAh",
+     "price": 52000
+    },
+    {
+     "model": "IPHONE 14 Pro max",
+     "capacity": "4323mAh",
+     "price": 60000
+    }
+   ]
+  }
+ },
+ {
+  "order": 26,
+  "page": 27,
+  "category": "conectividad",
+  "type": "Batería",
+  "slug": "bateria-diagnostic-original-amperaje-real",
+  "sbSlug": "bateria-diagnostic",
+  "name": "Batería Diagnostic original, amperaje real",
+  "printedName": "BATERIA DIAGNOSTIC ORIGINAL AMPERAJE REAL",
+  "price": 100000,
+  "unit": "",
+  "from": true,
+  "features": [],
+  "images": [],
+  "table": {
+   "head": [
+    "Model",
+    "Original capacity",
+    "P/venta"
+   ],
+   "rows": [
+    {
+     "model": "IPHONE 12/12 Pro",
+     "capacity": "2815mAh",
+     "price": 100000
+    },
+    {
+     "model": "IPHONE 12 Pro Max",
+     "capacity": "3687mAh",
+     "price": 117000
+    },
+    {
+     "model": "IPHONE 13",
+     "capacity": "3227mAh",
+     "price": 104000
+    },
+    {
+     "model": "IPHONE 13PROMAX",
+     "capacity": "4352mAh",
+     "price": 125000
+    },
+    {
+     "model": "IPHONE 14",
+     "capacity": "3279mAh",
+     "price": 112000
+    },
+    {
+     "model": "IPHONE 14 Pro max",
+     "capacity": "4323mAh",
+     "price": 130000
+    },
+    {
+     "model": "IPHONE 15 Pro max",
+     "capacity": ">500Times",
+     "price": 138000
+    }
+   ]
+  }
+ },
+ {
+  "order": 27,
+  "page": 28,
+  "category": "hidrogel",
+  "type": "Máquina",
+  "slug": "maquina-de-hidrogel-21-pulgadas",
+  "sbSlug": "maquina-hidrogel-21",
+  "name": "Máquina de hidrogel 21 pulgadas",
+  "printedName": "MAQUINA DE HIDROGEL 21 PULGADAS",
+  "price": 2300000,
+  "unit": "",
+  "from": false,
+  "features": [
+   "Libre de códigos",
+   "21 pulgadas",
+   "Pantalla de 9 pulgadas",
+   "Garantía de 1 año"
+  ],
+  "images": [
+   {
+    "file": "maquina-de-hidrogel-21-pulgadas-1.webp",
+    "alpha": true,
+    "w": 800,
+    "h": 600
+   },
+   {
+    "file": "maquina-de-hidrogel-21-pulgadas-2.webp",
+    "alpha": true,
+    "w": 800,
+    "h": 600
+   }
+  ],
+  "sticker": "Reclame obsequio"
+ },
+ {
+  "order": 28,
+  "page": 29,
+  "category": "hidrogel",
+  "type": "Máquina",
+  "slug": "maquina-de-hidrogel-11-9-sellado-automatico-uv-oemp2300",
+  "sbSlug": "maquina-hidrogel-11-9-uv-oemp2300",
+  "name": "Máquina de hidrogel 11,9\" sellado automático UV OEMP2300",
+  "printedName": "MAQUINA DE HIDROGEL 11,9\" SELLADO AUTOMÁTICO UV OEMP2300",
+  "price": 2900000,
+  "unit": "",
+  "from": false,
+  "features": [
+   "Libre de códigos",
+   "11,9\" pulgadas",
+   "Pantalla de 9 pulgadas",
+   "Incluye UV",
+   "Garantía de 1 año"
+  ],
+  "images": [
+   {
+    "file": "maquina-de-hidrogel-11-9-sellado-automatico-uv-oemp2300-1.webp",
+    "alpha": true,
+    "w": 800,
+    "h": 453
+   }
+  ]
+ },
+ {
+  "order": 29,
+  "page": 30,
+  "category": "hidrogel",
+  "type": "Máquina",
+  "slug": "maquina-secado-inteligente-uv-g10u",
+  "sbSlug": "maquina-secado-uv-g10u",
+  "name": "Máquina secado inteligente UV G10U",
+  "printedName": "MAQUINA SECADO INTELIGENTE UV G10U",
+  "price": 100000,
+  "unit": "",
+  "from": false,
+  "features": [],
+  "images": [
+   {
+    "file": "maquina-secado-inteligente-uv-g10u-1.webp",
+    "alpha": true,
+    "w": 800,
+    "h": 709
+   }
+  ]
+ },
+ {
+  "order": 30,
+  "page": 31,
+  "category": "hidrogel",
+  "type": "Hidrogel",
+  "slug": "hidrogel-hd",
+  "sbSlug": "hg-hd",
+  "name": "Hidrogel HD · paquete x 50",
+  "printedName": "HIDROGEL HD PAQUETE X 50",
+  "price": 90000,
+  "unit": "",
+  "from": false,
+  "features": [
+   "Paquete x 50"
+  ],
+  "images": [
+   {
+    "file": "hidrogel-hd-1.webp",
+    "alpha": false,
+    "w": 566,
+    "h": 800
+   }
+  ]
+ },
+ {
+  "order": 31,
+  "page": 32,
+  "category": "hidrogel",
+  "type": "Hidrogel",
+  "slug": "hidrogel-mate",
+  "sbSlug": "hg-mate",
+  "name": "Hidrogel mate · paquete x 20",
+  "printedName": "HIDROGEL MATE PAQUETE X 20",
+  "price": 36000,
+  "unit": "",
+  "from": false,
+  "features": [
+   "Paquete x 20"
+  ],
+  "images": [
+   {
+    "file": "hidrogel-mate-1.webp",
+    "alpha": true,
+    "w": 533,
+    "h": 800
+   }
+  ]
+ },
+ {
+  "order": 32,
+  "page": 33,
+  "category": "hidrogel",
+  "type": "Hidrogel",
+  "slug": "hidrogel-antiblue",
+  "sbSlug": "hg-antiblue",
+  "name": "Hidrogel antiblue · paquete x 20",
+  "printedName": "HIDROGEL ANTIBLUE PAQUETE X 20",
+  "price": 36000,
+  "unit": "",
+  "from": false,
+  "features": [
+   "Paquete x 20"
+  ],
+  "images": [
+   {
+    "file": "hidrogel-antiblue-1.webp",
+    "alpha": true,
+    "w": 533,
+    "h": 800
+   }
+  ]
+ },
+ {
+  "order": 33,
+  "page": 34,
+  "category": "hidrogel",
+  "type": "Hidrogel",
+  "slug": "hidrogel-antiespia",
+  "sbSlug": "hg-antiespia",
+  "name": "Hidrogel antiespía · paquete x 20",
+  "printedName": "HIDROGEL ANTIESPIA PAQUETE X 20",
+  "price": 100000,
+  "unit": "",
+  "from": false,
+  "features": [
+   "Paquete x 20"
+  ],
+  "images": [
+   {
+    "file": "hidrogel-antiespia-1.webp",
+    "alpha": true,
+    "w": 533,
+    "h": 800
+   }
+  ]
+ },
+ {
+  "order": 34,
+  "page": 35,
+  "category": "hidrogel",
+  "type": "Hidrogel",
+  "slug": "hidrogel-360-especial-z-fold",
+  "sbSlug": "hg-360zfold",
+  "name": "Hidrogel 360 especial Z Fold · paquete x 10",
+  "printedName": "HIDROGEL 360 ESPECIAL Z FOLD PAQUETE X 10",
+  "price": 40000,
+  "unit": "",
+  "from": false,
+  "features": [
+   "Paquete x 10"
+  ],
+  "images": [
+   {
+    "file": "hidrogel-360-especial-z-fold-1.webp",
+    "alpha": false,
+    "w": 800,
+    "h": 777
+   }
+  ]
+ },
+ {
+  "order": 35,
+  "page": 36,
+  "category": "hidrogel",
+  "type": "Hidrogel",
+  "slug": "hidrogel-antiespia-360",
+  "sbSlug": "hg-antiespia360",
+  "name": "Hidrogel antiespía 360 · paquete x 10",
+  "printedName": "HIDROGEL ANTIESPIA 360 PAQUETE X 10",
+  "price": 90000,
+  "unit": "",
+  "from": false,
+  "features": [
+   "Paquete x 10"
+  ],
+  "images": [
+   {
+    "file": "hidrogel-antiespia-360-1.webp",
+    "alpha": true,
+    "w": 533,
+    "h": 800
+   }
+  ]
+ },
+ {
+  "order": 36,
+  "page": 37,
+  "category": "hidrogel",
+  "type": "Hidrogel",
+  "slug": "hidrogel-uv-alta-calidad",
+  "sbSlug": "hg-uv",
+  "name": "Hidrogel UV alta calidad · paquete x 20",
+  "printedName": "HIDROGEL UV ALTA CALIDAD PAQUETE X20",
+  "price": 160000,
+  "unit": "",
+  "from": false,
+  "features": [
+   "Paquete x 20"
+  ],
+  "images": [
+   {
+    "file": "hidrogel-uv-alta-calidad-1.webp",
+    "alpha": false,
+    "w": 533,
+    "h": 800
+   }
+  ]
+ },
+ {
+  "order": 37,
+  "page": 38,
+  "category": "hidrogel",
+  "type": "Hidrogel",
+  "slug": "hidrogel-uv-antiespia-alta-calidad",
+  "sbSlug": "hg-uv-antiespia",
+  "name": "Hidrogel UV antiespía alta calidad · paquete x 10",
+  "printedName": "HIDROGEL UV ANTIESPIA ALTA CALIDAD PAQUETE X 10",
+  "price": 110000,
+  "unit": "",
+  "from": false,
+  "features": [
+   "Paquete x 10"
+  ],
+  "images": [
+   {
+    "file": "hidrogel-uv-antiespia-alta-calidad-1.webp",
+    "alpha": false,
+    "w": 533,
+    "h": 800
+   }
+  ]
+ },
+ {
+  "order": 38,
+  "page": 39,
+  "category": "hidrogel",
+  "type": "Hidrogel",
+  "slug": "hidrogel-tablet-10-1-pulgadas",
+  "sbSlug": "hg-tab10",
+  "name": "Hidrogel tablet 10.1 pulgadas · paquete x 10",
+  "printedName": "HIDROGEL TABLET 10.1 PULGADAS PAQUETE X 10",
+  "price": 90000,
+  "unit": "",
+  "from": false,
+  "features": [
+   "Paquete x 10"
+  ],
+  "images": [
+   {
+    "file": "hidrogel-tablet-10-1-pulgadas-1.webp",
+    "alpha": false,
+    "w": 533,
+    "h": 800
+   }
+  ]
+ },
+ {
+  "order": 39,
+  "page": 40,
+  "category": "hidrogel",
+  "type": "Hidrogel",
+  "slug": "hidrogel-tablet-14-pulgadas",
+  "sbSlug": "hg-tab14",
+  "name": "Hidrogel tablet 14 pulgadas · paquete x 5",
+  "printedName": "HIDROGEL TABLET 14 PULGADAS PAQUETE X 5",
+  "price": 60000,
+  "unit": "",
+  "from": false,
+  "features": [
+   "Paquete x 5"
+  ],
+  "images": [
+   {
+    "file": "hidrogel-tablet-14-pulgadas-1.webp",
+    "alpha": false,
+    "w": 600,
+    "h": 800
+   }
+  ]
+ },
+ {
+  "order": 40,
+  "page": 41,
+  "category": "hidrogel",
+  "type": "Hidrogel",
+  "slug": "hidrogel-tablet-16-9-pulgadas",
+  "sbSlug": "hg-tab169",
+  "name": "Hidrogel tablet 16,9 pulgadas · paquete x 5",
+  "printedName": "HIDROGEL TABLET 16,9 PULGADAS PAQUETE X 5",
+  "price": 80000,
+  "unit": "",
+  "from": false,
+  "features": [
+   "Paquete x 5"
+  ],
+  "images": [
+   {
+    "file": "hidrogel-tablet-16-9-pulgadas-1.webp",
+    "alpha": true,
+    "w": 600,
+    "h": 800
+   }
+  ]
+ },
+ {
+  "order": 41,
+  "page": 42,
+  "category": "hidrogel",
+  "type": "Hidrogel",
+  "slug": "hidrogel-hd-para-maquina-vt8pro",
+  "sbSlug": "vt8-hd",
+  "name": "Hidrogel HD para máquina VT8PRO · x 50 und",
+  "printedName": "HIDROGEL HD PARA MAQUINA VT8PRO X 50 UND",
+  "price": 90000,
+  "unit": "",
+  "from": false,
+  "features": [
+   "x 50 unidades",
+   "Para máquina VT8PRO"
+  ],
+  "images": [
+   {
+    "file": "hidrogel-hd-para-maquina-vt8pro-1.webp",
+    "alpha": true,
+    "w": 550,
+    "h": 800
+   }
+  ]
+ },
+ {
+  "order": 42,
+  "page": 43,
+  "category": "hidrogel",
+  "type": "Hidrogel",
+  "slug": "hidrogel-mate-para-maquina-vt8pro",
+  "sbSlug": "vt8-mate",
+  "name": "Hidrogel mate para máquina VT8PRO · x 50 und",
+  "printedName": "HIDROGEL MATE PARA MAQUINA VT8PRO X 50 UND",
+  "price": 90000,
+  "unit": "",
+  "from": false,
+  "features": [
+   "x 50 unidades",
+   "Para máquina VT8PRO"
+  ],
+  "images": [
+   {
+    "file": "hidrogel-mate-para-maquina-vt8pro-1.webp",
+    "alpha": true,
+    "w": 544,
+    "h": 800
+   }
+  ]
+ },
+ {
+  "order": 43,
+  "page": 44,
+  "category": "hidrogel",
+  "type": "Hidrogel",
+  "slug": "hidrogel-antiespia-para-maquina-vt8pro",
+  "sbSlug": "vt8-antiespia",
+  "name": "Hidrogel antiespía para máquina VT8PRO · x 50 und",
+  "printedName": "HIDROGEL ANTIESPIA PARA MAQUINA VT8PRO X 50 UND",
+  "price": 250000,
+  "unit": "",
+  "from": false,
+  "features": [
+   "x 50 unidades",
+   "Para máquina VT8PRO"
+  ],
+  "images": [
+   {
+    "file": "hidrogel-antiespia-para-maquina-vt8pro-1.webp",
+    "alpha": true,
+    "w": 498,
+    "h": 800
+   }
+  ]
+ },
+ {
+  "order": 44,
+  "page": 45,
+  "category": "hidrogel",
+  "type": "Hidrogel",
+  "slug": "hidrogel-diseno-tapa-trasera",
+  "sbSlug": "hg-diseno",
+  "name": "Hidrogel diseño tapa trasera · 11 pulgadas tablet",
+  "printedName": "HIDROGEL DISEÑO TAPA TRASERA 11 PULGADAS TABLET",
+  "price": 70000,
+  "unit": "",
+  "from": false,
+  "features": [
+   "Tablet de 11 pulgadas"
+  ],
+  "images": [
+   {
+    "file": "hidrogel-diseno-tapa-trasera-1.webp",
+    "alpha": true,
+    "w": 574,
+    "h": 416
+   }
+  ]
+ },
+ {
+  "order": 45,
+  "page": 46,
+  "category": "hidrogel",
+  "type": "Insumo",
+  "slug": "pen-hidrogel",
+  "sbSlug": "pen",
+  "name": "Pen hidrogel",
+  "printedName": "PENS HIDROGEL",
+  "price": 5000,
+  "unit": "",
+  "from": false,
+  "features": [],
+  "images": [
+   {
+    "file": "pen-hidrogel-1.webp",
+    "alpha": true,
+    "w": 533,
+    "h": 800
+   }
+  ]
+ },
+ {
+  "order": 46,
+  "page": 47,
+  "category": "hidrogel",
+  "type": "Insumo",
+  "slug": "pala-grande",
+  "sbSlug": "pala-g",
+  "name": "Pala grande",
+  "printedName": "PALA GRANDE",
+  "price": 4500,
+  "unit": "",
+  "from": false,
+  "features": [],
+  "images": [
+   {
+    "file": "pala-grande-1.webp",
+    "alpha": true,
+    "w": 533,
+    "h": 800
+   }
+  ]
+ },
+ {
+  "order": 47,
+  "page": 47,
+  "category": "hidrogel",
+  "type": "Insumo",
+  "slug": "pala-pequena",
+  "sbSlug": "pala-p",
+  "name": "Pala pequeña",
+  "printedName": "PALA PEQUEÑA",
+  "price": 3500,
+  "unit": "",
+  "from": false,
+  "features": [],
+  "images": [
+   {
+    "file": "pala-pequena-1.webp",
+    "alpha": true,
+    "w": 720,
+    "h": 480
+   }
+  ]
+ },
+ {
+  "order": 48,
+  "page": 48,
+  "category": "hidrogel",
+  "type": "Insumo",
+  "slug": "cuchilla-para-maquina-de-hidrogel",
+  "sbSlug": "cuchilla",
+  "name": "Cuchilla para máquina de hidrogel",
+  "printedName": "CUCHILLA MAQUINA HIDROGEL",
+  "price": 15000,
+  "unit": "",
+  "from": false,
+  "features": [],
+  "images": [
+   {
+    "file": "cuchilla-para-maquina-de-hidrogel-1.webp",
+    "alpha": true,
+    "w": 600,
+    "h": 800
+   }
+  ]
+ },
+ {
+  "order": 49,
+  "page": 49,
+  "category": "hidrogel",
+  "type": "Máquina",
+  "slug": "maquina-de-laminacion-bomba-de-vacio-y-saca-burbujas",
+  "sbSlug": "maquina-laminacion-bomba-vacio",
+  "name": "Máquina de laminación, bomba de vacío, saca burbujas",
+  "printedName": "MAQUINA DE LAMINACIÓN, BOMBA VACIO, SACA BURBUJAS",
+  "price": 1150000,
+  "unit": "",
+  "from": false,
+  "features": [],
+  "images": [
+   {
+    "file": "maquina-de-laminacion-bomba-de-vacio-y-saca-burbujas-1.webp",
+    "alpha": true,
+    "w": 548,
+    "h": 389
+   }
+  ],
+  "heading": "Servicio técnico"
+ }
+]

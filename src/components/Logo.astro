@@ -1,0 +1,21 @@
+---
+// Logo oficial: trazos vectoriales extraídos tal cual del manual de marca (p. 2). No redibujar ni deformar.
+import paths from '../data/brand-paths.json';
+interface Props { variant?: 'color' | 'blanco'; class?: string; label?: string }
+const { variant = 'color', class: cls = '', label = 'UBU Latinoamérica' } = Astro.props;
+const { bbox, gray, eyes, tag, regStroke, regFill } = paths.logo;
+const pad = 4;
+const [x0, y0, x1, y1] = bbox;
+const vb = `${x0 - pad} ${y0 - pad} ${x1 - x0 + pad * 2} ${y1 - y0 + pad * 2}`;
+const body = variant === 'blanco' ? '#FFFFFF' : '#575756';
+const eye = variant === 'blanco' ? '#FFFFFF' : '#41B9C1';
+---
+<svg class={cls} viewBox={vb} role="img" aria-label={label} xmlns="http://www.w3.org/2000/svg">
+  <g fill={body}>
+    {gray.map((p) => <path d={p.d} />)}
+    {tag.map((p) => <path d={p.d} />)}
+    {regFill.map((p) => <path d={p.d} />)}
+  </g>
+  {regStroke.map((p) => <path d={p.d} fill="none" stroke={body} stroke-width="0.9" />)}
+  <g fill={eye}>{eyes.map((p) => <path d={p.d} />)}</g>
+</svg>

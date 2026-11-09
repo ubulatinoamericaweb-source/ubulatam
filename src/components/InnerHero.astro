@@ -1,0 +1,18 @@
+---
+import UbuFace from './UbuFace.astro';
+interface Props { kicker?: string; title: string; lede?: string; crumbs?: { href?: string; label: string }[] }
+const { kicker, title, lede, crumbs = [] } = Astro.props;
+---
+<section class="ihero on-dark">
+  <svg class="ihero__lines" viewBox="0 0 1200 400" preserveAspectRatio="none" aria-hidden="true"><path d="M0 300 C240 200 420 380 720 290 S1100 170 1200 260" /><path d="M0 340 C260 240 440 420 740 330 S1100 210 1200 300" /></svg>
+  <div class="ihero__ghost" aria-hidden="true"><UbuFace tone="blanco" eyes={false} /></div>
+  <div class="wrap">
+    {crumbs.length > 0 && (
+      <nav aria-label="Ruta de navegación"><ol class="crumbs"><li><a href="/">Inicio</a></li>{crumbs.map((c) => c.href ? <li><a href={c.href}>{c.label}</a></li> : <li aria-current="page">{c.label}</li>)}</ol></nav>
+    )}
+    {kicker && <p class="kicker">{kicker}</p>}
+    <h1>{title}</h1>
+    {lede && <p class="lede">{lede}</p>}
+    <slot />
+  </div>
+</section>
