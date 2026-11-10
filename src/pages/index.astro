@@ -302,18 +302,22 @@ const catImg = (slug: string, i = 0) => productImage(bySlug(slug)!.images[i].fil
   }
   @media (prefers-reduced-motion: reduce) { .hero__road i, .hero__speed i { animation: none; } .hero__speed { display: none; } }
   .cta2 { display: none; }
-  /* Escritorio: el mensaje final (rótulo, título, párrafo y botones) forma una sola columna alineada al contenedor de la página y
-     centrada en vertical con la carita; sin posiciones absolutas por elemento (solo la capa de la escena). */
+  /* Escritorio: composición por retícula. Escena 1: texto y botones en una columna (rejilla del contenedor de la portada) y camión
+     grande a la derecha. Escena 2: título y carita grandes que ocupan el ancho. Sin posiciones absolutas por elemento de texto. */
   @media (min-width: 900px) and (prefers-reduced-motion: no-preference) {
-    .hero__copy--2 {
-      --cl: max(var(--gut), calc((100vw - var(--wrap)) / 2));
-      left: 0; top: 0; bottom: 0; transform: none; width: calc(var(--cl) + min(40vw, 540px) + 2vw);
-      padding: 0 0 5vh calc(var(--cl) + 2vw);
-      display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
-    }
-    .hero__copy--2 .kicker, .hero__copy--2 h2, .hero__copy--2 .lede { margin-left: 0; }
-    .hero__copy--2 .lede { max-width: 34em; }
-    .cta2 { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+    .hero { --hl: max(5.5vw, calc((100vw - 1500px) / 2)); }
+    .hero__pin { display: grid; grid-template-columns: minmax(0, min(52vw, 900px)) 1fr; grid-template-rows: minmax(96px, .7fr) auto auto minmax(40px, 1.6fr); padding-left: var(--hl); }
+    .hero__copy--1 { position: relative; left: auto; top: auto; transform: none; width: auto; grid-column: 1; grid-row: 2; align-self: end; }
+    .hero__cta { position: relative; left: auto; bottom: auto; grid-column: 1; grid-row: 3; align-self: start; margin-top: clamp(22px, 3.6vh, 42px); max-width: clamp(380px, 30vw, 560px); }
+    .hero__copy--1 h1 { font-size: clamp(2.6rem, 5.2vw, 5.8rem); margin: 18px 0 22px; }
+    .hero__copy--1 .lede { font-size: clamp(1.1rem, 1.5vw, 1.6rem); max-width: 30em; }
+    .hero__truck { right: 1.5vw; bottom: 5%; width: min(70vw, 1400px, 128svh); }
+    .hero__copy--2 { left: 0; top: 0; bottom: 0; transform: none; width: calc(var(--hl) + min(52vw, 900px));
+      padding: 0 0 4vh var(--hl); display: flex; flex-direction: column; align-items: flex-start; justify-content: center; }
+    .hero__copy--2 h2 { font-size: clamp(2.6rem, 5.2vw, 5.8rem); margin: 18px 0 22px; }
+    .hero__copy--2 .lede { font-size: clamp(1.15rem, 1.6vw, 1.7rem); max-width: 30em; }
+    .hero__face { right: max(var(--gut), 5vw); width: min(41vw, 66svh, 720px); transform: none; }
+    .cta2 { display: flex; flex-wrap: wrap; gap: 12px; margin-top: clamp(22px, 3.6vh, 42px); }
   }
   /* Móvil con movimiento: el camión se desintegra en partículas que forman la carita en su mismo lugar (sin fijar la página) */
   @media (max-width: 899px) and (prefers-reduced-motion: no-preference) {
