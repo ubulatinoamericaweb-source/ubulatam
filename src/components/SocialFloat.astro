@@ -1,0 +1,49 @@
+---
+// Redes oficiales de UBU Latinoamérica (URL entregadas por la empresa). Botones flotantes compactos sobre el botón de WhatsApp.
+// Solo SVG propios: sin imágenes ni scripts de terceros.
+const redes = [
+  { id: 'ig', nombre: 'Instagram', href: 'https://www.instagram.com/ubulatinoamerica?srtk=MW02b3dqaXNnZGNsdw==' },
+  { id: 'tt', nombre: 'TikTok', href: 'https://www.tiktok.com/@ubu.latinoamerica?_r=1&_t=ZS-9BH6IEiY06m' },
+  { id: 'fb', nombre: 'Facebook', href: 'https://www.facebook.com/share/1HhZEkBmA4/' },
+];
+---
+<nav class="social" aria-label="Redes sociales de UBU Latinoamérica">
+  <ul>
+    {redes.map((r) => (
+      <li>
+        <a class={`soc soc--${r.id}`} href={r.href} target="_blank" rel="noopener noreferrer" aria-label={`${r.nombre} de UBU Latinoamérica (se abre en una pestaña nueva)`} data-label={r.nombre}>
+          {r.id === 'ig' && (
+            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none" /></svg>
+          )}
+          {r.id === 'tt' && (
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16.6 2h-3.2v13.1a2.9 2.9 0 1 1-2.9-2.9c.3 0 .6 0 .9.1V9a6.1 6.1 0 1 0 5.2 6V8.6a7.4 7.4 0 0 0 4.3 1.4V6.8A4.3 4.3 0 0 1 16.6 2z" /></svg>
+          )}
+          {r.id === 'fb' && (
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M13.6 21v-7.9h2.7l.4-3.1h-3.1V8.1c0-.9.3-1.5 1.6-1.5h1.7V3.8c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.4-4 4.1V10H7.800v3.100h2.700V21h3.100z" /></svg>
+          )}
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>
+
+<style>
+  .social { position: fixed; z-index: 89; right: 25px; bottom: calc(18px + 58px + 14px + env(safe-area-inset-bottom, 0px)); }
+  .social ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .soc { position: relative; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; color: #fff; text-decoration: none; border: 1px solid rgba(255,255,255,.28);
+    box-shadow: 0 8px 18px -8px rgba(0,0,0,.55); transition: transform .25s var(--ease), box-shadow .25s; }
+  .soc svg { width: 22px; height: 22px; display: block; }
+  .soc--ig { background: radial-gradient(circle at 30% 108%, #FED576 0%, #F47133 26%, #BC3081 62%, #4C63D2 100%); }
+  .soc--tt { background: #010101; box-shadow: 0 8px 18px -8px rgba(0,0,0,.55), -1.5px -1.5px 0 #25F4EE, 1.5px 1.5px 0 #FE2C55; }
+  .soc--fb { background: #1877F2; }
+  .soc:hover { transform: translateY(-2px) scale(1.06); box-shadow: 0 12px 22px -8px rgba(0,0,0,.6); }
+  .soc:focus-visible { outline: 3px solid var(--cian-realidad-virtual); outline-offset: 3px; }
+  /* Nombre de la red como tooltip solo en escritorio con puntero; en móvil queda la etiqueta accesible (aria-label) */
+  @media (hover: hover) and (min-width: 900px) {
+    .soc::after { content: attr(data-label); position: absolute; right: calc(100% + 10px); top: 50%; transform: translate(6px, -50%); padding: 5px 10px; border-radius: 8px; background: rgba(5,16,27,.94); color: #fff;
+      font: 600 .78rem/1.2 var(--font-display); white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity .18s, transform .18s; }
+    .soc:hover::after, .soc:focus-visible::after { opacity: 1; transform: translate(0, -50%); }
+  }
+  @media (max-width: 760px) { .social { right: 28px; } .soc { width: 38px; height: 38px; } .soc svg { width: 19px; height: 19px; } .social ul { gap: 9px; } }
+  @media (prefers-reduced-motion: reduce) { .soc, .soc::after { transition: none; } }
+</style>

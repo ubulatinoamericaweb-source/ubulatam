@@ -6,6 +6,7 @@ import Logo from '../components/Logo.astro';
 import UbuFace from '../components/UbuFace.astro';
 import Channels from '../components/Channels.astro';
 import ConsentBanner from '../components/ConsentBanner.astro';
+import SocialFloat from '../components/SocialFloat.astro';
 import { WA_PATH, CART_PATH } from '../data/icons';
 import { WA_DISPLAY, waGeneric } from '../data/catalog';
 
@@ -154,6 +155,7 @@ const ld = [org, ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [])]
     <a class="wa-float" href={waGeneric} target="_blank" rel="noopener" aria-label="Cotizar por WhatsApp">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d={WA_PATH} fill="currentColor" /></svg>
     </a>
+    <SocialFloat />
     {consentUI && <ConsentBanner />}
     <script>import '../scripts/core';</script>
   </body>

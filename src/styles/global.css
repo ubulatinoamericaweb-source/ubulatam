@@ -136,7 +136,7 @@ a { color: inherit; }
 @media (max-width: 480px) { .footer-grid { grid-template-columns: 1fr; } }
 
 /* ---------- WhatsApp flotante ---------- */
-.wa-float { position: fixed; right: 18px; bottom: 18px; z-index: 90; width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; background: #25D366; color: #052E16; box-shadow: 0 14px 34px -8px rgba(37,211,102,.6); transition: transform .3s var(--ease); }
+.wa-float { position: fixed; right: 18px; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); z-index: 90; width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; background: #25D366; color: #052E16; box-shadow: 0 14px 34px -8px rgba(37,211,102,.6); transition: transform .3s var(--ease); }
 .wa-float:hover { transform: scale(1.08) rotate(-4deg); }
 .wa-float svg { width: 32px; height: 32px; }
 
