@@ -3,6 +3,7 @@
    - Los datos personales viven solo en memoria mientras la página está abierta: no se guardan en localStorage, Supabase ni ningún servicio. */
 import { qGet, qSet, type QItem } from './core';
 import { WA_NUMBER } from '../data/catalog';
+import { allPeople } from '../data/contacts';
 import { renderQuote } from './quote-image';
 
 interface V { l: string; p: number }
@@ -177,20 +178,26 @@ function download() {
 }
 $('q-download').addEventListener('click', () => { download(); qStatus('Imagen descargada ✓'); });
 $('q-retry').addEventListener('click', buildQuote);
+/* PENDIENTE: el compartir directo de imagen + texto (navigator.share con archivos) solo se puede probar en un celular real (Android e iPhone); aquí se simuló.
+   Chat de ventas de UBU (+57 316 123 4566), tomado de contacts.ts. Una web no puede preseleccionar el contacto y adjuntar un archivo a la vez. */
+const UBU_CHAT = allPeople.find((x) => x.id === 'roberto')!;
 $('q-share').addEventListener('click', async () => {
   if (!quote) return;
   const text = message(true);
   const file = new File([quote.blob], 'cotizacion-ubu.png', { type: 'image/png' });
-  const mobile = matchMedia('(pointer: coarse)').matches;
-  if (mobile && navigator.canShare?.({ files: [file] })) {
-    try { await navigator.share({ files: [file], text }); qStatus('Listo: elige WhatsApp para enviar la imagen con el mensaje ✓'); return; }
-    catch (e) { if ((e as Error).name === 'AbortError') { qStatus('Compartir cancelado. Tu carrito sigue intacto.'); return; } }
+  if (matchMedia('(pointer: coarse)').matches && navigator.canShare?.({ files: [file] })) {
+    qStatus(`En la siguiente pantalla, elige WhatsApp y el chat de UBU (${UBU_CHAT.phone}).`);
+    try {
+      await navigator.share({ files: [file], title: 'Cotización UBU Latinoamérica', text });
+      qStatus('Se cerró la hoja de compartir. Revisa en WhatsApp que la imagen y el mensaje se hayan enviado; tu carrito sigue intacto.');
+      return;
+    } catch (e) {
+      if ((e as Error).name === 'AbortError') { qStatus('Cancelaste el envío: no se envió nada y tu carrito sigue intacto.'); return; }
+    }
   }
-  // Sin soporte de archivos: wa.me y WhatsApp Web no adjuntan imágenes, así que se descarga el PNG y se avisa.
   download();
-  const q = encodeURIComponent(text);
-  window.open(mobile ? `https://wa.me/${WA_NUMBER}?text=${q}` : `https://web.whatsapp.com/send?phone=${WA_NUMBER}&text=${q}`, '_blank', 'noopener');
-  qStatus('La imagen se descargó y se abrió WhatsApp solo con el texto. Adjunta tú el archivo «cotizacion-ubu.png» en la conversación antes de enviar.');
+  window.open(`https://wa.me/${UBU_CHAT.wa}?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
+  qStatus('La imagen se descargó. Adjunta el PNG en el chat de UBU antes de enviar el mensaje.');
 });
 
 $('confirm').addEventListener('click', () => {
