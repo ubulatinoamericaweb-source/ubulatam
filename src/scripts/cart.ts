@@ -3,6 +3,7 @@
    - Los datos personales viven solo en memoria mientras la página está abierta: no se guardan en localStorage, Supabase ni ningún servicio. */
 import { qGet, qSet, type QItem } from './core';
 import { WA_NUMBER } from '../data/catalog';
+import { renderQuote } from './quote-image';
 
 interface V { l: string; p: number }
 interface PInfo { n: string; price: number | null; unit: string; img: string; blend: boolean; vars: V[] | null; vlabel: string }
@@ -134,32 +135,72 @@ function renderSummary() {
     const row = document.createElement('div'); const dt = document.createElement('dt'); dt.textContent = k; const dd = document.createElement('dd'); dd.textContent = v; row.append(dt, dd); dl.append(row);
   });
 }
-function message() {
+const sep = '━━━━━━━━━━━━━━━━━━';
+function message(attach: boolean) {
   const L = lines();
   const sub = L.reduce((a, x) => a + (x.total || 0), 0);
-  const rows = L.map(({ item, d, unit, total }, i) => [
-    `${i + 1}. ${d.n}`,
-    item.v ? `   ${d.vlabel[0].toUpperCase()}${d.vlabel.slice(1)}: ${item.v}` : '',
-    `   Cantidad: ${item.qty} · Precio: ${cop(unit || 0)} COP c/u · Subtotal: ${cop(total || 0)} COP`,
-  ].filter(Boolean).join('\n'));
   return [
-    'Hola UBU Latinoamérica, quiero hacer este pedido:', '',
-    'PRODUCTOS', ...rows, '',
-    `SUBTOTAL: ${cop(sub)} COP (precios de referencia del catálogo 2026; no incluye envío)`, '',
-    'DATOS DE ENTREGA',
-    `Nombre: ${cust.nombre}`, `Teléfono: ${cust.tel}`, `País: ${cust.pais}`, `Ciudad: ${cust.ciudad}`, `Dirección: ${cust.dir}`, '',
-    'ENVÍO: el costo y la disponibilidad de envío se confirman por WhatsApp.',
-    '¿Me confirman disponibilidad y el valor final del pedido?',
+    '*UBU LATINOAMÉRICA* — Cotización', sep,
+    `👤 *Nombre:* ${cust.nombre}`, `📱 *WhatsApp:* ${cust.tel}`, `📍 *Ciudad:* ${cust.ciudad}, ${cust.pais}`, `🚚 *Entrega:* ${cust.dir}`, sep,
+    '🛍️ *DETALLE DEL PEDIDO*',
+    ...L.map(({ item, d, total }) => `• ${item.qty}x ${d.n}${item.v ? ` (${item.v})` : ''} — ${cop(total || 0)} COP`), sep,
+    `Subtotal: ${cop(sub)} COP`, 'Envío: Por confirmar', `*TOTAL: ${cop(sub)} COP*`,
+    ...(attach ? ['', 'Adjunto la imagen de mi cotización 🧾✨'] : ['', 'Precios de referencia del catálogo 2026. ¿Me confirman disponibilidad, envío y valor final?']),
   ].join('\n');
 }
+
+/* ---------- Imagen de la cotización (descargar / compartir) ---------- */
+let quote: { blob: Blob; url: string } | null = null;
+const qStatus = (t: string, bad = false) => { const e = $('q-status'); e.textContent = t; e.classList.toggle('is-bad', bad); };
+const qBusy = (on: boolean) => document.querySelectorAll<HTMLButtonElement>('[data-q]').forEach((b) => { b.disabled = on; b.setAttribute('aria-busy', String(on)); });
+async function buildQuote() {
+  if (quote) URL.revokeObjectURL(quote.url); quote = null;
+  $<HTMLImageElement>('q-img').removeAttribute('src'); qBusy(true); qStatus('Generando la imagen…');
+  try {
+    const L = lines();
+    const blob = await renderQuote({
+      rows: L.map(({ item, d, unit, total }) => ({ name: d.n, variant: item.v ? `${d.vlabel[0].toUpperCase()}${d.vlabel.slice(1)}: ${item.v}` : '', qty: item.qty, unit: unit || 0, total: total || 0, img: d.img, blend: d.blend })),
+      fields: [['Nombre', cust.nombre], ['Teléfono', cust.tel], ['Ciudad', `${cust.ciudad}, ${cust.pais}`], ['Dirección', cust.dir]],
+      sub: L.reduce((a, x) => a + (x.total || 0), 0),
+      date: new Date().toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' }),
+    });
+    quote = { blob, url: URL.createObjectURL(blob) };
+    $<HTMLImageElement>('q-img').src = quote.url; qBusy(false); qStatus('');
+  } catch (e) {
+    qStatus(`No se pudo generar la imagen: ${e instanceof Error ? e.message : 'error desconocido'}. Tu carrito sigue intacto; puedes enviar el pedido como texto.`, true);
+    document.querySelectorAll<HTMLButtonElement>('[data-q="retry"]').forEach((b) => { b.disabled = false; });
+  }
+}
+function download() {
+  if (!quote) return;
+  const a = document.createElement('a'); a.href = quote.url; a.download = 'cotizacion-ubu.png'; document.body.append(a); a.click(); a.remove();
+}
+$('q-download').addEventListener('click', () => { download(); qStatus('Imagen descargada ✓'); });
+$('q-retry').addEventListener('click', buildQuote);
+$('q-share').addEventListener('click', async () => {
+  if (!quote) return;
+  const text = message(true);
+  const file = new File([quote.blob], 'cotizacion-ubu.png', { type: 'image/png' });
+  const mobile = matchMedia('(pointer: coarse)').matches;
+  if (mobile && navigator.canShare?.({ files: [file] })) {
+    try { await navigator.share({ files: [file], text }); qStatus('Listo: elige WhatsApp para enviar la imagen con el mensaje ✓'); return; }
+    catch (e) { if ((e as Error).name === 'AbortError') { qStatus('Compartir cancelado. Tu carrito sigue intacto.'); return; } }
+  }
+  // Sin soporte de archivos: wa.me y WhatsApp Web no adjuntan imágenes, así que se descarga el PNG y se avisa.
+  download();
+  const q = encodeURIComponent(text);
+  window.open(mobile ? `https://wa.me/${WA_NUMBER}?text=${q}` : `https://web.whatsapp.com/send?phone=${WA_NUMBER}&text=${q}`, '_blank', 'noopener');
+  qStatus('La imagen se descargó y se abrió WhatsApp solo con el texto. Adjunta tú el archivo «cotizacion-ubu.png» en la conversación antes de enviar.');
+});
+
 $('confirm').addEventListener('click', () => {
-  const text = message();
+  const text = message(false);
   const url = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(text)}`;
   ($('send') as HTMLAnchorElement).href = url;
   $('msg').textContent = text;
   $('long-warn').hidden = url.length < 1900;
   $('copy-msg').textContent = '';
-  show(4);
+  show(4); buildQuote();
 });
 $('copy').addEventListener('click', async () => {
   const text = $('msg').textContent || '';
