@@ -15,7 +15,7 @@ const realista = {
 // Rutas que NO van al sitemap (privadas, redirecciones o sin valor de búsqueda).
 // LEGAL_PENDIENTES: páginas legales en borrador; quitarlas de esta lista (y su noindex) cuando estén completas.
 const LEGAL_PENDIENTES = ['privacidad', 'cookies', 'terminos'];
-const NO_INDEXAR = ['carrito', '404', 'maquinas', 'accesorios', 'cotizacion', 'admin', 'realista', ...LEGAL_PENDIENTES];
+const NO_INDEXAR = ['carrito', '404', 'maquinas', 'accesorios', 'cotizacion', 'admin', 'mayoristas', 'realista', ...LEGAL_PENDIENTES];
 
 // Sitio estático: las URLs se sirven sin .html gracias a "cleanUrls" en vercel.json.
 // Dominio canónico de producción: https://www.ubulatinoamerica.com

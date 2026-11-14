@@ -271,3 +271,21 @@ mark.pending { background: #FFF2B8; color: #3B2F00; padding: .05em .4em; border-
 /* Botón con aspecto de enlace (pie: «Preferencias de cookies») */
 .linkbtn { all: unset; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; min-height: 44px; display: inline-flex; align-items: center; }
 .linkbtn:hover { color: var(--cian-realidad-virtual); } .linkbtn:focus-visible { outline: 3px solid var(--cian-realidad-virtual); outline-offset: 3px; border-radius: 6px; }
+
+/* ---------- Acceso mayorista y administración ---------- */
+.may-link { padding: .55em .9em; border-radius: var(--r-pill); color: #fff; text-decoration: none; font-family: var(--font-display); font-weight: 600; font-size: .88rem; border: 1px solid rgba(255,255,255,.35); white-space: nowrap; }
+.may-link:hover { background: rgba(255,255,255,.12); }
+.admin-link { padding: .5em .7em; border-radius: var(--r-pill); color: rgba(255,255,255,.75); text-decoration: none; font-size: .8rem; white-space: nowrap; }
+.admin-link:hover, .admin-link:focus-visible { color: #fff; background: rgba(255,255,255,.12); }
+@media (max-width: 1060px) { .may-link, .admin-link { display: none; } }
+/* en escritorio la barra mide como máximo 1180 px y no cabe todo: los enlaces se compactan */
+@media (min-width: 1061px) { .nav a { white-space: nowrap; padding: .5em .6em; font-size: .88rem; } .may-link { padding: .5em .7em; font-size: .82rem; } .admin-link { padding: .5em .5em; } .header-actions { gap: 4px; } }
+.menu-panel .menu-admin { justify-self: end; padding: .4em .8em; font-size: .8rem; font-weight: 400; opacity: .55; }
+.may-bar { position: fixed; z-index: 120; left: 50%; bottom: 76px; transform: translateX(-50%); width: max-content; max-width: calc(100% - 24px); display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 14px; padding: 10px 12px 10px 18px; border-radius: var(--r-pill); background: var(--tinta-1); color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,.25); font-size: .92rem; }
+.may-bar b { color: var(--cian-realidad-virtual); }
+.may-bar__out { font: inherit; font-weight: 600; color: var(--tinta-1); background: #fff; border: 0; border-radius: var(--r-pill); min-height: 40px; padding: 0 1em; cursor: pointer; }
+.may-bar__out:focus-visible { outline: 3px solid var(--cian-realidad-virtual); outline-offset: 2px; }
+.is-ask small, .is-ask .unit { display: none; }
+.is-ask [data-num] { font-size: .7em; }
+.form[hidden] { display: none; } /* sin esto, el display:grid de .form anula el atributo hidden */
+@media (max-width: 520px) { .may-bar { font-size: .85rem; padding: 6px 6px 6px 14px; } .may-bar__x { display: none; } }

@@ -1,0 +1,75 @@
+---
+import Base from '../layouts/Base.astro';
+import { products } from '../data/catalog';
+const configured = !!(import.meta.env.PUBLIC_SUPABASE_URL && import.meta.env.PUBLIC_SUPABASE_ANON_KEY);
+// Datos públicos del catálogo (los mismos que ya publica el sitio). Los precios de Supabase se cargan tras iniciar sesión.
+const list = products.filter((p) => !p.info).map((p) => ({
+  slug: p.slug, name: p.name, cat: p.category, order: p.order,
+  vars: p.table ? p.table.rows.map((r) => ({ k: r.model, l: `${r.model} · ${r.capacity}`, c: r.price })) : [{ k: '', l: 'Precio', c: p.price }],
+}));
+---
+<Base title="Administración" description="Panel administrativo de UBU Latinoamérica." noindex bodyClass="admin-body">
+  <section class="adm on-light">
+    <div class="wrap">
+      <h1 class="adm__title">Administración</h1>
+      {!configured && <p role="alert">Supabase no está configurado en este sitio (faltan PUBLIC_SUPABASE_URL y PUBLIC_SUPABASE_ANON_KEY).</p>}
+
+      <form class="form adm__login" id="a-login" novalidate hidden>
+        <div class="field"><label for="a-user">Usuario administrador (correo)</label><input id="a-user" type="email" autocomplete="username" required /></div>
+        <div class="field"><label for="a-pass">Contraseña</label><input id="a-pass" type="password" autocomplete="current-password" required /></div>
+        <p class="err" id="a-err" role="alert" aria-live="assertive"></p>
+        <button class="btn" type="submit" id="a-go">Ingresar</button>
+      </form>
+
+      <div id="a-panel" hidden>
+        <div class="adm__bar">
+          <div class="field"><label for="a-q">Buscar</label><input id="a-q" type="search" placeholder="Nombre del producto" /></div>
+          <div class="field"><label for="a-cat">Categoría</label><select id="a-cat"><option value="">Todas</option><option value="conectividad">Conectividad</option><option value="hidrogel">Hidrogel</option></select></div>
+          <div class="field"><label for="a-vis">Estado</label><select id="a-vis"><option value="">Todos</option><option value="on">Visibles</option><option value="off">Ocultos</option></select></div>
+          <button class="btn btn--line btn--sm" type="button" id="a-out">Cerrar sesión</button>
+        </div>
+        <p class="adm__hint">Precio vacío en «Cliente final» = se usa el precio del catálogo. Precio mayorista vacío = el mayorista ve «Consultar precio». Valores en COP, enteros, sin decimales.</p>
+        <p id="a-status" role="status" aria-live="polite"></p>
+        <div id="a-list" class="adm__list"></div>
+      </div>
+    </div>
+  </section>
+  <script type="application/json" id="a-data" set:html={JSON.stringify(list)} />
+</Base>
+
+<script>import '../scripts/admin';</script>
+
+<style is:global>
+  .adm { padding: 130px 0 80px; min-height: 100vh; background: #F4F8FA; }
+  .adm__title { font-size: clamp(1.8rem, 4vw, 2.6rem); margin-bottom: 20px; }
+  .adm__login { max-width: 460px; }
+  .adm__bar { display: grid; grid-template-columns: minmax(0, 2fr) repeat(2, minmax(0, 1fr)) auto; gap: 12px; align-items: end; }
+  .adm__hint { margin: 14px 0 6px; font-size: .88rem; color: var(--texto-suave); }
+  #a-status { min-height: 1.4em; font-size: .92rem; }
+  .adm__list { display: grid; gap: 12px; margin-top: 10px; }
+  .ap { background: #fff; border: 1px solid #D5E1E7; border-radius: 18px; padding: 16px 18px; display: grid; gap: 12px; }
+  .ap.is-off { background: #F1F3F4; }
+  .ap.is-dirty { border-color: var(--confianza-indigo); }
+  .ap__head { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; justify-content: space-between; }
+  .ap__name { font-family: var(--font-display); font-weight: 600; font-size: 1.05rem; }
+  .ap__meta { font-size: .82rem; color: var(--texto-suave); }
+  .ap__vis { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; font-size: .92rem; cursor: pointer; }
+  .ap__vis input { width: 22px; height: 22px; accent-color: var(--confianza-indigo); }
+  .ap__prices { display: grid; gap: 6px; }
+  .ap__row { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr); gap: 8px 12px; align-items: end; }
+  .ap__row > span { font-size: .9rem; padding-bottom: .7em; }
+  .ap__row label { display: grid; gap: 4px; font-size: .78rem; font-weight: 600; color: var(--texto-suave); }
+  .ap__row input { width: 100%; font: inherit; padding: .6em .8em; border-radius: 10px; border: 1.5px solid #B8C9D1; background: #fff; min-height: 44px; }
+  .ap__row input:focus { outline: 3px solid var(--cian-realidad-virtual); outline-offset: 1px; }
+  .ap__row input[aria-invalid="true"] { border-color: #B42318; background: #FEF3F2; }
+  .ap__foot { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+  .ap__msg { font-size: .88rem; }
+  .ap__msg.is-bad { color: #B42318; }
+  .ap__msg.is-ok { color: #067647; }
+  @media (max-width: 760px) {
+    .adm__bar { grid-template-columns: 1fr 1fr; }
+    .adm__bar .field:first-child { grid-column: 1 / -1; }
+    .ap__row { grid-template-columns: 1fr 1fr; }
+    .ap__row > span { grid-column: 1 / -1; padding: 0; font-weight: 600; }
+  }
+</style>

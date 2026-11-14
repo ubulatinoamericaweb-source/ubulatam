@@ -30,7 +30,7 @@ const ld = {
 };
 ---
 <Base title={p.name} description={desc} type="product" jsonLd={ld} image={imgs[0] ? productImage(imgs[0].file).src : '/og.png'}>
-  <section class="pdp">
+  <section class="pdp" data-product-page={p.slug} data-back={`/${p.category}`}>
     <div class="pdp__bg" aria-hidden="true"></div>
     <div class="wrap">
       <nav aria-label="Ruta de navegación"><ol class="crumbs"><li><a href="/">Inicio</a></li><li><a href={`/${cat.slug}`}>{cat.name}</a></li><li aria-current="page">{p.name}</li></ol></nav>
@@ -59,7 +59,7 @@ const ld = {
           {p.features.length > 0 && <ul class="pdp__feats">{p.features.map((f) => <li>{f}</li>)}</ul>}
           {p.colors && <div class="swatches" role="img" aria-label="Disponible en los colores mostrados en el catálogo">{p.colors.map((c) => <i style={`background:${c}`} />)}<span>Disponible en estos colores</span></div>}
           {hasPrice && (
-            <p class="pdp__price price" data-sb-price={p.sbSlug}>
+            <p class="pdp__price price" data-sb-price={p.slug}>
               <span data-num>{(p.from ? 'Desde ' : '') + cop(p.price!)}</span>{p.unit && <span class="unit">{p.unit}</span>}<small>COP</small>
             </p>
           )}
@@ -78,7 +78,7 @@ const ld = {
           <div class="tbl" tabindex="0" role="region" aria-label={`Tabla de precios: ${p.name}`}>
             <table>
               <thead><tr>{p.table.head.map((h) => <th scope="col">{h}</th>)}<th scope="col"><span class="sr-only">Carrito</span></th></tr></thead>
-              <tbody>{p.table.rows.map((r) => <tr><th scope="row">{r.model}</th><td>{r.capacity}</td><td class="num">{cop(r.price)} <small>COP</small></td><td class="act"><button class="btn btn--sm btn--line" type="button" data-add-var={p.slug} data-v={`${r.model} · ${r.capacity}`} aria-label={`Agregar ${r.model} al carrito`}><span class="t">Agregar</span></button></td></tr>)}</tbody>
+              <tbody>{p.table.rows.map((r) => <tr><th scope="row">{r.model}</th><td>{r.capacity}</td><td class="num" data-sb-price={`${p.slug}|${r.model}`}><span data-num>{cop(r.price)}</span> <small>COP</small></td><td class="act"><button class="btn btn--sm btn--line" type="button" data-add-var={p.slug} data-v={`${r.model} · ${r.capacity}`} aria-label={`Agregar ${r.model} al carrito`}><span class="t">Agregar</span></button></td></tr>)}</tbody>
             </table>
           </div>
           <p class="pdp__note">Los datos de la tabla se muestran tal como aparecen en el catálogo (p. {p.page}).</p>
@@ -86,7 +86,7 @@ const ld = {
       )}
       {p.references && (
         <div class="pdp__block" id="variantes">
-          <h2 class="h2">Referencias disponibles · {cop(p.price!)} {p.unit} <small style="font-size:.5em;opacity:.6">COP</small></h2>
+          <h2 class="h2">Referencias disponibles · <span data-sb-price={p.slug}><span data-num>{cop(p.price!)}</span></span> {p.unit} <small style="font-size:.5em;opacity:.6">COP</small></h2>
           <ul class="refs-list">{p.references.map((r) => <li>{r}</li>)}</ul>
           <div class="pick"><label>Elige la referencia<select><option value="">Selecciona</option>{p.references.map((r) => <option>{r}</option>)}</select></label><button class="btn btn--dark" type="button" data-add-pick={p.slug}><span class="t">Agregar al carrito</span></button></div>
         </div>

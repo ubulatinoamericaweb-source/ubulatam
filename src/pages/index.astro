@@ -84,7 +84,7 @@ const catImg = (slug: string, i = 0) => productImage(bySlug(slug)!.images[i].fil
       <div class="strip__viewport" data-viewport>
         <ul class="strip__track" data-track>
           {featured.map((p, i) => (
-            <li class="sitem" data-sitem>
+            <li class="sitem" data-sitem data-product={p.slug}>
               <div class="sitem__stage">
                 <Image src={productImage(p.images[0].file)} alt={p.name} widths={[360, 560]} sizes="(max-width: 700px) 70vw, 380px" loading={i < 2 ? 'eager' : 'lazy'} class={p.images[0].alpha ? '' : 'is-blend'} />
                 <span class="sitem__floor" aria-hidden="true"></span>
@@ -92,7 +92,7 @@ const catImg = (slug: string, i = 0) => productImage(bySlug(slug)!.images[i].fil
               <div class="sitem__info">
                 <span class="sitem__type">{p.type}</span>
                 <h3><a href={`/${p.slug}`}>{p.name}</a></h3>
-                <p class="price" data-sb-price={p.sbSlug}><span data-num>{cop(p.price!)}</span><small>COP</small></p>
+                <p class="price" data-sb-price={p.slug}><span data-num>{cop(p.price!)}</span><small>COP</small></p>
                 <div class="sitem__actions">
                   <a class="btn btn--sm btn--dark" href={`/${p.slug}`}>Ver ficha</a>
                   <a class="btn btn--sm btn--wa" href={waProduct(p)} target="_blank" rel="noopener">Cotizar</a>
@@ -116,8 +116,8 @@ const catImg = (slug: string, i = 0) => productImage(bySlug(slug)!.images[i].fil
         <p class="lede">Elige un producto y mira su ficha del catálogo.</p>
         <div class="glass__tabs" role="tablist" aria-label="Productos de tecnología">
           {glass.map((p, i) => (
-            <button class="glass__tab" role="tab" type="button" id={`gt-${i}`} aria-selected={i === 0 ? 'true' : 'false'} aria-controls={`gp-${i}`} data-gtab={i}>
-              <span>{p.name}</span><small>{cop(p.price!)} COP</small>
+            <button class="glass__tab" role="tab" type="button" id={`gt-${i}`} aria-selected={i === 0 ? 'true' : 'false'} aria-controls={`gp-${i}`} data-gtab={i} data-product={p.slug}>
+              <span>{p.name}</span><small data-sb-price={p.slug}><span data-num>{cop(p.price!)}</span> COP</small>
             </button>
           ))}
         </div>
@@ -128,12 +128,12 @@ const catImg = (slug: string, i = 0) => productImage(bySlug(slug)!.images[i].fil
           <span class="glint" data-glint></span>
         </div>
         {glass.map((p, i) => (
-          <article class="gprod" role="tabpanel" id={`gp-${i}`} aria-labelledby={`gt-${i}`} data-gprod={i} hidden={i !== 0}>
+          <article class="gprod" role="tabpanel" id={`gp-${i}`} aria-labelledby={`gt-${i}`} data-gprod={i} data-product={p.slug} hidden={i !== 0}>
             <Image class="gprod__img" src={productImage(p.images[0].file)} alt={p.name} widths={[420, 640]} sizes="(max-width: 800px) 70vw, 380px" loading="lazy" />
             <div class="gprod__card" data-reveal-glint>
               <p class="gprod__tag">{glassCopy[p.slug]}</p>
               <h3>{p.name}</h3>
-              <p class="price"><span>{cop(p.price!)}</span><small>COP</small></p>
+              <p class="price" data-sb-price={p.slug}><span data-num>{cop(p.price!)}</span><small>COP</small></p>
               <div class="gprod__actions">
                 <a class="btn btn--sm" href={`/${p.slug}`}>Ver ficha</a>
                 <a class="btn btn--sm btn--ghost" href={waProduct(p)} target="_blank" rel="noopener">Cotizar</a>

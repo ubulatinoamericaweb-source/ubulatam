@@ -87,7 +87,9 @@ const ld = [org, ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [])]
         </nav>
         <div class="header-actions">
           <a class="quote-pill" href="/carrito" data-cart-link aria-label="Carrito, vacío"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d={CART_PATH} /></svg><span class="t">Carrito</span><span class="quote-pill__n" data-quote-count data-n="0">0</span></a>
+          <a class="may-link" href="/mayoristas">Acceso mayorista</a>
           <a class="btn btn--wa btn--sm" href={waGeneric} target="_blank" rel="noopener">WhatsApp</a>
+          <a class="admin-link" href="/admin" rel="nofollow">Administración</a>
           <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu-panel" aria-label="Abrir menú" data-menu-btn>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
           </button>
@@ -97,7 +99,9 @@ const ld = [org, ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [])]
         {nav.map((n) => <a href={n.href} aria-current={isCur(n.href) ? 'page' : undefined}>{n.label}</a>)}
         <a href="/catalogo">Catálogo completo</a>
         {lab && (path === '/' || path === '/realista') && <a href={path === '/' ? '/realista' : '/'}>{path === '/' ? 'Comparar: versión realista (prueba)' : 'Ver la versión animada actual'}</a>}
+        <a href="/mayoristas">Acceso mayorista</a>
         <a class="btn btn--wa" href={waGeneric} target="_blank" rel="noopener">Cotizar por WhatsApp</a>
+        <a class="menu-admin" href="/admin" rel="nofollow">Administración</a>
       </nav>
     </header>
 

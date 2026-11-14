@@ -1,4 +1,5 @@
 /* Funciones comunes: header, menú, lista de cotización, revelado y ojos de la carita decorativa. */
+import { applyPrices } from './pricing';
 
 const $ = <T extends Element = HTMLElement>(s: string, r: ParentNode = document) => r.querySelector<T>(s);
 const $$ = <T extends Element = HTMLElement>(s: string, r: ParentNode = document) => Array.from(r.querySelectorAll<T>(s));
@@ -148,22 +149,5 @@ if (!reduced) {
   }
 }
 
-/* ---------- Precios en vivo (opcional): solo si hay variables PUBLIC_SUPABASE_* ---------- */
-const SB_URL = import.meta.env.PUBLIC_SUPABASE_URL as string | undefined;
-const SB_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY as string | undefined;
-if (SB_URL && SB_KEY && $('[data-sb-price]')) {
-  const cop = (n: number) => '$' + String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-  fetch(`${SB_URL}/rest/v1/productos?select=slug,precio,desde,unidad,activo`, { headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` } })
-    .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
-    .then((rows: { slug: string; precio: number; desde?: boolean; unidad?: string; activo?: boolean }[]) => {
-      if (!Array.isArray(rows) || !rows.length) return;
-      const map = new Map(rows.map((r) => [r.slug, r]));
-      $$('[data-sb-price]').forEach((el) => {
-        const r = map.get(el.dataset.sbPrice!);
-        if (!r || r.activo === false || !Number.isFinite(r.precio)) return; // sin dato válido: se conserva el precio del catálogo
-        const num = $('[data-num]', el);
-        if (num) num.textContent = (r.desde ? 'Desde ' : '') + cop(r.precio);
-      });
-    })
-    .catch(() => { /* sin conexión o sin tabla: se mantienen los precios del catálogo */ });
-}
+/* ---------- Precios en vivo, productos ocultos y vista mayorista (Supabase; ver pricing.ts) ---------- */
+applyPrices();

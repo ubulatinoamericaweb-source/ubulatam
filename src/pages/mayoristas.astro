@@ -1,0 +1,48 @@
+---
+import Base from '../layouts/Base.astro';
+import InnerHero from '../components/InnerHero.astro';
+import { waUrl } from '../data/catalog';
+const configured = !!(import.meta.env.PUBLIC_SUPABASE_URL && import.meta.env.PUBLIC_SUPABASE_ANON_KEY);
+const waAccess = waUrl('Hola UBU Latinoamérica, tengo un negocio y quiero acceso a los precios mayoristas.');
+---
+<Base title="Acceso mayorista" description="Ingreso para clientes mayoristas de UBU Latinoamérica: consulta precios mayoristas del catálogo." noindex>
+  <InnerHero kicker="Clientes mayoristas" title="Acceso mayorista" lede="Ingresa con el usuario mayorista para ver el catálogo con precios mayoristas." crumbs={[{ label: 'Acceso mayorista' }]} />
+  <section class="band band--light">
+    <div class="wrap" style="max-width:520px">
+      {!configured && <p role="alert">El acceso mayorista aún no está configurado en este sitio.</p>}
+      <form class="form" id="mform" novalidate hidden={!configured}>
+        <div class="field"><label for="m-user">Usuario (correo)</label><input id="m-user" type="email" autocomplete="username" required /></div>
+        <div class="field"><label for="m-pass">Contraseña</label><input id="m-pass" type="password" autocomplete="current-password" required /></div>
+        <p class="err" id="m-err" role="alert" aria-live="assertive"></p>
+        <button class="btn" type="submit" id="m-go">Ingresar</button>
+      </form>
+      <div id="m-in" hidden>
+        <p><b>Vista mayorista activa.</b> Los precios del catálogo se muestran como precios mayoristas mientras la sesión esté abierta.</p>
+        <p style="margin-top:18px;display:flex;flex-wrap:wrap;gap:12px"><a class="btn" href="/catalogo">Ver catálogo</a><button class="btn btn--line" type="button" id="m-out">Cerrar sesión</button></p>
+      </div>
+      <p style="margin-top:28px;font-size:.92rem">¿Aún no tienes acceso? <a href={waAccess} target="_blank" rel="noopener">Solicítalo por WhatsApp</a>.</p>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import { sbOn, getSession, signIn, endSession } from '../scripts/pricing';
+  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const form = $<HTMLFormElement>('mform'), err = $('m-err'), go = $<HTMLButtonElement>('m-go');
+  const view = () => { const on = !!getSession('mayorista'); form.hidden = on || !sbOn; $('m-in').hidden = !on; };
+  view();
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const user = $<HTMLInputElement>('m-user').value.trim(), pass = $<HTMLInputElement>('m-pass').value;
+    if (!user || !pass) { err.textContent = 'Escribe tu usuario y tu contraseña.'; return; }
+    err.textContent = ''; go.disabled = true; go.textContent = 'Ingresando…';
+    try {
+      await signIn('mayorista', user, pass);
+      location.href = '/catalogo';
+    } catch (x) {
+      err.textContent = x instanceof Error ? x.message : 'No se pudo ingresar.';
+      $<HTMLInputElement>('m-pass').value = '';
+    } finally { go.disabled = false; go.textContent = 'Ingresar'; }
+  });
+  $('m-out').addEventListener('click', () => { endSession('mayorista'); location.reload(); });
+</script>

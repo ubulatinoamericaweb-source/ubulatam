@@ -21,8 +21,10 @@ npm run preview    # sirve dist/ tal como saldrá a producción
 | `src/components/` | `Logo`, `UbuFace` (carita decorativa), `Truck`, `Hands`, `PcHead`, `ProductCard`, `CategoryView`, `InnerHero`. |
 | `src/pages/` | Inicio, `conectividad`, `hidrogel`, `catalogo`, `[slug]` (una ficha por producto), nosotros, para-tu-negocio, soporte, contacto, ubicación, cotización, legales, 404. |
 | `src/scripts/` | `core.ts` (menú, carrito, ojos), `home.ts` (escenas GSAP), `cart.ts` (carrito de pedido), `inner.ts`. |
-| `public/admin.html` | Panel administrativo existente (Supabase Auth), conservado sin cambios. |
-| `supabase/schema.sql` | Esquema **sugerido**, no aplicado (ver «Supabase»). |
+| `src/pages/admin.astro` + `src/scripts/admin.ts` | Panel `/admin`: mostrar/ocultar productos y editar precio cliente final y mayorista. Enlace discreto «Administración» al final del menú hamburguesa. |
+| `src/pages/mayoristas.astro` | `/mayoristas`: acceso mayorista (usuario global) y cierre de sesión. |
+| `src/scripts/pricing.ts` | Precios en vivo, productos ocultos y vista mayorista; lo usan todas las páginas y el carrito. |
+| `supabase/schema.sql`, `supabase/seed.sql` | Esquema con RLS y carga inicial de productos (ver «Supabase»). Deben aplicarse a mano. |
 | `legacy-site/` | Sitio anterior (HTML suelto) como respaldo. No se publica; puede borrarse cuando se valide el nuevo. |
 | `source-private/` | PDFs y referencias. Ignorada por git (`.gitignore` y `.git/info/exclude`); nada de ahí se copia a `public/`. |
 
@@ -98,13 +100,33 @@ git switch -c volver-a-animada punto-restauracion-animada-v1   # volver a esa ve
 | 28 | Etiqueta amarilla «RECLAME OBSEQUIO» en la máquina de 21": el PDF no explica las condiciones. |
 | 22 | **Parlante Harman Kardon ($220.000) está en el PDF y no estaba en el sitio anterior**; ya se incluye. |
 
-## Supabase
+## Supabase: catálogo, mayoristas y administración
 
-- El sitio anterior apuntaba a un proyecto de Supabase (`ksfabuzurjxofapqoonc`). Al consultarlo con la clave pública, **las tablas `productos`, `solicitudes` y `admins` no existen** (error `PGRST205`), por lo que la carga de precios en vivo y el panel `/admin` no podían funcionar. No se escribió ni modificó nada en Supabase.
-- **Comparación de precios:** no hay precios activos en Supabase con los que comparar. Los 47 precios incrustados en el sitio anterior coinciden con el catálogo PDF (0 diferencias).
-- La integración se conservó **desactivada por defecto**: si defines `PUBLIC_SUPABASE_URL` y `PUBLIC_SUPABASE_ANON_KEY` (ver `.env.example`), el sitio superpone precios activos de `productos` y el formulario guarda una copia en `solicitudes`. Si no hay respuesta válida, se mantienen los precios del catálogo. Nunca va una `service_role` en el navegador.
-- `supabase/schema.sql` propone tablas y políticas RLS (insertar solicitudes: público; leer/editar: solo `admins`). Revísalo antes de aplicarlo.
-- `public/admin.html` sigue igual: usa `supabase-js@2.45.4` desde jsDelivr (sin SRI) y valida el rol consultando `admins`. La seguridad real depende de las políticas RLS, que hoy no existen en ese proyecto.
+Proyecto: `ksfabuzurjxofapqoonc` (el mismo que usaba el sitio anterior). Sitio estático + Supabase (Auth y RLS); no hay backend propio ni secretos en el código.
+
+**Cómo funciona**
+- Público: el HTML trae los precios del catálogo (`products.json`); al cargar, `pricing.ts` oculta los productos inactivos y aplica el precio de cliente final de la tabla `precios` (vacío = precio del catálogo).
+- Mayorista: en `/mayoristas` inicia sesión el usuario global; solo entonces se leen `precios_mayoristas` (RLS: solo usuarios de la tabla `mayoristas` o `admins`). Sin precio mayorista se muestra «Consultar precio». Franja «Vista mayorista activa» con «Cerrar sesión».
+- Admin: `/admin` (enlace «Administración» al final del menú hamburguesa). Solo usuarios de `admins` pueden leer todo y escribir (RLS). Un mayorista que intente entrar es rechazado y la base de datos bloquea sus escrituras.
+- Sesión: token de Supabase en `sessionStorage` (nunca la contraseña); se borra al cerrar la pestaña y caduca con el token (1 h por defecto). Al vencer, vuelve la vista pública.
+- Precios: enteros COP >= 0, validados también en la base de datos (`check (precio >= 0)`).
+- El panel anterior `public/admin.html` (no funcionaba: sus tablas no existían) se retiró; queda una copia en `legacy-site/admin.html`.
+
+**Configuración (una sola vez, la haces tú)**
+1. Supabase → SQL Editor: ejecuta `supabase/schema.sql` y luego `supabase/seed.sql` (no pisa ediciones previas).
+2. Authentication → Sign In / Providers: **desactiva «Allow new users to sign up»** (solo tú creas usuarios).
+3. Authentication → Users → Add user (con «Auto Confirm»): crea el administrador y el usuario mayorista, con correos y contraseñas fuertes y distintas. No los escribas en el repositorio.
+4. SQL Editor (cambia los correos):
+   `insert into public.admins (user_id) select id from auth.users where email = 'admin@tu-dominio.com';`
+   `insert into public.mayoristas (user_id) select id from auth.users where email = 'mayoristas@tu-dominio.com';`
+5. Variables (públicas, no son secretos): `PUBLIC_SUPABASE_URL=https://ksfabuzurjxofapqoonc.supabase.co` y `PUBLIC_SUPABASE_ANON_KEY` (Project Settings → API → anon/publishable). En local van en `.env` (ignorado por Git); en Vercel, en Environment Variables, y requieren volver a compilar. **Nunca** la `service_role`.
+6. Cambiar la contraseña mayorista: Authentication → Users → el usuario → actualizar contraseña. Mayoristas individuales en el futuro: crea más usuarios y agrégalos a `mayoristas`; el código no cambia.
+
+**Límites conocidos**
+- El sitio es estático: un producto oculto se retira al cargar la página (catálogo, fichas, inicio y carrito; su ficha redirige a la categoría), pero sigue en el HTML compilado y en el sitemap hasta la próxima compilación.
+- Los precios de cliente final editados se aplican al cargar; buscadores y JSON-LD siguen viendo los de `products.json`.
+- El enlace «Administración» solo está en el menú hamburguesa (pantallas de hasta 1060 px); en escritorio se entra con `/admin`.
+- La imagen de cotización y el texto de WhatsApp usan la vista activa (pública o mayorista).
 
 ## SEO y dominio
 

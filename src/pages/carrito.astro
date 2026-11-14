@@ -7,7 +7,7 @@ const data = Object.fromEntries(
   products.filter((p) => !p.info).map((p) => {
     const im = displayImages(p)[0];
     const vars = p.table
-      ? p.table.rows.map((r) => ({ l: `${r.model} · ${r.capacity}`, p: r.price }))
+      ? p.table.rows.map((r) => ({ l: `${r.model} · ${r.capacity}`, p: r.price, k: r.model }))
       : p.references ? p.references.map((r) => ({ l: r, p: p.price! })) : null;
     return [p.slug, { n: p.name, price: p.price, unit: p.unit, img: im ? productImage(im.file).src : '', blend: im ? !im.alpha : false, vars, vlabel: p.table ? 'modelo' : 'referencia' }];
   }),

@@ -5,8 +5,9 @@ import { qGet, qSet, type QItem } from './core';
 import { WA_NUMBER } from '../data/catalog';
 import { allPeople } from '../data/contacts';
 import { renderQuote } from './quote-image';
+import { loadPrices, priceFor, priceKey } from './pricing';
 
-interface V { l: string; p: number }
+interface V { l: string; p: number | null; k?: string }
 interface PInfo { n: string; price: number | null; unit: string; img: string; blend: boolean; vars: V[] | null; vlabel: string }
 const data: Record<string, PInfo> = JSON.parse(document.getElementById('c-data')?.textContent || '{}');
 const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -45,7 +46,7 @@ function renderCart() {
       const w = document.createElement('label'); w.className = 'crow__v' + (unit == null ? ' is-missing' : ''); w.append(document.createTextNode(`Elige el ${d.vlabel}`));
       const sel = document.createElement('select');
       const o0 = document.createElement('option'); o0.value = ''; o0.textContent = 'Selecciona'; sel.append(o0);
-      d.vars.forEach((v) => { const o = document.createElement('option'); o.value = v.l; o.textContent = `${v.l} — ${cop(v.p)}`; if (v.l === item.v) o.selected = true; sel.append(o); });
+      d.vars.forEach((v) => { const o = document.createElement('option'); o.value = v.l; o.textContent = `${v.l} — ${v.p == null ? 'Consultar precio' : cop(v.p)}`; if (v.l === item.v) o.selected = true; sel.append(o); });
       sel.addEventListener('change', () => mutate((l) => l.map((x) => (same(x, item) ? { id: x.id, qty: x.qty, ...(sel.value ? { v: sel.value } : {}) } : x))));
       w.append(sel); b.append(w);
     }
@@ -58,7 +59,7 @@ function renderCart() {
     minus.onclick = () => mutate((l) => l.map((x) => (same(x, item) ? { ...x, qty: Math.max(1, x.qty - 1) } : x)));
     plus.onclick = () => mutate((l) => l.map((x) => (same(x, item) ? { ...x, qty: Math.min(999, x.qty + 1) } : x)));
     const price = document.createElement('div'); price.className = 'crow__p';
-    price.textContent = total == null ? 'Elige una opción' : cop(total);
+    price.textContent = total == null ? (d.vars && !item.v ? 'Elige una opción' : 'Consultar precio') : cop(total);
     if (total != null) { const sm = document.createElement('small'); sm.textContent = ` COP${item.qty > 1 ? ` · ${cop(unit!)} c/u` : ''}`; price.append(sm); }
     const rm = document.createElement('button'); rm.type = 'button'; rm.className = 'btn btn--sm btn--line'; rm.textContent = 'Quitar'; rm.setAttribute('aria-label', 'Quitar ' + d.n);
     rm.onclick = () => mutate((l) => l.filter((x) => !same(x, item)));
@@ -90,7 +91,7 @@ document.querySelectorAll<HTMLElement>('[data-back]').forEach((b) => b.addEventL
 
 $('to2').addEventListener('click', () => {
   const L = lines();
-  const miss = L.find((x) => x.unit == null);
+  const miss = L.find((x) => x.d.vars && !x.item.v);
   if (!L.length) return;
   if (miss) {
     $('c-warn').textContent = `Elige el ${miss.d.vlabel} de «${miss.d.n}» para continuar.`;
@@ -127,8 +128,8 @@ function renderSummary() {
   L.forEach(({ item, d, unit, total }) => {
     const li = document.createElement('li');
     const b = document.createElement('b'); b.textContent = d.n;
-    const t = document.createElement('span'); t.className = 't'; t.textContent = `${cop(total || 0)} COP`;
-    const s = document.createElement('small'); s.textContent = `${item.v ? `${d.vlabel[0].toUpperCase()}${d.vlabel.slice(1)}: ${item.v} · ` : ''}${item.qty} × ${cop(unit || 0)} COP`;
+    const t = document.createElement('span'); t.className = 't'; t.textContent = total == null ? 'Consultar precio' : `${cop(total)} COP`;
+    const s = document.createElement('small'); s.textContent = `${item.v ? `${d.vlabel[0].toUpperCase()}${d.vlabel.slice(1)}: ${item.v} · ` : ''}${item.qty} × ${unit == null ? 'consultar precio' : `${cop(unit)} COP`}`;
     li.append(b, t, s); ul.append(li);
   });
   const dl = $('s-data'); dl.replaceChildren();
@@ -144,8 +145,8 @@ function message(attach: boolean) {
     '*UBU LATINOAMÉRICA* — Cotización', sep,
     `👤 *Nombre:* ${cust.nombre}`, `📱 *WhatsApp:* ${cust.tel}`, `📍 *Ciudad:* ${cust.ciudad}, ${cust.pais}`, `🚚 *Entrega:* ${cust.dir}`, sep,
     '🛍️ *DETALLE DEL PEDIDO*',
-    ...L.map(({ item, d, total }) => `• ${item.qty}x ${d.n}${item.v ? ` (${item.v})` : ''} — ${cop(total || 0)} COP`), sep,
-    `Subtotal: ${cop(sub)} COP`, 'Envío: Por confirmar', `*TOTAL: ${cop(sub)} COP*`,
+    ...L.map(({ item, d, total }) => `• ${item.qty}x ${d.n}${item.v ? ` (${item.v})` : ''} — ${total == null ? 'Consultar precio' : `${cop(total)} COP`}`), sep,
+    `Subtotal: ${cop(sub)} COP${L.some((x) => x.total == null) ? ' + productos por cotizar' : ''}`, 'Envío: Por confirmar', `*TOTAL: ${cop(sub)} COP*`,
     ...(attach ? ['', 'Adjunto la imagen de mi cotización 🧾✨'] : ['', 'Precios de referencia del catálogo 2026. ¿Me confirman disponibilidad, envío y valor final?']),
   ].join('\n');
 }
@@ -160,7 +161,7 @@ async function buildQuote() {
   try {
     const L = lines();
     const blob = await renderQuote({
-      rows: L.map(({ item, d, unit, total }) => ({ name: d.n, variant: item.v ? `${d.vlabel[0].toUpperCase()}${d.vlabel.slice(1)}: ${item.v}` : '', qty: item.qty, unit: unit || 0, total: total || 0, img: d.img, blend: d.blend })),
+      rows: L.map(({ item, d, unit, total }) => ({ name: d.n, variant: item.v ? `${d.vlabel[0].toUpperCase()}${d.vlabel.slice(1)}: ${item.v}` : '', qty: item.qty, unit, total, img: d.img, blend: d.blend })),
       fields: [['Nombre', cust.nombre], ['Teléfono', cust.tel], ['Ciudad', `${cust.ciudad}, ${cust.pais}`], ['Dirección', cust.dir]],
       sub: L.reduce((a, x) => a + (x.total || 0), 0),
       date: new Date().toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' }),
@@ -218,3 +219,14 @@ $('clear').addEventListener('click', () => { qSet([]); show(1); renderCart(); })
 
 addEventListener('storage', () => { if (step === 1) renderCart(); });
 renderCart(); show(1, false);
+
+// Precios en vivo (públicos o mayoristas) y productos ocultos desde Administración: se aplican cuando llegan.
+loadPrices().then((p) => {
+  if (!p) return;
+  for (const [id, d] of Object.entries(data)) {
+    if (p.active.get(id) === false) { delete data[id]; continue; }
+    d.price = d.price == null && !p.may ? null : priceFor(p, priceKey(id), d.price);
+    d.vars?.forEach((v) => { v.p = priceFor(p, priceKey(id, v.k ?? ''), v.k ? v.p : d.price); });
+  }
+  if (step === 1) renderCart();
+});

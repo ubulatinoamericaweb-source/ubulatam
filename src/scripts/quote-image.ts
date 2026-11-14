@@ -1,7 +1,7 @@
 /* Imagen PNG del resumen de pedido, dibujada en un <canvas> con recursos locales (logo oficial y fuentes del sitio).
    Nada sale del navegador. La altura crece según las filas: no se recorta ningún producto. */
 
-export interface QuoteRow { name: string; variant: string; qty: number; unit: number; total: number; img: string; blend: boolean }
+export interface QuoteRow { name: string; variant: string; qty: number; unit: number | null; total: number | null; img: string; blend: boolean }
 export interface QuoteData { rows: QuoteRow[]; fields: [string, string][]; sub: number; date: string }
 
 const W = 1080, M = 56;
@@ -111,8 +111,8 @@ export async function renderQuote(q: QuoteData): Promise<Blob> {
     m.v.forEach((l) => { text(l, tx, ty - 2, VAR, C.soft); ty += 27; });
     const my = top + 38;
     text(String(r.qty), XQ, my, `700 28px ${DISPLAY}`, C.ink, 'center');
-    text(cop(r.unit), XU, my, `400 24px ${BODY}`, C.ink2, 'right');
-    text(cop(r.total), XT, my, `700 26px ${DISPLAY}`, C.ink, 'right');
+    text(r.unit == null ? 'Consultar' : cop(r.unit), XU, my, `400 24px ${BODY}`, C.ink2, 'right');
+    text(r.total == null ? 'Consultar' : cop(r.total), XT, my, `700 26px ${DISPLAY}`, C.ink, 'right');
     g.fillStyle = C.line; g.fillRect(M, y + m.h - 1, W - 2 * M, 1.5);
     y += m.h;
   });
