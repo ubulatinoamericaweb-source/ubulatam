@@ -35,7 +35,11 @@ export function sb(path: string, init: RequestInit = {}, token?: string) {
 }
 
 /** Inicia sesión y exige el rol pedido: un mayorista no entra a administración ni al revés. */
-export async function signIn(role: Role, email: string, password: string): Promise<Session> {
+/** Los usuarios de Supabase Auth exigen correo: quien ingresa escribe solo el usuario ("admin") y se completa con el dominio de UBU. */
+const USER_DOMAIN = 'ubulatinoamerica.com';
+export async function signIn(role: Role, user: string, password: string): Promise<Session> {
+  const u = user.trim().toLowerCase();
+  const email = u.includes('@') ? u : `${u}@${USER_DOMAIN}`;
   const r = await sb('/auth/v1/token?grant_type=password', { method: 'POST', body: JSON.stringify({ email, password }) });
   if (r.status === 400 || r.status === 401) throw new Error('Usuario o contraseña incorrectos.');
   if (r.status === 429) throw new Error('Demasiados intentos. Espera unos minutos e inténtalo de nuevo.');

@@ -11,7 +11,7 @@ const waAccess = waUrl('Hola UBU Latinoamérica, tengo un negocio y quiero acces
     <div class="wrap" style="max-width:520px">
       {!configured && <p role="alert">El acceso mayorista aún no está configurado en este sitio.</p>}
       <form class="form" id="mform" novalidate hidden={!configured}>
-        <div class="field"><label for="m-user">Usuario (correo)</label><input id="m-user" type="email" autocomplete="username" required /></div>
+        <div class="field"><label for="m-user">Usuario</label><input id="m-user" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" required /></div>
         <div class="field"><label for="m-pass">Contraseña</label><input id="m-pass" type="password" autocomplete="current-password" required /></div>
         <p class="err" id="m-err" role="alert" aria-live="assertive"></p>
         <button class="btn" type="submit" id="m-go">Ingresar</button>

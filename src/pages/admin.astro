@@ -15,7 +15,7 @@ const list = products.filter((p) => !p.info).map((p) => ({
       {!configured && <p role="alert">Supabase no está configurado en este sitio (faltan PUBLIC_SUPABASE_URL y PUBLIC_SUPABASE_ANON_KEY).</p>}
 
       <form class="form adm__login" id="a-login" novalidate hidden>
-        <div class="field"><label for="a-user">Usuario administrador (correo)</label><input id="a-user" type="email" autocomplete="username" required /></div>
+        <div class="field"><label for="a-user">Usuario administrador</label><input id="a-user" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" required /></div>
         <div class="field"><label for="a-pass">Contraseña</label><input id="a-pass" type="password" autocomplete="current-password" required /></div>
         <p class="err" id="a-err" role="alert" aria-live="assertive"></p>
         <button class="btn" type="submit" id="a-go">Ingresar</button>
