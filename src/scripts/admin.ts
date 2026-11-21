@@ -1,7 +1,8 @@
 /* Panel de administración: activar/ocultar productos y editar precios de cliente final y mayorista.
    La autorización real la hace Supabase con RLS (solo usuarios de la tabla `admins` pueden escribir);
    este script solo arma la interfaz. Si un guardado falla, los valores escritos se conservan para reintentar. */
-import { sbOn, sb, getSession, signIn, endSession, priceKey, parsePrice } from './pricing';
+import { priceKey, parsePrice } from './pricing';
+import { get, upsert, SessionLost } from './gestion/api';
 
 interface Var { k: string; l: string; c: number | null }
 interface Item { slug: string; name: string; cat: 'conectividad' | 'hidrogel'; order: number; vars: Var[] }
@@ -9,45 +10,18 @@ type Row = { slug: string; variante: string; precio: number | null };
 
 const items: Item[] = JSON.parse(document.getElementById('a-data')?.textContent || '[]');
 const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
-const login = $<HTMLFormElement>('a-login'), panel = $('a-panel'), status = $('a-status'), list = $('a-list');
-const dirty = new Set<string>();
+const status = $('a-status'), list = $('a-list');
+export const dirty = new Set<string>();
+const onSessionLost = (e: unknown) => e instanceof SessionLost;
 
-function showLogin(msg = '') {
-  panel.hidden = true; login.hidden = !sbOn; $('a-err').textContent = msg;
-}
-
-async function api(path: string, init: RequestInit = {}) {
-  const s = getSession('admin');
-  if (!s) throw new Error('SESSION');
-  const r = await sb(path, init, s.t);
-  if (r.status === 401 || r.status === 403) {
-    const j = await r.json().catch(() => ({}));
-    // 401 con JWT vencido = sesión; 401/403 de RLS = sin permiso
-    throw new Error(/jwt|expired/i.test(JSON.stringify(j)) ? 'SESSION' : 'Sin permiso para guardar. Vuelve a iniciar sesión como administrador.');
-  }
-  if (r.status === 400) {
-    const j = await r.json().catch(() => ({}));
-    throw new Error(/check/i.test(JSON.stringify(j)) ? 'Precio inválido: debe ser un número entero mayor o igual a 0.' : 'El servidor rechazó los datos.');
-  }
-  if (!r.ok) throw new Error(`Error del servidor (${r.status}). Inténtalo de nuevo.`);
-  const txt = await r.text(); // return=minimal responde sin cuerpo
-  return txt ? JSON.parse(txt) : null;
-}
-const upsert = (table: string, conflict: string, rows: object[]) =>
-  api(`/rest/v1/${table}?on_conflict=${conflict}`, { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates,return=minimal' }, body: JSON.stringify(rows) });
-
-function onSessionLost(e: unknown) {
-  if (e instanceof Error && e.message === 'SESSION') { endSession('admin'); showLogin('Tu sesión venció. Ingresa de nuevo; los cambios sin guardar de esta pantalla se perdieron.'); return true; }
-  return false;
-}
-
-async function loadPanel() {
-  login.hidden = true; panel.hidden = false; status.textContent = 'Cargando productos…'; list.replaceChildren();
+/** Vista «Catálogo y precios» del panel de gestión. */
+export async function loadPanel() {
+  status.textContent = 'Cargando productos…'; list.replaceChildren();
   try {
     const [prods, pub, may] = (await Promise.all([
-      api('/rest/v1/productos?select=slug,activo'),
-      api('/rest/v1/precios?select=slug,variante,precio'),
-      api('/rest/v1/precios_mayoristas?select=slug,variante,precio'),
+      get('productos?select=slug,activo'),
+      get('precios?select=slug,variante,precio'),
+      get('precios_mayoristas?select=slug,variante,precio'),
     ])) as [{ slug: string; activo: boolean }[], Row[], Row[]];
     const active = new Map(prods.map((p) => [p.slug, p.activo]));
     const P = new Map(pub.map((r) => [priceKey(r.slug, r.variante), r.precio]));
@@ -143,19 +117,3 @@ function filter() {
 }
 ['a-q', 'a-cat', 'a-vis'].forEach((id) => $(id).addEventListener('input', filter));
 
-login.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const go = $<HTMLButtonElement>('a-go'), user = $<HTMLInputElement>('a-user').value.trim(), pass = $<HTMLInputElement>('a-pass');
-  if (!user || !pass.value) { $('a-err').textContent = 'Escribe tu usuario y tu contraseña.'; return; }
-  go.disabled = true; go.textContent = 'Ingresando…'; $('a-err').textContent = '';
-  try { await signIn('admin', user, pass.value); pass.value = ''; loadPanel(); }
-  catch (x) { $('a-err').textContent = (x as Error).message; pass.value = ''; }
-  finally { go.disabled = false; go.textContent = 'Ingresar'; }
-});
-$('a-out').addEventListener('click', () => {
-  if (dirty.size && !confirm('Hay cambios sin guardar. ¿Cerrar sesión de todos modos?')) return;
-  dirty.clear(); endSession('admin'); showLogin();
-});
-addEventListener('beforeunload', (e) => { if (dirty.size) e.preventDefault(); });
-
-if (sbOn && getSession('admin')) loadPanel(); else showLogin();

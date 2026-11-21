@@ -9,14 +9,14 @@ const SB_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY as string | undefined;
 export const sbOn = !!(SB_URL && SB_KEY);
 
 export type Role = 'admin' | 'mayorista';
-export interface Session { t: string; exp: number }
+export interface Session { t: string; exp: number; r?: string }
 const KEYS: Record<Role, string> = { admin: 'ubu_admin', mayorista: 'ubu_may' };
 
 export function getSession(role: Role): Session | null {
   try {
     const s = JSON.parse(sessionStorage.getItem(KEYS[role]) || 'null') as Session | null;
     if (s && s.t && s.exp > Date.now() + 5000) return s;
-    sessionStorage.removeItem(KEYS[role]);
+    if (!s?.r) sessionStorage.removeItem(KEYS[role]); // con refresh token se conserva para que freshSession la renueve
   } catch { /* almacenamiento bloqueado: sin sesión */ }
   return null;
 }
@@ -45,7 +45,8 @@ export async function signIn(role: Role, user: string, password: string): Promis
   if (r.status === 429) throw new Error('Demasiados intentos. Espera unos minutos e inténtalo de nuevo.');
   if (!r.ok) throw new Error('No se pudo conectar con el servidor. Inténtalo de nuevo.');
   const j = await r.json();
-  const s: Session = { t: j.access_token, exp: Date.now() + (Number(j.expires_in) || 3600) * 1000 };
+  // El refresh token solo se guarda para administración (el POS se usa toda la jornada); el mayorista vuelve a la vista pública al vencer.
+  const s: Session = { t: j.access_token, exp: Date.now() + (Number(j.expires_in) || 3600) * 1000, r: role === 'admin' ? j.refresh_token : undefined };
   const rr = await sb('/rest/v1/rpc/mi_rol', { method: 'POST', body: '{}' }, s.t);
   const got = rr.ok ? ((await rr.json()) as Role | null) : null;
   if (got !== role) {
@@ -53,6 +54,21 @@ export async function signIn(role: Role, user: string, password: string): Promis
     throw new Error(role === 'admin' ? 'Esta cuenta no tiene permisos de administración.' : 'Esta cuenta no es de acceso mayorista.');
   }
   sessionStorage.setItem(KEYS[role], JSON.stringify(s));
+  return s;
+}
+
+/** Sesión de administración vigente, renovándola con el refresh token si está por vencer. null = hay que volver a ingresar. */
+export async function freshSession(role: Role): Promise<Session | null> {
+  const ok = getSession(role);
+  if (ok && ok.exp > Date.now() + 120_000) return ok;
+  let old: Session | null = null;
+  try { old = JSON.parse(sessionStorage.getItem(KEYS[role]) || 'null'); } catch { /* sin almacenamiento */ }
+  if (!old?.r) return ok;
+  const r = await sb('/auth/v1/token?grant_type=refresh_token', { method: 'POST', body: JSON.stringify({ refresh_token: old.r }) }).catch(() => null);
+  if (!r?.ok) return ok;
+  const j = await r.json();
+  const s: Session = { t: j.access_token, exp: Date.now() + (Number(j.expires_in) || 3600) * 1000, r: j.refresh_token };
+  try { sessionStorage.setItem(KEYS[role], JSON.stringify(s)); } catch { /* nada */ }
   return s;
 }
 

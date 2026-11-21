@@ -100,6 +100,16 @@ git switch -c volver-a-animada punto-restauracion-animada-v1   # volver a esa ve
 | 28 | Etiqueta amarilla «RECLAME OBSEQUIO» en la máquina de 21": el PDF no explica las condiciones. |
 | 22 | **Parlante Harman Kardon ($220.000) está en el PDF y no estaba en el sitio anterior**; ya se incluye. |
 
+## UBU Gestión (`/admin`)
+
+Portal interno (solo administradores) con menú lateral: **Dashboard, Punto de venta, Cotizaciones, Facturas y anulaciones, Inventario, Catálogo y precios, Clientes y terceros, Cuentas por cobrar (incluye cobros vencidos) y Gastos**. Fase 2 (en construcción): Garantías, Campañas WhatsApp, Reportes y Estados financieros.
+
+- Código: `src/pages/admin.astro` (estructura y estilos), `src/scripts/gestion/app.ts` (módulos), `src/scripts/gestion/api.ts` (Supabase), `src/scripts/admin.ts` (editor de precios).
+- Base de datos: **ejecuta `supabase/gestion.sql`** en el SQL Editor (una vez; es idempotente). Crea terceros, inventario, kardex, documentos, ítems, pagos y gastos con RLS solo-admin, y las funciones `emitir_documento`, `registrar_pago`, `anular_documento` y `ajustar_inventario`: totales, consecutivos (COT-, FV-, REM-) y movimientos de stock se calculan en el servidor en una sola transacción.
+- Documentos internos (cotización, factura de venta, remisión): **no son factura electrónica DIAN**. Se descargan como imagen con el diseño UBU y se envían por WhatsApp.
+- Dos listas de precios: `gestion.sql` copia los precios actuales de la web a la lista **mayorista** (sin pisar ediciones). La lista **cliente final** se edita en «Catálogo y precios».
+- La sesión de administración se renueva sola con el refresh token mientras la pestaña esté abierta.
+
 ## Supabase: catálogo, mayoristas y administración
 
 Proyecto: `ksfabuzurjxofapqoonc` (el mismo que usaba el sitio anterior). Sitio estático + Supabase (Auth y RLS); no hay backend propio ni secretos en el código.

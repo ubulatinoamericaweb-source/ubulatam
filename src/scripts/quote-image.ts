@@ -2,7 +2,11 @@
    Nada sale del navegador. La altura crece según las filas: no se recorta ningún producto. */
 
 export interface QuoteRow { name: string; variant: string; qty: number; unit: number | null; total: number | null; img: string; blend: boolean }
-export interface QuoteData { rows: QuoteRow[]; fields: [string, string][]; sub: number; date: string }
+export interface QuoteData {
+  rows: QuoteRow[]; fields: [string, string][]; sub: number; date: string;
+  /** Opcionales para documentos del admin (factura, remisión, cotización numerada). Sin ellos = resumen de pedido del carrito. */
+  title?: string; subtitle?: string; lines?: [string, string][]; total?: number; note?: string;
+}
 
 const W = 1080, M = 56;
 const C = { ink: '#05101B', ink2: '#0F2436', soft: '#4A5A66', line: '#D9E4EA', mist: '#EAF6F7', teal: '#41B9C1', cyan: '#01DCEF' };
@@ -50,7 +54,7 @@ export async function renderQuote(q: QuoteData): Promise<Blob> {
     cy += Math.max(a.h, b?.h || 0); i += b ? 2 : 1;
   }
   const CUST = cells.length ? cy + 56 : 0;
-  const HDRROW = 56, TOTALS = 270, FOOT = 110;
+  const extra = q.lines ? q.lines.length : 2, HDRROW = 56, TOTALS = 170 + extra * 50, FOOT = 110;
   const H = HEAD + TITLE + CUST + HDRROW + rows.reduce((a, r) => a + r.h, 0) + TOTALS + FOOT;
 
   const scale = Math.min(2, Math.sqrt(MAX_PIXELS / (W * H)));
@@ -69,12 +73,12 @@ export async function renderQuote(q: QuoteData): Promise<Blob> {
   g.fillStyle = glow; g.fillRect(0, 0, W, HEAD);
   const lh = 110, lw = lh * (logo.naturalWidth && logo.naturalHeight ? logo.naturalWidth / logo.naturalHeight : 506.511 / 240.347);
   g.drawImage(logo, M, 56, lw, lh);
-  text('Resumen de pedido', W - M, 100, `700 40px ${DISPLAY}`, '#fff', 'right');
+  text(q.title || 'Resumen de pedido', W - M, 100, `700 40px ${DISPLAY}`, '#fff', 'right');
   text(q.date, W - M, 144, `400 24px ${BODY}`, C.teal, 'right');
   g.fillStyle = C.cyan; g.fillRect(0, HEAD - 6, W, 6);
 
   let y = HEAD + 70;
-  text('Cotización · precios de referencia del catálogo 2026', M, y, `400 23px ${BODY}`, C.soft);
+  text(q.subtitle || 'Cotización · precios de referencia del catálogo 2026', M, y, `400 23px ${BODY}`, C.soft);
   y = HEAD + TITLE;
 
   // ---- cliente ----
@@ -120,13 +124,14 @@ export async function renderQuote(q: QuoteData): Promise<Blob> {
   // ---- totales ----
   y += 28;
   const lab = `400 26px ${BODY}`, val = `600 28px ${DISPLAY}`;
-  text('Subtotal', XT - 330, y + 26, lab, C.soft); text(`${cop(q.sub)} COP`, XT, y + 26, val, C.ink2, 'right');
-  text('Envío', XT - 330, y + 76, lab, C.soft); text('Por confirmar', XT, y + 76, val, C.ink2, 'right');
-  rr(M, y + 110, W - 2 * M, 96, 22); g.fillStyle = C.ink; g.fill();
-  text('TOTAL', M + 32, y + 172, `600 26px ${DISPLAY}`, C.cyan);
-  text(`${cop(q.sub)} COP`, XT - 32, y + 174, `700 44px ${DISPLAY}`, '#fff', 'right');
-  y += 206;
-  text('El total no incluye envío. El valor final y el envío se confirman por WhatsApp.', M, y + 50, `400 21px ${BODY}`, C.soft);
+  const L = q.lines ?? [['Subtotal', `${cop(q.sub)} COP`], ['Envío', 'Por confirmar']];
+  L.forEach(([k, v], i) => { text(k, XT - 330, y + 26 + i * 50, lab, C.soft); text(v, XT, y + 26 + i * 50, val, C.ink2, 'right'); });
+  y += L.length * 50 + 10;
+  rr(M, y, W - 2 * M, 96, 22); g.fillStyle = C.ink; g.fill();
+  text('TOTAL', M + 32, y + 62, `600 26px ${DISPLAY}`, C.cyan);
+  text(`${cop(q.total ?? q.sub)} COP`, XT - 32, y + 64, `700 44px ${DISPLAY}`, '#fff', 'right');
+  y += 96;
+  text(q.note ?? 'El total no incluye envío. El valor final y el envío se confirman por WhatsApp.', M, y + 50, `400 21px ${BODY}`, C.soft);
   text('www.ubulatinoamerica.com', W / 2, H - 28, `600 20px ${DISPLAY}`, C.teal, 'center');
 
   return new Promise((res, rej) => cv.toBlob((b) => (b ? res(b) : rej(new Error('El navegador no pudo crear la imagen.'))), 'image/png'));
