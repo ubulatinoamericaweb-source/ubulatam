@@ -16,14 +16,19 @@ const nav = [
   ['Operación', [['dashboard', 'Dashboard', 'M3 13h8V3H3zm10 8h8V11h-8zM3 21h8v-6H3zm10-18v6h8V3z'],
     ['pos', 'Punto de venta', 'M3 3h2l2.4 12h11.2L21 7H6.2M9 20a1 1 0 1 0 0-.01M18 20a1 1 0 1 0 0-.01'],
     ['cotizar', 'Cotizaciones', 'M7 3h8l4 4v14H7zM14 3v5h5M10 13h6M10 17h6'],
-    ['documentos', 'Facturas y anulaciones', 'M6 2h12v20l-3-2-3 2-3-2-3 2zM9 7h6M9 11h6M9 15h4']]],
+    ['documentos', 'Facturas y anulaciones', 'M6 2h12v20l-3-2-3 2-3-2-3 2zM9 7h6M9 11h6M9 15h4'],
+    ['caja', 'Caja', 'M3 7h18v13H3zM7 7V4h10v3M12 11v5M9.5 13.5h5']]],
   ['Mercancía', [['inventario', 'Inventario', 'M21 8 12 3 3 8v8l9 5 9-5zM3 8l9 5 9-5M12 13v8'],
-    ['precios', 'Catálogo y precios', 'M20 12 12 20 3 11V3h8zM7.5 7.5h.01']]],
+    ['precios', 'Catálogo y precios', 'M20 12 12 20 3 11V3h8zM7.5 7.5h.01'],
+    ['compras', 'Compras y proveedores', 'M3 9h18l-2 11H5zM8 9V6a4 4 0 0 1 8 0v3'],
+    ['garantias', 'Garantías', 'M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6zM9 12l2 2 4-4']]],
   ['Clientes y dinero', [['terceros', 'Clientes y terceros', 'M16 19v-1a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v1M9 10a3.5 3.5 0 1 0 0-.01M22 19v-1a4 4 0 0 0-3-3.9M16 3.1a3.5 3.5 0 0 1 0 6.8'],
     ['cartera', 'Cuentas por cobrar', 'M3 6h18v12H3zM3 10h18M7 15h3'],
-    ['gastos', 'Gastos', 'M12 2v20M17 6H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6']]],
+    ['gastos', 'Gastos', 'M12 2v20M17 6H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6'],
+    ['campanas', 'Campañas WhatsApp', 'M21 12a9 9 0 0 1-13.5 7.8L3 21l1.2-4.5A9 9 0 1 1 21 12z']]],
+  ['Análisis', [['reportes', 'Reportes', 'M4 20V10M10 20V4M16 20v-7M22 20H2'],
+    ['financieros', 'Estados financieros', 'M4 4h16v16H4zM4 10h16M10 10v10']]],
 ] as const;
-const soon = ['Garantías', 'Campañas WhatsApp', 'Reportes', 'Estados financieros'];
 ---
 <!doctype html>
 <html lang="es">
@@ -62,10 +67,6 @@ const soon = ['Garantías', 'Campañas WhatsApp', 'Reportes', 'Estados financier
             ))}
           </div>
         ))}
-        <div class="g-navgrp g-navgrp--soon">
-          <p>Fase 2 · en construcción</p>
-          {soon.map((s) => <span>{s}</span>)}
-        </div>
       </nav>
       <div class="g-user"><span class="g-ava">UB</span><div><b>Administrador</b><small>UBU Latinoamérica</small></div><button type="button" id="a-out" class="g-ico" aria-label="Cerrar sesión" title="Cerrar sesión"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3h4v18h-4M10 17l5-5-5-5M15 12H3" /></svg></button></div>
     </aside>
@@ -98,6 +99,12 @@ const soon = ['Garantías', 'Campañas WhatsApp', 'Reportes', 'Estados financier
       <section data-view="terceros" id="v-terceros"></section>
       <section data-view="cartera" id="v-cartera"></section>
       <section data-view="gastos" id="v-gastos"></section>
+      <section data-view="caja" id="v-caja"></section>
+      <section data-view="compras" id="v-compras"></section>
+      <section data-view="garantias" id="v-garantias"></section>
+      <section data-view="campanas" id="v-campanas"></section>
+      <section data-view="reportes" id="v-reportes"></section>
+      <section data-view="financieros" id="v-financieros"></section>
     </div>
   </div>
 
@@ -291,5 +298,16 @@ const soon = ['Garantías', 'Campañas WhatsApp', 'Reportes', 'Estados financier
     .pos__l { grid-template-columns: minmax(0, 1fr) 64px 92px 28px; }
   }
   @media (prefers-reduced-motion: reduce) { .g-side { transition: none; } }
-  @media print { .g-side, .g-top, .g-status { display: none; } }
+  .g-bars { display: grid; gap: 6px; }
+  .g-bar { display: grid; grid-template-columns: minmax(90px, 160px) minmax(0, 1fr) auto; gap: 10px; align-items: center; font-size: .86rem; }
+  .g-bar i { display: block; height: 12px; border-radius: 6px; background: linear-gradient(90deg, var(--teal), var(--cyan)); min-width: 2px; }
+  .g-bar span:last-child { font-variant-numeric: tabular-nums; font-family: var(--disp); font-weight: 600; }
+  .g-fin { width: 100%; border-collapse: collapse; font-size: .95rem; }
+  .g-fin td { padding: 8px 4px; border-bottom: 1px solid #EEF3F5; }
+  .g-fin td:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+  .g-fin .sub td { padding-left: 22px; color: var(--soft); font-size: .9rem; }
+  .g-fin .tot td { font-family: var(--disp); font-weight: 700; border-top: 2px solid var(--ink2); }
+  .g-fin .neg td:last-child { color: var(--bad); }
+  .g-fin .pos td:last-child { color: var(--ok); }
+  @media print { .g-side, .g-top, .g-status, .g-noprint { display: none !important; } body.g { background: #fff; } .g-card { border: 0; } }
 </style>

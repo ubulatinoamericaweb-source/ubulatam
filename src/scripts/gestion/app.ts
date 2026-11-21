@@ -13,7 +13,7 @@ interface Prod { slug: string; name: string; cat: string; order: number; img: st
 const PRODS: Prod[] = JSON.parse(document.getElementById('a-data')?.textContent || '[]');
 const BY = new Map(PRODS.map((p) => [p.slug, p]));
 const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
-const cop = (n: number | null | undefined) => n == null ? '—' : '$' + String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+const cop = (n: number | null | undefined) => n == null ? '—' : (n < 0 ? '−$' : '$') + String(Math.abs(Math.round(n))).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 const fdt = (s: string) => new Date(s).toLocaleString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 const fd = (s: string) => new Date(s.length === 10 ? s + 'T12:00:00' : s).toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit', year: 'numeric' });
 const dayStart = (d = new Date()) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString();
@@ -100,7 +100,7 @@ function badge(id: string, n: number, bad = false) {
 VIEWS.dashboard = async (root: HTMLElement) => {
   root.replaceChildren(h('p', { class: 'g-muted', text: 'Cargando…' }));
   const today = dayStart(), month = isoDate(new Date(new Date().getFullYear(), new Date().getMonth(), 1));
-  const [, hoy, pagos, cartera, ult, gastos, cots] = await Promise.all([
+  const [, hoy, pagos, cartera, ult, gastos, cots, caja] = await Promise.all([
     loadRef(),
     get<Any[]>(`v_documentos?select=id,tipo,total,estado&fecha=gte.${today}&tipo=neq.cotizacion&estado=neq.anulada`),
     get<Any[]>(`pagos?select=valor,metodo,documentos!inner(estado)&fecha=gte.${today}&documentos.estado=neq.anulada`),
@@ -108,6 +108,7 @@ VIEWS.dashboard = async (root: HTMLElement) => {
     get<Any[]>('v_documentos?select=id,numero,tipo,cliente,fecha,total,estado&order=fecha.desc&limit=10'),
     get<Any[]>(`gastos?select=valor,fecha&fecha=gte.${month}`),
     get<Any[]>('documentos?select=id&tipo=eq.cotizacion&estado=eq.vigente'),
+    get<Any[]>('cajas?select=id,abierta_en,base&cerrada_en=is.null').catch(() => []),
   ]);
   const ids = hoy.map((d) => d.id);
   const items = ids.length ? await get<Any[]>(`documento_items?select=cantidad,costo,total,documento_id&documento_id=in.(${ids.join(',')})`) : [];
@@ -117,7 +118,10 @@ VIEWS.dashboard = async (root: HTMLElement) => {
   const low = lowStock(), gMes = gastos.reduce((a, g) => a + g.valor, 0), gHoy = gastos.filter((g) => g.fecha === isoDate()).reduce((a, g) => a + g.valor, 0);
   badge('inventario', low.length, true); badge('cartera', vencidas.length, true); badge('cotizar', cots.length);
 
+  badge('caja', caja.length ? 0 : 1);
   root.replaceChildren(
+    caja.length ? h('div', { class: 'g-banner', style: 'background:#E4F7F9;color:#0B6E78' }, `🔓 Caja abierta desde ${fdt(caja[0].abierta_en)} · base ${cop(caja[0].base)}`, h('a', { class: 'g-btn g-btn--sm', href: '#caja', text: 'Informe X / cerrar' }))
+      : h('div', { class: 'g-banner g-banner--warn' }, '🔒 La caja está cerrada. Ábrela para llevar el cuadre de efectivo del día.', h('a', { class: 'g-btn g-btn--sm', href: '#caja', text: 'Abrir caja' })),
     low.length ? h('div', { class: 'g-banner g-banner--warn' }, `📦 ${low.length} referencia(s) en o bajo el stock mínimo.`, h('a', { class: 'g-btn g-btn--sm', href: '#inventario', text: 'Ver' })) : '',
     vencidas.length ? h('div', { class: 'g-banner g-banner--bad' }, `⏰ ${vencidas.length} documento(s) vencido(s) por ${cop(vencidas.reduce((a, d) => a + d.saldo, 0))}.`, h('a', { class: 'g-btn g-btn--sm', href: '#cartera', text: 'Cartera' })) : '',
     h('div', { class: 'g-kpis' },
@@ -134,7 +138,9 @@ VIEWS.dashboard = async (root: HTMLElement) => {
         h('a', { href: '#inventario' }, '📦 Entrada de mercancía', h('small', { text: 'inventario y kardex' })),
         h('a', { href: '#cartera' }, '💳 Registrar abono', h('small', { text: 'cuentas por cobrar' })),
         h('a', { href: '#gastos' }, '💸 Registrar gasto', h('small', { text: 'caja menor y fijos' })),
-        h('a', { href: '#terceros' }, '👥 Nuevo cliente', h('small', { text: 'clientes y mayoristas' })))),
+        h('a', { href: '#terceros' }, '👥 Nuevo cliente', h('small', { text: 'clientes y mayoristas' })),
+        h('a', { href: '#compras' }, '🛍️ Registrar compra', h('small', { text: 'proveedores y costos' })),
+        h('a', { href: '#garantias' }, '🛡️ Garantía', h('small', { text: '365 días' })))),
       h('div', { class: 'g-card' }, h('h2', { text: '🕘 Últimos 10 documentos' }), docTable(ult, false)),
     ),
   );
@@ -549,6 +555,398 @@ VIEWS.gastos = async (root: HTMLElement) => {
       h('div', { class: 'g-card' }, h('h2', { text: 'Detalle' }), table(['Fecha', 'Categoría', 'Descripción', 'Método', 'Valor', ''], gs.map((g) => h('tr', {},
         h('td', { text: fd(g.fecha) }), h('td', { text: g.categoria }), h('td', { text: g.descripcion || '' }), h('td', { text: g.metodo }), h('td', { class: 'n', text: cop(g.valor) }),
         h('td', {}, btn('✕', async () => { if (!confirm('¿Eliminar este gasto?')) return; try { await del('gastos', `id=eq.${g.id}`); VIEWS.gastos(root); } catch (e) { fail(e); } }, 'g-btn--sm g-btn--bad')))), [4]))));
+};
+
+/* ================= FASE 2: caja, compras, garantías, campañas, reportes y estados financieros ================= */
+Object.assign(TITLES, { caja: 'Caja', compras: 'Compras y proveedores', garantias: 'Garantías', campanas: 'Campañas WhatsApp', reportes: 'Reportes', financieros: 'Estados financieros' });
+const sum = (a: Any[], f: (x: Any) => number) => a.reduce((t, x) => t + (f(x) || 0), 0);
+const groupSum = (a: Any[], key: (x: Any) => string, val: (x: Any) => number) => {
+  const m = new Map<string, number>(); a.forEach((x) => m.set(key(x), (m.get(key(x)) || 0) + (val(x) || 0)));
+  return [...m.entries()].sort((x, y) => y[1] - x[1]);
+};
+const bars = (rows: [string, number][], fmt = cop) => {
+  const max = Math.max(1, ...rows.map((r) => r[1]));
+  return rows.length ? h('div', { class: 'g-bars' }, rows.map(([k, v]) => h('div', { class: 'g-bar' }, h('span', { text: k }), h('i', { style: `width:${(v / max) * 100}%` }), h('span', { text: fmt(v) }))))
+    : h('p', { class: 'g-muted', text: 'Sin datos en el periodo.' });
+};
+const kpi = (label: string, value: string, small = '', cls = '') => h('div', { class: `g-kpi ${cls}` }, h('span', { text: label }), h('b', { text: value, style: value.length > 14 ? 'font-size:1.1rem' : null }), small ? h('small', { text: small }) : '');
+const prodOptions = () => PRODS.flatMap((p) => p.vars.map((v) => ({ label: v.k ? `${p.name} · ${v.k}` : p.name, p, v })));
+const PROD_OPTS = prodOptions();
+const prodPicker = (id: string, onPick: (p: Prod, v: Var) => void, placeholder = 'Buscar producto…') => {
+  const i = h('input', { class: 'g-in', list: id, placeholder, 'aria-label': placeholder }) as HTMLInputElement;
+  i.addEventListener('change', () => { const o = PROD_OPTS.find((x) => x.label === i.value); if (o) { onPick(o.p, o.v); i.value = ''; } });
+  return [i, h('datalist', { id }, PROD_OPTS.map((o) => h('option', { value: o.label })))];
+};
+const daysAgo = (n: number) => { const d = new Date(); d.setDate(d.getDate() - n); return d; };
+const rangeFields = (r: { desde: string; hasta: string }, reload: () => void) => [
+  field('Desde', h('input', { type: 'date', value: r.desde, onchange: (e: Event) => { r.desde = (e.target as HTMLInputElement).value || r.desde; reload(); } })),
+  field('Hasta', h('input', { type: 'date', value: r.hasta, onchange: (e: Event) => { r.hasta = (e.target as HTMLInputElement).value || r.hasta; reload(); } })),
+];
+const isoStart = (d: string) => new Date(d + 'T00:00:00').toISOString();
+const isoEnd = (d: string) => { const x = new Date(d + 'T00:00:00'); x.setDate(x.getDate() + 1); return x.toISOString(); };
+
+/* ---------- CAJA ---------- */
+VIEWS.caja = async (root: HTMLElement) => {
+  const cajas = await get<Any[]>('cajas?select=*&order=id.desc&limit=30');
+  const open = cajas.find((c) => !c.cerrada_en);
+  const hist = table(['Apertura', 'Cierre', 'Base', 'Esperado', 'Contado', 'Diferencia'], cajas.filter((c) => c.cerrada_en).map((c) => h('tr', { 'data-open': '', onclick: () => informeZ(c) },
+    h('td', { text: fdt(c.abierta_en) }), h('td', { text: fdt(c.cerrada_en) }), h('td', { class: 'n', text: cop(c.base) }), h('td', { class: 'n', text: cop(c.esperado) }), h('td', { class: 'n', text: cop(c.contado) }),
+    h('td', { class: 'n' }, h('span', { class: `g-pill ${c.diferencia === 0 ? 'g-pill--ok' : 'g-pill--bad'}`, text: (c.diferencia > 0 ? '+' : '') + cop(c.diferencia) })))), [2, 3, 4, 5]);
+  if (!open) {
+    const base = h('input', { inputmode: 'numeric', placeholder: 'Ej.: 200000' }) as HTMLInputElement;
+    root.replaceChildren(h('div', { class: 'g-card' }, h('h2', { text: '🔓 Abrir caja' }), h('p', { class: 'g-muted', text: 'Registra el efectivo con el que empiezas el día. Al cerrar, el sistema calcula cuánto debería haber.' }),
+      h('div', { class: 'g-filters' }, field('Base en efectivo', base), btn('Abrir caja', async () => {
+        const v = parsePrice(base.value); if (v == null || Number.isNaN(v)) { status('Escribe la base (puede ser 0).', 'bad'); return; }
+        try { await rpc('abrir_caja', { base: v }); status(`Caja abierta con base ${cop(v)} ✓`, 'ok'); VIEWS.caja(root); } catch (e) { fail(e); }
+      }, 'g-btn--pri'))), h('div', { class: 'g-card' }, h('h2', { text: 'Cierres anteriores' }), hist));
+    return;
+  }
+  const since = open.abierta_en;
+  const [pagos, gastos, prov] = await Promise.all([
+    get<Any[]>(`pagos?select=valor,metodo,documentos!inner(estado,numero)&fecha=gte.${since}&documentos.estado=neq.anulada`),
+    get<Any[]>(`gastos?select=valor,metodo&fecha=gte.${isoDate(new Date(since))}`),
+    get<Any[]>(`pagos_compras?select=valor,metodo&fecha=gte.${since}`),
+  ]);
+  const ef = (a: Any[]) => sum(a.filter((x) => x.metodo === 'efectivo'), (x) => x.valor);
+  const esperado = open.base + ef(pagos) - ef(gastos) - ef(prov);
+  const contado = h('input', { inputmode: 'numeric', placeholder: cop(esperado) }) as HTMLInputElement, notas = h('input', { maxlength: 600 }) as HTMLInputElement;
+  const dif = h('b', { text: '' });
+  contado.addEventListener('input', () => { const v = parsePrice(contado.value); dif.textContent = v == null || Number.isNaN(v) ? '' : `Diferencia: ${v - esperado > 0 ? '+' : ''}${cop(v - esperado)}`; });
+  root.replaceChildren(
+    h('div', { class: 'g-kpis' },
+      kpi('Caja abierta desde', fdt(since), `base ${cop(open.base)}`, 'g-kpi--hero'),
+      kpi('Cobros en efectivo', cop(ef(pagos))), kpi('Gastos en efectivo', cop(ef(gastos))), kpi('Pagos a proveedores', cop(ef(prov))),
+      kpi('Efectivo esperado', cop(esperado), 'Informe X: parcial, no cierra', 'g-kpi--ok')),
+    h('div', { class: 'g-grid2' },
+      h('div', { class: 'g-card' }, h('h2', { text: 'Cobros por método (desde la apertura)' }), bars(groupSum(pagos, (x) => x.metodo, (x) => x.valor))),
+      h('div', { class: 'g-card', style: 'display:grid;gap:12px' }, h('h2', { text: '🔒 Cerrar caja (Informe Z)' }),
+        h('div', { class: 'g-row' }, field('Efectivo contado', contado), field('Notas', notas)), dif,
+        btn('Cerrar caja', async () => {
+          const v = parsePrice(contado.value); if (v == null || Number.isNaN(v)) { status('Escribe el efectivo contado.', 'bad'); return; }
+          if (!confirm(`¿Cerrar la caja con ${cop(v)} contados?`)) return;
+          try { await rpc('cerrar_caja', { contado: v, notas: notas.value || null }); status('Caja cerrada ✓', 'ok'); const [c] = await get<Any[]>(`cajas?select=*&id=eq.${open.id}`); await VIEWS.caja(root); informeZ(c); } catch (e) { fail(e); }
+        }, 'g-btn--pri'))),
+    h('div', { class: 'g-card' }, h('h2', { text: 'Cierres anteriores' }), hist));
+};
+function informeZ(c: Any) {
+  const r = c.resumen || {};
+  openModal(`Informe Z · ${fd(c.cerrada_en)}`,
+    h('table', { class: 'g-fin' }, h('tbody', {},
+      [['Apertura', fdt(c.abierta_en)], ['Cierre', fdt(c.cerrada_en)], ['Base', cop(c.base)], ['+ Cobros en efectivo', cop(r.cobros_efectivo)], ['− Gastos en efectivo', cop(r.gastos_efectivo)], ['− Pagos a proveedores en efectivo', cop(r.pagos_proveedores_efectivo)]]
+        .map(([k, v]) => h('tr', {}, h('td', { text: k }), h('td', { text: v }))),
+      h('tr', { class: 'tot' }, h('td', { text: 'Efectivo esperado' }), h('td', { text: cop(c.esperado) })),
+      h('tr', {}, h('td', { text: 'Efectivo contado' }), h('td', { text: cop(c.contado) })),
+      h('tr', { class: c.diferencia < 0 ? 'neg' : 'pos' }, h('td', { text: c.diferencia < 0 ? 'Faltante' : c.diferencia > 0 ? 'Sobrante' : 'Cuadre exacto' }), h('td', { text: cop(c.diferencia) })),
+      Object.entries(r.por_metodo || {}).map(([m, v]) => h('tr', { class: 'sub' }, h('td', { text: `Cobrado por ${m}` }), h('td', { text: cop(v as number) }))))),
+    c.notas ? h('p', { class: 'g-muted', text: `Notas: ${c.notas}` }) : '',
+    h('div', { class: 'g-actions g-noprint' }, btn('Imprimir', () => print())));
+}
+
+/* ---------- COMPRAS Y PROVEEDORES ---------- */
+interface CLine { slug: string; k: string; nombre: string; cantidad: number; costo: number }
+let compra = { proveedor: '', proveedor_id: '', factura_prov: '', vence: '', notas: '', pago: '', metodo: 'efectivo', lines: [] as CLine[] };
+VIEWS.compras = async (root: HTMLElement) => {
+  const [provs, list] = await Promise.all([get<Any[]>('terceros?select=id,nombre,telefono&tipo=eq.proveedor&order=nombre'), get<Any[]>('v_compras?select=*&order=fecha.desc&limit=200'), loadRef()]);
+  const ed = h('div', { class: 'g-card', style: 'display:grid;gap:12px' });
+  const draw = () => {
+    const total = sum(compra.lines, (l) => l.cantidad * l.costo);
+    const [pick, dl] = prodPicker('dl-compra', (p, v) => {
+      const hit = compra.lines.find((l) => l.slug === p.slug && l.k === v.k);
+      if (hit) hit.cantidad++; else compra.lines.push({ slug: p.slug, k: v.k, nombre: v.k ? `${p.name} · ${v.k}` : p.name, cantidad: 1, costo: INV.get(priceKey(p.slug, v.k))?.costo || 0 });
+      draw();
+    }, 'Agregar producto a la compra…');
+    const setF = (k: keyof typeof compra) => (e: Event) => ((compra as Any)[k] = (e.target as HTMLInputElement).value);
+    ed.replaceChildren(h('h2', { text: '🛍️ Registrar compra (entrada de mercancía)' }),
+      h('div', { class: 'g-row3' },
+        field('Proveedor', h('input', { list: 'dl-prov', value: compra.proveedor, maxlength: 120, oninput: (e: Event) => { compra.proveedor = (e.target as HTMLInputElement).value; compra.proveedor_id = provs.find((x) => x.nombre === compra.proveedor)?.id || ''; } })),
+        field('Factura del proveedor', h('input', { value: compra.factura_prov, maxlength: 40, oninput: setF('factura_prov') })),
+        field('Vence (si es a crédito)', h('input', { type: 'date', value: compra.vence, onchange: setF('vence') }))),
+      h('datalist', { id: 'dl-prov' }, provs.map((x) => h('option', { value: x.nombre }))),
+      pick, dl,
+      compra.lines.length ? table(['Producto', 'Cantidad', 'Costo unitario', 'Subtotal', ''], compra.lines.map((l, i) => h('tr', {},
+        h('td', { text: l.nombre }),
+        h('td', {}, h('input', { class: 'g-in', type: 'number', min: 1, value: l.cantidad, style: 'max-width:90px', 'aria-label': `Cantidad de ${l.nombre}`, onchange: (e: Event) => { l.cantidad = Math.max(1, Math.floor(+(e.target as HTMLInputElement).value) || 1); draw(); } })),
+        h('td', {}, h('input', { class: 'g-in', inputmode: 'numeric', value: l.costo, style: 'max-width:130px', 'aria-label': `Costo de ${l.nombre}`, onchange: (e: Event) => { const v = parsePrice((e.target as HTMLInputElement).value); if (v != null && !Number.isNaN(v)) l.costo = v; draw(); } })),
+        h('td', { class: 'n', text: cop(l.cantidad * l.costo) }),
+        h('td', {}, btn('✕', () => { compra.lines.splice(i, 1); draw(); }, 'g-btn--sm')))), [3]) : h('p', { class: 'g-muted', text: 'Agrega los productos que llegaron.' }),
+      h('div', { class: 'g-row3' },
+        field('Pagado ahora', h('input', { inputmode: 'numeric', value: compra.pago, placeholder: `${cop(total)} (todo)`, oninput: setF('pago') })),
+        field('Método', sel(METODOS.map((m) => [m, m]), compra.metodo, { onchange: setF('metodo') })),
+        field('Notas', h('input', { value: compra.notas, maxlength: 600, oninput: setF('notas') }))),
+      h('div', { class: 'pos__tot' }, h('div', {}, h('span', { text: 'TOTAL COMPRA' }), cop(total))),
+      h('p', { class: 'g-muted', text: 'Al guardar entra el stock y el costo del producto se actualiza con el promedio ponderado.' }),
+      h('div', { class: 'g-actions' }, h('button', { type: 'button', class: 'g-btn g-btn--cyan', disabled: !compra.lines.length || null, text: 'Guardar compra', onclick: async (e: Event) => {
+        const b = e.target as HTMLButtonElement;
+        const pago = compra.pago.trim() === '' ? total : parsePrice(compra.pago);
+        if (!compra.proveedor.trim()) { status('Indica el proveedor.', 'bad'); return; }
+        if (pago == null || Number.isNaN(pago) || pago > total) { status('El pago debe estar entre 0 y el total.', 'bad'); return; }
+        b.disabled = true;
+        try {
+          const r = await rpc<Any>('registrar_compra', { p: { proveedor: compra.proveedor.trim(), proveedor_id: compra.proveedor_id || null, factura_prov: compra.factura_prov || null, vence: compra.vence || null, notas: compra.notas || null,
+            items: compra.lines.map((l) => ({ slug: l.slug, variante: l.k, nombre: l.nombre, cantidad: l.cantidad, costo: l.costo })), pago: { valor: pago, metodo: compra.metodo } } });
+          compra = { proveedor: '', proveedor_id: '', factura_prov: '', vence: '', notas: '', pago: '', metodo: 'efectivo', lines: [] };
+          status(`Compra ${r.numero} registrada y stock actualizado ✓`, 'ok'); VIEWS.compras(root);
+        } catch (x) { fail(x); b.disabled = false; }
+      } }), btn('Limpiar', () => { compra.lines = []; draw(); })));
+  };
+  const porPagar = list.filter((c) => c.saldo > 0);
+  root.replaceChildren(
+    h('div', { class: 'g-kpis' }, kpi('Cuentas por pagar', cop(sum(porPagar, (c) => c.saldo)), `${porPagar.length} compra(s)`, 'g-kpi--hero'),
+      kpi('Vencidas', cop(sum(porPagar.filter((c) => c.vence && c.vence < isoDate()), (c) => c.saldo))),
+      kpi('Compras del mes', cop(sum(list.filter((c) => c.estado !== 'anulada' && c.fecha >= isoStart(isoDate().slice(0, 8) + '01')), (c) => c.total)))),
+    ed,
+    h('div', { class: 'g-card' }, h('h2', {}, 'Compras registradas', h('a', { class: 'g-btn g-btn--sm', href: '#terceros', text: 'Proveedores' })),
+      table(['Número', 'Proveedor', 'Fecha', 'Vence', 'Total', 'Saldo', 'Estado'], list.map((c) => h('tr', { 'data-open': '', tabindex: 0, onclick: () => showCompra(c.id, root) },
+        h('td', {}, h('b', { text: c.numero })), h('td', { text: c.proveedor + (c.factura_prov ? ` · ${c.factura_prov}` : '') }), h('td', { text: fd(c.fecha) }),
+        h('td', {}, c.vence ? h('span', { class: `g-pill ${c.saldo && c.vence < isoDate() ? 'g-pill--bad' : ''}`, text: fd(c.vence) }) : '—'),
+        h('td', { class: 'n', text: cop(c.total) }), h('td', { class: 'n', text: cop(c.saldo) }), h('td', {}, pill(c.estado)))), [4, 5])));
+  draw();
+};
+async function showCompra(id: string, root: HTMLElement) {
+  try {
+    const [[c], items, pagos] = await Promise.all([get<Any[]>(`v_compras?select=*&id=eq.${id}`), get<Any[]>(`compra_items?select=*&compra_id=eq.${id}&order=id`), get<Any[]>(`pagos_compras?select=*&compra_id=eq.${id}&order=fecha`)]);
+    const vivo = c.estado !== 'anulada';
+    const v = h('input', { inputmode: 'numeric', value: c.saldo }) as HTMLInputElement, m = sel(METODOS.map((x) => [x, x]), 'transferencia') as HTMLSelectElement;
+    const mo = h('input', { maxlength: 300, placeholder: 'Motivo de la anulación' }) as HTMLInputElement;
+    openModal(`Compra ${c.numero} · ${c.proveedor}`,
+      h('div', { class: 'g-actions' }, pill(c.estado), h('span', { class: 'g-muted', text: `${fdt(c.fecha)}${c.factura_prov ? ' · factura ' + c.factura_prov : ''}${c.vence ? ' · vence ' + fd(c.vence) : ''}` })),
+      table(['Producto', 'Cant.', 'Costo', 'Subtotal'], items.map((i) => h('tr', {}, h('td', { text: i.nombre }), h('td', { class: 'n', text: i.cantidad }), h('td', { class: 'n', text: cop(i.costo) }), h('td', { class: 'n', text: cop(i.total) }))), [1, 2, 3]),
+      h('div', { class: 'pos__tot' }, h('div', {}, h('span', { text: `Pagado ${cop(c.pagado)} · saldo ${cop(c.saldo)}` }), h('span', { text: '' })), h('div', {}, h('span', { text: 'TOTAL' }), cop(c.total))),
+      pagos.length ? table(['Fecha', 'Método', 'Valor'], pagos.map((p) => h('tr', {}, h('td', { text: fdt(p.fecha) }), h('td', { text: p.metodo }), h('td', { class: 'n', text: cop(p.valor) }))), [2]) : '',
+      vivo && c.saldo > 0 ? h('div', { class: 'g-filters' }, field('Pagar al proveedor', v), field('Método', m), btn('Registrar pago', async () => {
+        const x = parsePrice(v.value); if (!x || Number.isNaN(x)) { status('Valor inválido.', 'bad'); return; }
+        try { await rpc('pagar_compra', { c: c.id, valor: x, metodo: m.value }); status(`Pago de ${cop(x)} a ${c.proveedor} registrado ✓`, 'ok'); showCompra(id, root); VIEWS.compras(root); } catch (e) { fail(e); }
+      }, 'g-btn--pri')) : '',
+      vivo ? h('div', { class: 'g-filters' }, field('Anular compra (saca el stock que entró)', mo), btn('Anular', async () => {
+        if (!mo.value.trim()) { status('Escribe el motivo.', 'bad'); return; }
+        try { await rpc('anular_compra', { c: c.id, motivo: mo.value }); status(`Compra ${c.numero} anulada ✓`, 'ok'); modal.close(); VIEWS.compras(root); } catch (e) { fail(e); }
+      }, 'g-btn--bad')) : '',
+      c.notas ? h('p', { class: 'g-muted', text: c.notas }) : '');
+  } catch (e) { fail(e); }
+}
+
+/* ---------- GARANTÍAS (365 días según el catálogo 2026) ---------- */
+const GAR_DIAS = 365;
+const GAR_ESTADOS: [string, string][] = [['recibida', 'Recibida'], ['en_revision', 'En revisión'], ['cambiada', 'Cambiada'], ['reparada', 'Reparada'], ['rechazada', 'Rechazada'], ['entregada', 'Entregada']];
+let garFiltro = 'abiertas';
+VIEWS.garantias = async (root: HTMLElement) => {
+  const [gars, ters] = await Promise.all([get<Any[]>('garantias?select=*&order=fecha.desc&limit=300'), get<Any[]>('terceros?select=id,nombre,telefono,documento,ciudad,direccion&order=nombre&limit=2000')]);
+  const g: Any = { tercero_id: '', cliente: { nombre: '', telefono: '' }, documento_id: '', docNum: '', docFecha: '', items: [] as Any[], prod: null, cantidad: 1, falla: '' };
+  const form = h('div', { class: 'g-card', style: 'display:grid;gap:12px' });
+  const draw = () => {
+    const cov = g.docFecha ? Math.floor((Date.now() - new Date(g.docFecha).getTime()) / 864e5) : null;
+    const [pick, dl] = prodPicker('dl-gar', (p, v) => { g.prod = { slug: p.slug, variante: v.k, nombre: v.k ? `${p.name} · ${v.k}` : p.name }; draw(); }, 'Producto en garantía…');
+    form.replaceChildren(h('h2', { text: '🛡️ Recibir garantía' }),
+      h('div', { class: 'g-row' },
+        field('Factura o remisión (opcional)', h('input', { value: g.docNum, placeholder: 'FV-15', onchange: async (e: Event) => {
+          g.docNum = (e.target as HTMLInputElement).value.trim().toUpperCase(); g.documento_id = ''; g.docFecha = ''; g.items = [];
+          if (!g.docNum) { draw(); return; }
+          try {
+            const [d] = await get<Any[]>(`documentos?select=id,fecha,cliente,tercero_id,tipo,estado&numero=eq.${encodeURIComponent(g.docNum)}`);
+            if (!d || d.tipo === 'cotizacion') { status(`No se encontró la venta ${g.docNum}.`, 'bad'); draw(); return; }
+            Object.assign(g, { documento_id: d.id, docFecha: d.fecha, tercero_id: d.tercero_id || '', cliente: { nombre: '', telefono: '', ...d.cliente } });
+            g.items = await get<Any[]>(`documento_items?select=slug,variante,nombre,cantidad&documento_id=eq.${d.id}`);
+            if (g.items.length === 1) g.prod = { ...g.items[0] };
+            status(''); draw();
+          } catch (x) { fail(x); }
+        } })),
+        field('Cliente', h('input', { list: 'dl-gar-cli', value: g.cliente.nombre, maxlength: 120, oninput: (e: Event) => {
+          const val = (e.target as HTMLInputElement).value, t = ters.find((x) => x.nombre === val);
+          g.cliente = t ? { nombre: t.nombre, telefono: t.telefono || '', documento: t.documento || '', ciudad: t.ciudad || '' } : { ...g.cliente, nombre: val }; g.tercero_id = t?.id || '';
+        } }))),
+      h('datalist', { id: 'dl-gar-cli' }, ters.map((t) => h('option', { value: t.nombre }))),
+      cov == null ? '' : h('div', { class: `g-banner ${cov <= GAR_DIAS ? 'g-banner--warn' : 'g-banner--bad'}`, text: cov <= GAR_DIAS
+        ? `✅ En garantía: compra del ${fd(g.docFecha)} (hace ${cov} días, quedan ${GAR_DIAS - cov}).` : `⚠️ Fuera de garantía: compra del ${fd(g.docFecha)}, hace ${cov} días (límite ${GAR_DIAS}).` }),
+      g.items.length > 1 ? field('Producto de esa venta', sel([['', 'Elegir…'], ...g.items.map((i: Any, n: number) => [String(n), i.nombre] as [string, string])], '', { onchange: (e: Event) => { const i = g.items[+(e.target as HTMLSelectElement).value]; if (i) { g.prod = { ...i }; draw(); } } })) : '',
+      g.items.length ? '' : h('div', {}, pick, dl),
+      g.prod ? h('p', {}, h('b', { text: 'Producto: ' }), g.prod.nombre) : '',
+      h('div', { class: 'g-row' }, field('Cantidad', h('input', { type: 'number', min: 1, value: g.cantidad, onchange: (e: Event) => (g.cantidad = Math.max(1, Math.floor(+(e.target as HTMLInputElement).value) || 1)) })),
+        field('Teléfono del cliente', h('input', { value: g.cliente.telefono || '', maxlength: 30, oninput: (e: Event) => (g.cliente.telefono = (e.target as HTMLInputElement).value) }))),
+      field('Falla reportada', h('textarea', { maxlength: 600, value: g.falla, oninput: (e: Event) => (g.falla = (e.target as HTMLTextAreaElement).value) })),
+      h('div', { class: 'g-actions' }, btn('Registrar garantía', async () => {
+        if (!g.prod) { status('Elige el producto.', 'bad'); return; }
+        if (!g.cliente.nombre?.trim() || !g.falla.trim()) { status('Completa el cliente y la falla.', 'bad'); return; }
+        try {
+          const r = await insert('garantias', { tercero_id: g.tercero_id || null, cliente: g.cliente, documento_id: g.documento_id || null, slug: g.prod.slug, variante: g.prod.variante || '', nombre: g.prod.nombre, cantidad: g.cantidad, falla: g.falla.trim() });
+          status(`Garantía GAR-${r.id} registrada ✓`, 'ok'); VIEWS.garantias(root);
+        } catch (e) { fail(e); }
+      }, 'g-btn--cyan')));
+  };
+  const abiertas = (x: Any) => ['recibida', 'en_revision'].includes(x.estado);
+  const rows = gars.filter((x) => garFiltro === 'todas' || (garFiltro === 'abiertas' ? abiertas(x) : !abiertas(x)));
+  root.replaceChildren(
+    h('div', { class: 'g-kpis' }, kpi('Abiertas', String(gars.filter(abiertas).length), 'recibidas o en revisión', 'g-kpi--hero'),
+      kpi('Cambios este mes', String(gars.filter((x) => x.estado === 'cambiada' && x.cerrada_en >= isoStart(isoDate().slice(0, 8) + '01')).length)),
+      kpi('Productos con más reclamos', groupSum(gars, (x) => x.nombre, (x) => x.cantidad)[0]?.[0] || '—')),
+    h('div', { class: 'g-grid2' }, form,
+      h('div', { class: 'g-card' },
+        h('div', { class: 'pos__seg', role: 'group', 'aria-label': 'Filtro', style: 'margin-bottom:12px' }, [['abiertas', 'Abiertas'], ['cerradas', 'Cerradas'], ['todas', 'Todas']].map(([v, l]) =>
+          h('button', { type: 'button', 'aria-pressed': String(garFiltro === v), text: l, onclick: () => { garFiltro = v; VIEWS.garantias(root).catch(fail); } }))),
+        table(['N.º', 'Cliente', 'Producto', 'Recibida', 'Estado'], rows.map((x) => h('tr', { 'data-open': '', tabindex: 0, onclick: () => garModal(x, root) },
+          h('td', {}, h('b', { text: `GAR-${x.id}` })), h('td', { text: x.cliente?.nombre || '' }), h('td', { text: `${x.nombre}${x.cantidad > 1 ? ' ×' + x.cantidad : ''}` }), h('td', { text: fd(x.fecha) }),
+          h('td', {}, h('span', { class: `g-pill ${abiertas(x) ? 'g-pill--warn' : x.estado === 'rechazada' ? 'g-pill--bad' : 'g-pill--ok'}`, text: GAR_ESTADOS.find((e) => e[0] === x.estado)?.[1] || x.estado })))))))
+  );
+  draw();
+};
+function garModal(x: Any, root: HTMLElement) {
+  const est = sel(GAR_ESTADOS, x.estado) as HTMLSelectElement, res = h('textarea', { maxlength: 600, value: x.resolucion || '' }) as HTMLTextAreaElement;
+  const msg = () => `Hola ${x.cliente?.nombre || ''}, te escribimos de UBU Latinoamérica sobre tu garantía GAR-${x.id} (${x.nombre}): ${GAR_ESTADOS.find((e) => e[0] === est.value)?.[1].toLowerCase()}. ${res.value}`.trim();
+  openModal(`Garantía GAR-${x.id}`,
+    h('p', {}, h('b', { text: x.nombre }), ` · ${x.cantidad} und · recibida ${fdt(x.fecha)}`),
+    h('p', { class: 'g-muted', text: `Cliente: ${x.cliente?.nombre || ''} ${x.cliente?.telefono ? '· ' + x.cliente.telefono : ''}` }),
+    h('div', { class: 'g-banner g-banner--warn', text: `Falla: ${x.falla}` }),
+    field('Nuevo estado', est), h('p', { class: 'g-muted', text: '«Cambiada» entrega un producto nuevo: descuenta stock del inventario (kardex tipo garantía).' }),
+    field('Resolución / diagnóstico', res),
+    h('div', { class: 'g-actions' },
+      btn('Guardar', async () => {
+        if (est.value === 'cambiada' && x.estado !== 'cambiada' && !confirm(`Se descontarán ${x.cantidad} unidad(es) de ${x.nombre} del inventario. ¿Continuar?`)) return;
+        try { await rpc('resolver_garantia', { g: x.id, nuevo: est.value, resolucion: res.value || null }); status(`GAR-${x.id} actualizada ✓`, 'ok'); modal.close(); VIEWS.garantias(root); } catch (e) { fail(e); }
+      }, 'g-btn--pri'),
+      x.cliente?.telefono ? btn('Avisar por WhatsApp', () => open(`https://wa.me/${waNum(x.cliente.telefono)}?text=${encodeURIComponent(msg())}`, '_blank', 'noopener')) : '',
+      x.documento_id ? btn('Ver venta', () => showDoc(x.documento_id)) : ''));
+}
+
+/* ---------- CAMPAÑAS WHATSAPP ---------- */
+// shortcut: WhatsApp no permite envíos masivos desde un enlace web; se abre un chat por cliente. Para envío masivo real hace falta la API de WhatsApp Business.
+const PLANTILLAS: [string, string][] = [
+  ['Novedades del catálogo', 'Hola {nombre} 👋, en UBU Latinoamérica llegaron novedades en cargadores, cables e hidrogel. Mira el catálogo 2026: https://www.ubulatinoamerica.com/catalogo'],
+  ['Promoción', 'Hola {nombre}, esta semana tenemos precios especiales en UBU Latinoamérica. Escríbenos y te enviamos la cotización 🚀'],
+  ['Recordatorio de pago', 'Hola {nombre}, te recordamos que tienes un saldo pendiente de {saldo} con UBU Latinoamérica. ¡Gracias por tu confianza!'],
+  ['Volver a comprar', 'Hola {nombre}, hace un tiempo no te vemos por UBU Latinoamérica 😊. ¿Te ayudamos con tu próximo pedido?'],
+];
+const camp = { tipo: '', ciudad: '', filtro: '', dias: 60, texto: PLANTILLAS[0][1], enviados: new Set<string>() };
+VIEWS.campanas = async (root: HTMLElement) => {
+  const [ters, docs] = await Promise.all([get<Any[]>('terceros?select=*&order=nombre&limit=2000'), get<Any[]>('v_documentos?select=tercero_id,fecha,saldo,estado,tipo&tercero_id=not.is.null&order=fecha.desc&limit=5000')]);
+  const info = new Map<string, { ultima: string; saldo: number }>();
+  docs.filter((d) => d.estado !== 'anulada' && d.tipo !== 'cotizacion').forEach((d) => {
+    const i = info.get(d.tercero_id) || { ultima: '', saldo: 0 };
+    if (d.fecha > i.ultima) i.ultima = d.fecha; i.saldo += d.saldo; info.set(d.tercero_id, i);
+  });
+  const list = h('div', {});
+  const draw = () => {
+    const limite = daysAgo(camp.dias).toISOString();
+    const aud = ters.filter((t) => t.telefono && t.tipo !== 'proveedor' && (!camp.tipo || t.tipo === camp.tipo) && (!camp.ciudad || (t.ciudad || '').toLowerCase().includes(camp.ciudad.toLowerCase())) && (() => {
+      const i = info.get(t.id);
+      if (camp.filtro === 'saldo') return (i?.saldo || 0) > 0;
+      if (camp.filtro === 'activos') return !!i && i.ultima >= limite;
+      if (camp.filtro === 'inactivos') return !i || i.ultima < limite;
+      return true;
+    })());
+    const txt = (t: Any) => camp.texto.replaceAll('{nombre}', t.nombre.split(' ')[0]).replaceAll('{saldo}', cop(info.get(t.id)?.saldo || 0));
+    list.replaceChildren(h('p', { class: 'g-muted', text: `${aud.length} destinatario(s) con teléfono · ${[...camp.enviados].filter((id) => aud.some((t) => t.id === id)).length} abiertos en esta sesión` }),
+      table(['Cliente', 'Tipo', 'Ciudad', 'Última compra', 'Saldo', ''], aud.map((t) => {
+        const i = info.get(t.id), sent = camp.enviados.has(t.id);
+        return h('tr', {}, h('td', {}, h('b', { text: t.nombre }), h('div', { class: 'g-muted', text: t.telefono })), h('td', { text: t.tipo }), h('td', { text: t.ciudad || '' }),
+          h('td', { text: i ? fd(i.ultima) : '—' }), h('td', { class: 'n', text: i?.saldo ? cop(i.saldo) : '—' }),
+          h('td', {}, h('button', { type: 'button', class: `g-btn g-btn--sm ${sent ? '' : 'g-btn--pri'}`, text: sent ? 'Abierto ✓' : 'Enviar', onclick: () => {
+            open(`https://wa.me/${waNum(t.telefono)}?text=${encodeURIComponent(txt(t))}`, '_blank', 'noopener'); camp.enviados.add(t.id); draw();
+          } })));
+      }), [4]));
+  };
+  const f = (k: 'tipo' | 'ciudad' | 'filtro') => (e: Event) => { camp[k] = (e.target as HTMLInputElement).value; draw(); };
+  const ta = h('textarea', { maxlength: 1000, value: camp.texto, oninput: (e: Event) => { camp.texto = (e.target as HTMLTextAreaElement).value; draw(); } }) as HTMLTextAreaElement;
+  root.replaceChildren(
+    h('div', { class: 'g-card', style: 'display:grid;gap:12px' }, h('h2', { text: '📣 Nueva campaña' }),
+      h('div', { class: 'g-filters' },
+        field('Público', sel([['', 'Clientes y mayoristas'], ['cliente', 'Solo clientes'], ['mayorista', 'Solo mayoristas']], camp.tipo, { onchange: f('tipo') })),
+        field('Ciudad contiene', h('input', { value: camp.ciudad, oninput: f('ciudad') })),
+        field('Segmento', sel([['', 'Todos'], ['saldo', 'Con saldo pendiente'], ['activos', 'Compraron en los últimos N días'], ['inactivos', 'Sin compras en N días']], camp.filtro, { onchange: f('filtro') })),
+        field('N días', h('input', { type: 'number', min: 1, value: camp.dias, onchange: (e: Event) => { camp.dias = Math.max(1, +(e.target as HTMLInputElement).value || 60); draw(); } }))),
+      field('Plantilla', sel([['', 'Elegir plantilla…'], ...PLANTILLAS.map(([n], i) => [String(i), n] as [string, string])], '', { onchange: (e: Event) => { const p = PLANTILLAS[+(e.target as HTMLSelectElement).value]; if (p) { camp.texto = p[1]; ta.value = p[1]; draw(); } } })),
+      field('Mensaje ({nombre} y {saldo} se reemplazan por cada cliente)', ta),
+      h('p', { class: 'g-muted', text: 'WhatsApp no permite envíos masivos desde la web: cada botón abre el chat con el mensaje listo y tú lo envías.' })),
+    h('div', { class: 'g-card' }, list));
+  draw();
+};
+
+/* ---------- REPORTES ---------- */
+// shortcut: Supabase devuelve como máximo 1000 filas por consulta por defecto; para periodos con más ventas, subir «Max rows» en la API o paginar.
+const rep = { desde: isoDate(new Date(new Date().getFullYear(), new Date().getMonth(), 1)), hasta: isoDate() };
+async function ventasPeriodo(desde: string, hasta: string) {
+  const f = `fecha=gte.${isoStart(desde)}&fecha=lt.${isoEnd(hasta)}`;
+  const [docs, items, pagos, cots] = await Promise.all([
+    get<Any[]>(`v_documentos?select=*&${f}&tipo=neq.cotizacion&estado=neq.anulada&order=fecha`),
+    get<Any[]>(`documento_items?select=slug,variante,nombre,cantidad,precio,costo,total,documentos!inner(fecha,estado,tipo,lista,cliente,descuento,subtotal)&documentos.fecha=gte.${isoStart(desde)}&documentos.fecha=lt.${isoEnd(hasta)}&documentos.estado=neq.anulada&documentos.tipo=neq.cotizacion`),
+    get<Any[]>(`pagos?select=valor,metodo,fecha,documentos!inner(estado)&${f}&documentos.estado=neq.anulada`),
+    get<Any[]>(`documentos?select=estado&${f}&tipo=eq.cotizacion`),
+  ]);
+  // Descuento del documento repartido proporcionalmente entre sus líneas para que la utilidad por producto cuadre con el total.
+  items.forEach((i) => { const d = i.documentos; i.neto = d.subtotal ? Math.round(i.total * (1 - d.descuento / d.subtotal)) : i.total; i.util = i.neto - i.costo * i.cantidad; });
+  return { docs, items, pagos, cots };
+}
+const csv = (name: string, rows: (string | number)[][]) => {
+  const txt = '﻿' + rows.map((r) => r.map((c) => `"${String(c ?? '').replace(/"/g, '""')}"`).join(';')).join('\n');
+  const a = h('a', { href: URL.createObjectURL(new Blob([txt], { type: 'text/csv;charset=utf-8' })), download: name }) as HTMLAnchorElement;
+  document.body.append(a); a.click(); a.remove();
+};
+VIEWS.reportes = async (root: HTMLElement) => {
+  const body = h('div', { style: 'display:grid;gap:18px' }, h('p', { class: 'g-muted', text: 'Cargando…' }));
+  const load = async () => {
+    const { docs, items, pagos, cots } = await ventasPeriodo(rep.desde, rep.hasta);
+    const ventas = sum(docs, (d) => d.total), util = sum(items, (i) => i.util), costo = sum(items, (i) => i.costo * i.cantidad);
+    const porProd = new Map<string, Any>();
+    items.forEach((i) => { const k = i.nombre; const r = porProd.get(k) || { nombre: k, cant: 0, venta: 0, util: 0 }; r.cant += i.cantidad; r.venta += i.neto; r.util += i.util; porProd.set(k, r); });
+    const prods = [...porProd.values()].sort((a, b) => b.venta - a.venta);
+    body.replaceChildren(
+      h('div', { class: 'g-kpis' }, kpi('Ventas netas', cop(ventas), `${docs.length} documento(s)`, 'g-kpi--hero'), kpi('Ticket promedio', cop(docs.length ? ventas / docs.length : 0)),
+        kpi('Utilidad bruta', cop(util), ventas ? `margen ${Math.round((util / ventas) * 100)}%` : '', 'g-kpi--ok'), kpi('Recaudado', cop(sum(pagos, (p) => p.valor))),
+        kpi('Cotizaciones', String(cots.length), cots.length ? `${Math.round((cots.filter((c) => c.estado === 'convertida').length / cots.length) * 100)}% convertidas en venta` : '')),
+      costo ? '' : h('div', { class: 'g-banner g-banner--warn', text: 'Sin costos registrados: la utilidad aparece igual a la venta. Registra costos en Inventario o con Compras.' }),
+      h('div', { class: 'g-grid2' },
+        h('div', { class: 'g-card' }, h('h2', { text: 'Ventas por día' }), bars(groupSum(docs, (d) => fd(d.fecha), (d) => d.total).sort((a, b) => a[0].split('/').reverse().join('').localeCompare(b[0].split('/').reverse().join(''))))),
+        h('div', { class: 'g-card' }, h('h2', { text: 'Por método de pago' }), bars(groupSum(pagos, (p) => p.metodo, (p) => p.valor)),
+          h('h2', { text: 'Por lista de precios', style: 'margin-top:18px' }), bars(groupSum(docs, (d) => (d.lista === 'mayorista' ? 'Mayorista' : 'Cliente final'), (d) => d.total)),
+          h('h2', { text: 'Por tipo de documento', style: 'margin-top:18px' }), bars(groupSum(docs, (d) => TIPO[d.tipo], (d) => d.total)))),
+      h('div', { class: 'g-card' }, h('h2', {}, 'Productos', btn('Exportar CSV', () => csv(`productos-${rep.desde}-${rep.hasta}.csv`, [['Producto', 'Unidades', 'Venta neta', 'Utilidad', 'Margen %'], ...prods.map((p) => [p.nombre, p.cant, p.venta, p.util, p.venta ? Math.round((p.util / p.venta) * 100) : 0])]), 'g-btn--sm')),
+        table(['Producto', 'Unidades', 'Venta neta', 'Utilidad', 'Margen'], prods.map((p) => h('tr', {}, h('td', { text: p.nombre }), h('td', { class: 'n', text: p.cant }), h('td', { class: 'n', text: cop(p.venta) }), h('td', { class: 'n', text: cop(p.util) }), h('td', { class: 'n', text: p.venta ? `${Math.round((p.util / p.venta) * 100)}%` : '—' }))), [1, 2, 3, 4])),
+      h('div', { class: 'g-grid2' },
+        h('div', { class: 'g-card' }, h('h2', { text: 'Top 10 clientes' }), bars(groupSum(docs, (d) => d.cliente?.nombre || 'Consumidor final', (d) => d.total).slice(0, 10))),
+        h('div', { class: 'g-card' }, h('h2', {}, 'Detalle de ventas', btn('Exportar CSV', () => csv(`ventas-${rep.desde}-${rep.hasta}.csv`, [['Número', 'Tipo', 'Fecha', 'Cliente', 'Lista', 'Subtotal', 'Descuento', 'Total', 'Pagado', 'Saldo', 'Estado'],
+          ...docs.map((d) => [d.numero, TIPO[d.tipo], fdt(d.fecha), d.cliente?.nombre || '', d.lista, d.subtotal, d.descuento, d.total, d.pagado, d.saldo, d.estado])]), 'g-btn--sm')),
+          h('p', { class: 'g-muted', text: `${docs.length} documento(s) en el periodo. Ábrelos en Facturas y anulaciones.` }))));
+  };
+  root.replaceChildren(h('div', { class: 'g-card g-noprint' }, h('div', { class: 'g-filters' }, rangeFields(rep, () => load().catch(fail)), btn('Imprimir', () => print()))), body);
+  await load();
+};
+
+/* ---------- ESTADOS FINANCIEROS (simplificados, no reemplazan la contabilidad) ---------- */
+const fin = { desde: rep.desde, hasta: rep.hasta };
+VIEWS.financieros = async (root: HTMLElement) => {
+  const body = h('div', { style: 'display:grid;gap:18px' }, h('p', { class: 'g-muted', text: 'Cargando…' }));
+  const load = async () => {
+    const [{ docs, items, pagos }, gastos, compras, pagosProv, cartera, cxp] = await Promise.all([
+      ventasPeriodo(fin.desde, fin.hasta),
+      get<Any[]>(`gastos?select=categoria,valor&fecha=gte.${fin.desde}&fecha=lte.${fin.hasta}`),
+      get<Any[]>(`compras?select=total&estado=neq.anulada&fecha=gte.${isoStart(fin.desde)}&fecha=lt.${isoEnd(fin.hasta)}`),
+      get<Any[]>(`pagos_compras?select=valor&fecha=gte.${isoStart(fin.desde)}&fecha=lt.${isoEnd(fin.hasta)}`),
+      get<Any[]>('v_documentos?select=saldo&saldo=gt.0'),
+      get<Any[]>('v_compras?select=saldo&saldo=gt.0'),
+      loadRef(),
+    ]);
+    const ingresos = sum(docs, (d) => d.total), costo = sum(items, (i) => i.costo * i.cantidad), bruta = ingresos - costo;
+    const gCat = groupSum(gastos, (g) => g.categoria, (g) => g.valor), gTot = sum(gastos, (g) => g.valor), oper = bruta - gTot;
+    const cobros = sum(pagos, (p) => p.valor), pProv = sum(pagosProv, (p) => p.valor), flujo = cobros - gTot - pProv;
+    const invVal = sum([...INV.values()], (r) => Math.max(r.stock, 0) * r.costo), cxc = sum(cartera, (d) => d.saldo), cxpT = sum(cxp, (c) => c.saldo);
+    const pct = (v: number) => (ingresos ? ` (${Math.round((v / ingresos) * 100)}%)` : '');
+    const row = (k: string, v: number, cls = '') => h('tr', { class: cls }, h('td', { text: k }), h('td', { text: cop(v) }));
+    body.replaceChildren(
+      h('div', { class: 'g-kpis' }, kpi('Ventas netas', cop(ingresos), '', 'g-kpi--hero'), kpi('Utilidad bruta', cop(bruta), pct(bruta).trim(), 'g-kpi--ok'), kpi('Utilidad operacional', cop(oper), pct(oper).trim(), oper < 0 ? '' : 'g-kpi--ok'), kpi('Flujo de caja neto', cop(flujo))),
+      h('div', { class: 'g-grid2' },
+        h('div', { class: 'g-card' }, h('h2', { text: `Estado de resultados · ${fd(fin.desde)} a ${fd(fin.hasta)}` }), h('table', { class: 'g-fin' }, h('tbody', {},
+          row('Ingresos operacionales (ventas netas)', ingresos), row('− Costo de ventas', costo, 'neg'), row(`Utilidad bruta${pct(bruta)}`, bruta, 'tot'),
+          h('tr', {}, h('td', { text: 'Gastos operacionales' }), h('td', { text: '' })), gCat.map(([c, v]) => row(c, v, 'sub')), row('− Total gastos', gTot, 'neg'),
+          row(`Utilidad operacional${pct(oper)}`, oper, `tot ${oper < 0 ? 'neg' : 'pos'}`)))),
+        h('div', { style: 'display:grid;gap:18px' },
+          h('div', { class: 'g-card' }, h('h2', { text: 'Flujo de caja del periodo' }), h('table', { class: 'g-fin' }, h('tbody', {},
+            row('+ Cobros a clientes (todas las formas de pago)', cobros), row('− Gastos', gTot, 'neg'), row('− Pagos a proveedores', pProv, 'neg'), row('Flujo neto', flujo, `tot ${flujo < 0 ? 'neg' : 'pos'}`),
+            row('Compras de mercancía del periodo (informativo)', sum(compras, (c) => c.total), 'sub')))),
+          h('div', { class: 'g-card' }, h('h2', { text: 'Situación a hoy (simplificada)' }), h('table', { class: 'g-fin' }, h('tbody', {},
+            row('Inventario al costo', invVal), row('Cuentas por cobrar', cxc), row('Total activos registrados', invVal + cxc, 'tot'),
+            row('Cuentas por pagar a proveedores', cxpT, 'neg'), row('Patrimonio estimado (sin caja ni bancos)', invVal + cxc - cxpT, 'tot')))))),
+      h('p', { class: 'g-muted', text: 'Informe de gestión calculado con los datos del sistema (ventas, costos de inventario, gastos y compras). No reemplaza los estados financieros de tu contador: no incluye impuestos, depreciaciones, caja/bancos ni obligaciones fuera del sistema.' }));
+  };
+  root.replaceChildren(h('div', { class: 'g-card g-noprint' }, h('div', { class: 'g-filters' }, rangeFields(fin, () => load().catch(fail)), btn('Imprimir', () => print()))), body);
+  await load();
 };
 
 /* ================= ingreso / salida ================= */

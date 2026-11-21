@@ -265,3 +265,211 @@ grant execute on function public.emitir_documento(jsonb), public.registrar_pago(
 insert into public.precios_mayoristas (slug, variante, precio)
 select slug, variante, precio from public.precios where precio is not null
 on conflict (slug, variante) do update set precio = excluded.precio where public.precios_mayoristas.precio is null;
+
+
+-- =====================================================================================================
+-- FASE 2 · garantías, compras a proveedores (cuentas por pagar) y caja (apertura/cierre).
+-- =====================================================================================================
+create table if not exists public.garantias (
+  id           bigint generated always as identity primary key,
+  fecha        timestamptz not null default now(),
+  tercero_id   uuid references public.terceros(id) on delete set null,
+  cliente      jsonb not null default '{}',
+  documento_id uuid references public.documentos(id) on delete set null,
+  slug         text not null,
+  variante     text not null default '',
+  nombre       text not null,
+  cantidad     integer not null default 1 check (cantidad > 0),
+  falla        text not null check (char_length(falla) between 1 and 600),
+  estado       text not null default 'recibida' check (estado in ('recibida','en_revision','cambiada','reparada','rechazada','entregada')),
+  resolucion   text,
+  cerrada_en   timestamptz
+);
+
+create table if not exists public.compras (
+  id           uuid primary key default gen_random_uuid(),
+  numero       text not null unique,
+  fecha        timestamptz not null default now(),
+  proveedor_id uuid references public.terceros(id) on delete set null,
+  proveedor    text not null,
+  factura_prov text,
+  total        integer not null check (total >= 0),
+  vence        date,
+  notas        text,
+  estado       text not null default 'pendiente'   -- pendiente | parcial | pagada | anulada
+);
+create table if not exists public.compra_items (
+  id        bigint generated always as identity primary key,
+  compra_id uuid not null references public.compras(id) on delete cascade,
+  slug      text not null,
+  variante  text not null default '',
+  nombre    text not null,
+  cantidad  integer not null check (cantidad > 0),
+  costo     integer not null check (costo >= 0),
+  total     integer not null
+);
+create table if not exists public.pagos_compras (
+  id        bigint generated always as identity primary key,
+  compra_id uuid not null references public.compras(id) on delete cascade,
+  fecha     timestamptz not null default now(),
+  valor     integer not null check (valor > 0),
+  metodo    text not null,
+  nota      text
+);
+create or replace view public.v_compras with (security_invoker = on) as
+select c.*, coalesce(p.pagado, 0)::int as pagado,
+       case when c.estado = 'anulada' then 0 else greatest(c.total - coalesce(p.pagado, 0), 0) end::int as saldo
+from public.compras c left join (select compra_id, sum(valor) pagado from public.pagos_compras group by compra_id) p on p.compra_id = c.id;
+
+create table if not exists public.cajas (
+  id          bigint generated always as identity primary key,
+  abierta_en  timestamptz not null default now(),
+  base        integer not null check (base >= 0),
+  cerrada_en  timestamptz,
+  esperado    integer,     -- base + cobros en efectivo − gastos en efectivo − pagos a proveedores en efectivo
+  contado     integer check (contado >= 0),
+  diferencia  integer,
+  resumen     jsonb,
+  notas       text
+);
+create unique index if not exists una_caja_abierta on public.cajas ((true)) where cerrada_en is null;
+
+insert into public.consecutivos (tipo, prefijo) values ('compra','OC') on conflict (tipo) do nothing;
+
+alter table public.garantias     enable row level security;
+alter table public.compras       enable row level security;
+alter table public.compra_items  enable row level security;
+alter table public.pagos_compras enable row level security;
+alter table public.cajas         enable row level security;
+do $$ declare t text; begin
+  foreach t in array array['compras','compra_items','pagos_compras','cajas'] loop
+    execute format('drop policy if exists "%1$s_admin_lee" on public.%1$s', t);
+    execute format('create policy "%1$s_admin_lee" on public.%1$s for select using (public.is_admin())', t);
+  end loop;
+  drop policy if exists "garantias_admin" on public.garantias;
+  create policy "garantias_admin" on public.garantias for all using (public.is_admin()) with check (public.is_admin());
+end $$;
+revoke all on public.garantias, public.compras, public.compra_items, public.pagos_compras, public.cajas, public.v_compras from anon;
+
+-- Compra a proveedor: entra el stock y el costo pasa a ser el PROMEDIO PONDERADO (stock anterior positivo × costo anterior + compra).
+-- p = {proveedor_id?, proveedor, factura_prov?, vence?, notas?, items:[{slug,variante,nombre,cantidad,costo}], pago?:{valor,metodo}}
+create or replace function public.registrar_compra(p jsonb) returns jsonb
+language plpgsql security definer set search_path = public as $$
+declare c uuid; num text; tot integer := 0; it jsonb; q integer; k integer; st integer; co integer;
+  pago integer := coalesce((p->'pago'->>'valor')::int, 0);
+begin
+  perform public._exigir_admin();
+  if coalesce(trim(p->>'proveedor'), '') = '' then raise exception 'Indica el proveedor'; end if;
+  if jsonb_typeof(p->'items') <> 'array' or jsonb_array_length(p->'items') = 0 then raise exception 'La compra no tiene productos'; end if;
+  for it in select * from jsonb_array_elements(p->'items') loop
+    q := (it->>'cantidad')::int; k := (it->>'costo')::int;
+    if q is null or q <= 0 or q > 1000000 or k is null or k < 0 then raise exception 'Cantidad o costo inválido en %', it->>'nombre'; end if;
+    tot := tot + q * k;
+  end loop;
+  if pago < 0 or pago > tot then raise exception 'El pago no puede superar el total'; end if;
+  update public.consecutivos set siguiente = siguiente + 1 where tipo = 'compra' returning prefijo || '-' || (siguiente - 1) into num;
+  insert into public.compras (numero, proveedor_id, proveedor, factura_prov, total, vence, notas)
+  values (num, nullif(p->>'proveedor_id','')::uuid, left(p->>'proveedor', 120), left(p->>'factura_prov', 40), tot,
+          nullif(p->>'vence','')::date, left(p->>'notas', 600))
+  returning id into c;
+  for it in select * from jsonb_array_elements(p->'items') loop
+    q := (it->>'cantidad')::int; k := (it->>'costo')::int; st := null; co := null;
+    insert into public.compra_items (compra_id, slug, variante, nombre, cantidad, costo, total)
+    values (c, it->>'slug', coalesce(it->>'variante',''), left(it->>'nombre', 160), q, k, q * k);
+    select stock, costo into st, co from public.inventario where slug = it->>'slug' and variante = coalesce(it->>'variante','');
+    perform public._mover_stock(it->>'slug', coalesce(it->>'variante',''), q, 'entrada', num, left(p->>'proveedor', 120));
+    update public.inventario set costo = case when coalesce(st, 0) > 0
+        then round((st::numeric * co + q::numeric * k) / (st + q))::int else k end
+    where slug = it->>'slug' and variante = coalesce(it->>'variante','');
+  end loop;
+  if pago > 0 then
+    insert into public.pagos_compras (compra_id, valor, metodo) values (c, pago, coalesce(p->'pago'->>'metodo','efectivo'));
+  end if;
+  update public.compras set estado = case when pago >= tot then 'pagada' when pago > 0 then 'parcial' else 'pendiente' end where id = c;
+  return jsonb_build_object('id', c, 'numero', num);
+end $$;
+
+create or replace function public.pagar_compra(c uuid, valor integer, metodo text, nota text default null) returns void
+language plpgsql security definer set search_path = public as $$
+declare d record; pag integer;
+begin
+  perform public._exigir_admin();
+  select * into d from public.compras where id = c for update;
+  if d is null or d.estado = 'anulada' then raise exception 'Compra no admite pagos'; end if;
+  select coalesce(sum(x.valor), 0) into pag from public.pagos_compras x where x.compra_id = c;
+  if valor is null or valor <= 0 or valor > d.total - pag then raise exception 'El pago debe ser mayor a 0 y no superar el saldo (%)', d.total - pag; end if;
+  insert into public.pagos_compras (compra_id, valor, metodo, nota) values (c, valor, metodo, left(nota, 300));
+  update public.compras set estado = case when pag + valor >= d.total then 'pagada' else 'parcial' end where id = c;
+end $$;
+
+-- Anular compra: saca de nuevo el stock que entró (el costo promedio no se recalcula).
+create or replace function public.anular_compra(c uuid, motivo text) returns void
+language plpgsql security definer set search_path = public as $$
+declare d record; it record;
+begin
+  perform public._exigir_admin();
+  if coalesce(trim(motivo), '') = '' then raise exception 'Escribe el motivo de la anulación'; end if;
+  select * into d from public.compras where id = c for update;
+  if d is null or d.estado = 'anulada' then raise exception 'La compra ya está anulada o no existe'; end if;
+  for it in select * from public.compra_items where compra_id = c loop
+    perform public._mover_stock(it.slug, it.variante, -it.cantidad, 'anulacion', d.numero, motivo);
+  end loop;
+  update public.compras set estado = 'anulada', notas = coalesce(notas || ' · ', '') || 'Anulada: ' || left(motivo, 300) where id = c;
+end $$;
+
+-- Cambio de estado de una garantía. 'cambiada' entrega un producto nuevo: descuenta stock (kardex tipo garantia).
+create or replace function public.resolver_garantia(g bigint, nuevo text, resolucion text default null) returns void
+language plpgsql security definer set search_path = public as $$
+declare r record;
+begin
+  perform public._exigir_admin();
+  select * into r from public.garantias where id = g for update;
+  if r is null then raise exception 'Garantía no encontrada'; end if;
+  if nuevo not in ('recibida','en_revision','cambiada','reparada','rechazada','entregada') then raise exception 'Estado inválido'; end if;
+  if r.estado in ('cambiada','reparada','rechazada','entregada') and nuevo <> 'entregada' then raise exception 'La garantía ya fue resuelta'; end if;
+  if nuevo = 'cambiada' then
+    perform public._mover_stock(r.slug, r.variante, -r.cantidad, 'garantia', 'GAR-' || g, left(resolucion, 300));
+  end if;
+  update public.garantias set estado = nuevo, resolucion = coalesce(left(resolver_garantia.resolucion, 600), garantias.resolucion),
+    cerrada_en = case when nuevo in ('cambiada','reparada','rechazada','entregada') then coalesce(cerrada_en, now()) else null end
+  where id = g;
+end $$;
+
+create or replace function public.abrir_caja(base integer) returns bigint
+language plpgsql security definer set search_path = public as $$
+declare i bigint;
+begin
+  perform public._exigir_admin();
+  if abrir_caja.base is null or abrir_caja.base < 0 then raise exception 'Base inválida'; end if;
+  if exists (select 1 from public.cajas where cerrada_en is null) then raise exception 'Ya hay una caja abierta'; end if;
+  insert into public.cajas (base) values (abrir_caja.base) returning id into i;
+  return i;
+end $$;
+
+-- Cierre: el esperado lo calcula el servidor con los movimientos en EFECTIVO desde la apertura.
+create or replace function public.cerrar_caja(contado integer, notas text default null) returns jsonb
+language plpgsql security definer set search_path = public as $$
+declare c record; cob integer; gas integer; pro integer; esp integer; res jsonb;
+begin
+  perform public._exigir_admin();
+  if cerrar_caja.contado is null or cerrar_caja.contado < 0 then raise exception 'Valor contado inválido'; end if;
+  select * into c from public.cajas where cerrada_en is null for update;
+  if c is null then raise exception 'No hay caja abierta'; end if;
+  select coalesce(sum(p.valor), 0) into cob from public.pagos p join public.documentos d on d.id = p.documento_id
+    where p.fecha >= c.abierta_en and p.metodo = 'efectivo' and d.estado <> 'anulada';
+  -- shortcut: los gastos solo tienen fecha (sin hora): cuenta los del día de apertura en adelante.
+  select coalesce(sum(valor), 0) into gas from public.gastos where metodo = 'efectivo' and fecha >= (c.abierta_en at time zone 'America/Bogota')::date;
+  select coalesce(sum(valor), 0) into pro from public.pagos_compras where metodo = 'efectivo' and fecha >= c.abierta_en;
+  esp := c.base + cob - gas - pro;
+  res := jsonb_build_object('base', c.base, 'cobros_efectivo', cob, 'gastos_efectivo', gas, 'pagos_proveedores_efectivo', pro,
+    'por_metodo', (select coalesce(jsonb_object_agg(x.metodo, x.v), '{}') from (select p.metodo, sum(p.valor) v from public.pagos p
+       join public.documentos d on d.id = p.documento_id where p.fecha >= c.abierta_en and d.estado <> 'anulada' group by p.metodo) x));
+  update public.cajas set cerrada_en = now(), esperado = esp, contado = cerrar_caja.contado, diferencia = cerrar_caja.contado - esp,
+    resumen = res, notas = left(cerrar_caja.notas, 600) where id = c.id;
+  return res || jsonb_build_object('esperado', esp, 'contado', cerrar_caja.contado, 'diferencia', cerrar_caja.contado - esp);
+end $$;
+
+revoke execute on function public.registrar_compra(jsonb), public.pagar_compra(uuid,integer,text,text), public.anular_compra(uuid,text),
+  public.resolver_garantia(bigint,text,text), public.abrir_caja(integer), public.cerrar_caja(integer,text) from public, anon;
+grant execute on function public.registrar_compra(jsonb), public.pagar_compra(uuid,integer,text,text), public.anular_compra(uuid,text),
+  public.resolver_garantia(bigint,text,text), public.abrir_caja(integer), public.cerrar_caja(integer,text) to authenticated;

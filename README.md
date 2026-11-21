@@ -102,12 +102,22 @@ git switch -c volver-a-animada punto-restauracion-animada-v1   # volver a esa ve
 
 ## UBU Gestión (`/admin`)
 
-Portal interno (solo administradores) con menú lateral: **Dashboard, Punto de venta, Cotizaciones, Facturas y anulaciones, Inventario, Catálogo y precios, Clientes y terceros, Cuentas por cobrar (incluye cobros vencidos) y Gastos**. Fase 2 (en construcción): Garantías, Campañas WhatsApp, Reportes y Estados financieros.
+Portal interno (solo administradores) con menú lateral:
+
+| Grupo | Módulos |
+|---|---|
+| Operación | Dashboard, Punto de venta (factura/remisión, lista cliente final o mayorista), Cotizaciones (se convierten en venta), Facturas y anulaciones, Caja (apertura, Informe X, cierre con Informe Z) |
+| Mercancía | Inventario (entradas, ajustes, mínimos, kardex), Catálogo y precios, Compras y proveedores (entrada de stock con costo promedio ponderado, cuentas por pagar), Garantías (365 días, valida contra la venta; «cambiada» descuenta stock) |
+| Clientes y dinero | Clientes y terceros (clientes, mayoristas, proveedores), Cuentas por cobrar (cobros vencidos y recordatorio por WhatsApp), Gastos, Campañas WhatsApp (segmentos y plantillas; un chat por cliente) |
+| Análisis | Reportes (ventas por día, producto, cliente, método, lista; utilidad y margen; CSV), Estados financieros simplificados (resultados, flujo de caja, situación) |
+
+Pendiente que no depende del código: el **catálogo de cliente final** (cargar sus precios en «Catálogo y precios»). Los pedidos del carrito web no se registran en el admin a propósito: la política de privacidad dice que los datos de entrega no se guardan.
 
 - Código: `src/pages/admin.astro` (estructura y estilos), `src/scripts/gestion/app.ts` (módulos), `src/scripts/gestion/api.ts` (Supabase), `src/scripts/admin.ts` (editor de precios).
-- Base de datos: **ejecuta `supabase/gestion.sql`** en el SQL Editor (una vez; es idempotente). Crea terceros, inventario, kardex, documentos, ítems, pagos y gastos con RLS solo-admin, y las funciones `emitir_documento`, `registrar_pago`, `anular_documento` y `ajustar_inventario`: totales, consecutivos (COT-, FV-, REM-) y movimientos de stock se calculan en el servidor en una sola transacción.
+- Base de datos: **ejecuta `supabase/gestion.sql`** en el SQL Editor (una vez; es idempotente). Crea terceros, inventario, kardex, documentos, ítems, pagos y gastos con RLS solo-admin, más garantías, compras, pagos a proveedores y cajas, y las funciones `emitir_documento`, `registrar_pago`, `anular_documento`, `ajustar_inventario`, `registrar_compra`, `pagar_compra`, `anular_compra`, `resolver_garantia`, `abrir_caja` y `cerrar_caja`: totales, consecutivos (COT-, FV-, REM-) y movimientos de stock se calculan en el servidor en una sola transacción.
 - Documentos internos (cotización, factura de venta, remisión): **no son factura electrónica DIAN**. Se descargan como imagen con el diseño UBU y se envían por WhatsApp.
 - Dos listas de precios: `gestion.sql` copia los precios actuales de la web a la lista **mayorista** (sin pisar ediciones). La lista **cliente final** se edita en «Catálogo y precios».
+- Reportes y estados financieros leen hasta 1000 filas por consulta (límite por defecto de Supabase): con más ventas en el periodo, sube «Max rows» en Supabase → API settings.
 - La sesión de administración se renueva sola con el refresh token mientras la pestaña esté abierta.
 
 ## Supabase: catálogo, mayoristas y administración
