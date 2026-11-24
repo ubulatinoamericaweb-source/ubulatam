@@ -1,6 +1,7 @@
 ---
 // Grupo ordenado de canales REALES de UBU (no hay perfiles de redes sociales publicados en el proyecto).
 import { WA_PATH, PIN_PATH, DL_PATH } from '../data/icons';
+import { CAT_DETAL } from '../data/catalogos';
 import { waGeneric } from '../data/catalog';
 interface Props { tone?: 'dark' | 'light'; labels?: boolean }
 const { tone = 'dark', labels = true } = Astro.props;
@@ -9,7 +10,7 @@ const maps = 'https://www.google.com/maps/search/?api=1&query=Centro%20Empresari
 <ul class={`channels channels--${tone}`} aria-label="Canales de contacto">
   <li><a class="ch ch--wa" href={waGeneric} target="_blank" rel="noopener" aria-label="Escribir por WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true"><path d={WA_PATH} fill="currentColor" /></svg>{labels && <span>WhatsApp</span>}</a></li>
   <li><a class="ch" href={maps} target="_blank" rel="noopener" aria-label="Ver ubicación en Google Maps (Centro Empresarial Hayuelos)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d={PIN_PATH} fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>{labels && <span>Ubicación</span>}</a></li>
-  <li><a class="ch" href="/descargas/catalogo-ubu-2026.pdf" download aria-label="Descargar catálogo en PDF"><svg viewBox="0 0 24 24" aria-hidden="true"><path d={DL_PATH} fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>{labels && <span>Catálogo PDF</span>}</a></li>
+  <li><a class="ch" href={CAT_DETAL} target="_blank" rel="noopener" data-catalog aria-label="Ver catálogo al detal"><svg viewBox="0 0 24 24" aria-hidden="true"><path d={DL_PATH} fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>{labels && <span data-cat-may="Catálogo mayorista">Catálogo al detal</span>}</a></li>
 </ul>
 <style>
   .channels { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }

@@ -4,6 +4,8 @@
    El navegador guarda el token de sesión (nunca la contraseña) en sessionStorage: se borra al cerrar la pestaña y caduca
    con el token (1 h por defecto en Supabase). shortcut: sin refresh token; al caducar se vuelve a precios públicos. */
 
+import { CAT_MAY } from '../data/catalogos';
+
 export const SB_URL = import.meta.env.PUBLIC_SUPABASE_URL as string | undefined;
 const SB_KEY = import.meta.env.PUBLIC_SUPABASE_ANON_KEY as string | undefined;
 export const sbOn = !!(SB_URL && SB_KEY);
@@ -151,6 +153,15 @@ function showWholesaleBar() {
   bar.append(t, out);
   document.body.prepend(bar);
   document.documentElement.classList.add('is-may');
+  // El catálogo mayorista (PDF del sitio) solo se enlaza en la vista mayorista; la web normal usa el catálogo al detal.
+  document.querySelectorAll<HTMLAnchorElement>('a[data-catalog]').forEach((a) => {
+    a.href = CAT_MAY;
+    a.removeAttribute('target');
+    a.removeAttribute('rel');
+    a.setAttribute('download', '');
+    if (a.hasAttribute('aria-label')) a.setAttribute('aria-label', 'Descargar catálogo mayorista');
+    [a, ...a.querySelectorAll<HTMLElement>('[data-cat-may]')].forEach((el) => { if (el.dataset.catMay) el.textContent = el.dataset.catMay; });
+  });
 }
 
 /** Normaliza lo que se escribe en un campo de precio: '' → null; '1.150.000' o '$ 49000' → número. NaN = inválido. */

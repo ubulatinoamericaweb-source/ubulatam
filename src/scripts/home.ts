@@ -270,32 +270,13 @@ mm.add(FULL, () => {
   } else sweep($('.gprod__card', panels[0]));
 })();
 
-/* ============ 4 · MANOS ============ */
-mm.add(ANY_MOTION, () => {
-  const scene = $('[data-hands-scene]');
-  if (!scene) return;
-  const human = $('[data-hand="human"]', scene), robot = $('[data-hand="robot"]', scene);
-  const halo = $('[data-halo]', scene), spark = $('[data-spark]', scene), tips = $$('.hands__tip', scene);
-  gsap.set(human, { x: -430 }); gsap.set(robot, { x: 430 }); gsap.set(halo, { scale: 0.4, opacity: 0, transformOrigin: '50% 50%' });
-  gsap.set(spark, { opacity: 0, scale: 0.4, transformOrigin: '50% 50%' });
-  const tl = gsap.timeline({ paused: true, defaults: { ease: 'power3.out' } });
-  tl.to(halo, { scale: 1, opacity: 1, duration: 1.4 }, 0)
-    .to(human, { x: 0, duration: 1.7 }, 0.1).to(robot, { x: 0, duration: 1.7 }, 0.1)
-    .to(tips, { opacity: 1, duration: 0.3 }, 1.5)
-    .to(spark, { opacity: 1, scale: 1.1, duration: 0.35, ease: 'back.out(3)' }, 1.6)
-    .to(spark, { opacity: 0, scale: 1.8, duration: 0.7, ease: 'power2.in' }, 2)
-    .to(halo, { scale: 1.06, duration: 1.4, yoyo: true, repeat: 1, ease: 'sine.inOut' }, 1.8);
-  ScrollTrigger.create({ trigger: scene, start: 'top 78%', once: true, onEnter: () => tl.play() });
-  return () => { gsap.set([human, robot, halo, spark, tips], { clearProps: 'all' }); };
-});
-
 /* ============ MÓVIL · revelado progresivo al bajar ============
    Versión adaptada de las animaciones de escritorio: cada bloque entra al aparecer en pantalla, con el
    desplazamiento vertical normal (sin fijar la página ni carruseles). Con movimiento reducido no se aplica
    y todo queda visible y estático. */
 mm.add('(max-width: 899px) and ' + ANY_MOTION, () => {
   const groups = [
-    '.strip__head > *','.glass__copy > *', '[data-gstage]', '.handsec__l1', '.handsec__l2',
+    '.strip__head > *','.glass__copy > *', '[data-gstage]',
     '.cats__head', '.biz__fig', '.biz__copy > .kicker, .biz__copy > h2, .biz__cta', '.close__card',
   ];
   const all: HTMLElement[] = [];

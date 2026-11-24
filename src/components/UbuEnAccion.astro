@@ -1,0 +1,88 @@
+---
+/* Videos verticales (Shorts de YouTube o MP4 propios). El reproductor de YouTube solo se carga al pulsar reproducir. */
+import { shorts, ytId } from '../data/shorts';
+const list = shorts.filter((s) => s.enabled !== false).map((s) => ({ ...s, yt: ytId(s.youtube) }));
+const ready = list.some((s) => s.yt || s.file);
+---
+<section class="acc on-dark" id="accion" aria-labelledby="acc-t">
+  <div class="wrap">
+    <header class="acc__head" data-reveal>
+      <p class="kicker">UBU en acción</p>
+      <h2 id="acc-t" class="h2">Demostraciones en video.</h2>
+      <p class="lede">{ready ? 'Máquinas, instalación y curado UV en videos cortos.' : 'Próximamente: Shorts con máquinas, instalación y curado UV.'}</p>
+    </header>
+  </div>
+  <div class="acc__rail" data-shorts aria-label="Videos verticales">
+    {list.map((s, i) => (
+      <article class="short" data-reveal style={`--i:${i}`} data-yt={s.yt ?? undefined} data-title={s.title}>
+        {s.file ? (
+          <video src={s.file} poster={s.poster} controls playsinline preload="none" aria-label={s.title}></video>
+        ) : s.yt ? (
+          <button type="button" class="short__play">
+            {s.poster ? <img class="short__poster" src={s.poster} alt="" loading="lazy" /> : <img class="short__poster" src={`https://i.ytimg.com/vi/${s.yt}/oar2.jpg`} alt="" loading="lazy" />}
+            <span class="short__ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg></span>
+            <strong>{s.title}</strong><small>Reproducir en la página</small>
+          </button>
+        ) : (
+          <div class="short__ph"><span>Video próximamente</span><strong>{s.title}</strong></div>
+        )}
+      </article>
+    ))}
+  </div>
+  <div class="wrap"><p class="acc__note">Los videos de YouTube se cargan solo cuando pulsas reproducir, en modo de privacidad mejorada.</p></div>
+</section>
+
+<script>
+  const rail = document.querySelector<HTMLElement>('[data-shorts]');
+  if (rail) {
+    let current: HTMLElement | null = null;
+    const saved = new Map<HTMLElement, string>();
+    const stop = () => { if (current) { current.innerHTML = saved.get(current)!; current = null; } };
+    rail.addEventListener('click', (ev) => {
+      const btn = (ev.target as HTMLElement).closest('.short__play');
+      const card = btn?.closest<HTMLElement>('.short');
+      if (!card?.dataset.yt) return;
+      stop();
+      saved.set(card, card.innerHTML);
+      const fr = document.createElement('iframe');
+      fr.src = `https://www.youtube-nocookie.com/embed/${card.dataset.yt}?autoplay=1&playsinline=1&rel=0&modestbranding=1`;
+      fr.allow = 'autoplay; encrypted-media; picture-in-picture';
+      fr.allowFullscreen = true;
+      fr.title = card.dataset.title || 'Video de UBU';
+      card.replaceChildren(fr);
+      current = card;
+    });
+    // Al salir de pantalla se detiene: se retira el reproductor y se pausan los MP4.
+    new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) return;
+      stop();
+      rail.querySelectorAll('video').forEach((v) => v.pause());
+    }, { threshold: 0.05 }).observe(rail);
+  }
+</script>
+
+<style>
+  .acc { position: relative; background: radial-gradient(60% 50% at 20% 0%, rgba(65,185,193,.18), transparent 70%), var(--tinta-1); color: #fff; padding: clamp(72px, 10vw, 128px) 0; overflow: clip; }
+  .acc__head { max-width: 640px; }
+  .acc__head .h2 { margin-top: 14px; }
+  .acc__rail { display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; margin-top: 36px;
+    padding: 8px max(var(--gut), calc((100% - var(--wrap)) / 2)) 24px; scroll-padding-inline: max(var(--gut), calc((100% - var(--wrap)) / 2)); }
+  .acc__rail::-webkit-scrollbar { display: none; }
+  .short { flex: 0 0 clamp(210px, 20vw, 260px); aspect-ratio: 9 / 16; scroll-snap-align: start; position: relative; border-radius: 22px; overflow: hidden;
+    background: linear-gradient(160deg, var(--tinta-3), var(--tinta-2)); border: 1px solid rgba(255,255,255,.14); box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 18px 40px rgba(0,0,0,.35); }
+  .short video, .short iframe, .short__poster { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; object-fit: cover; background: #000; }
+  .short__ph, .short__play { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 18px; text-align: center; color: #fff; }
+  .short__ph span { font-family: var(--font-display); font-size: .8rem; letter-spacing: .04em; padding: 8px 14px; border-radius: var(--r-pill); background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); color: #CFE6EC; }
+  .short__ph strong { position: absolute; left: 16px; right: 16px; bottom: 18px; font-family: var(--font-display); font-size: .95rem; line-height: 1.25; text-align: left; opacity: .85; }
+  .short__play { border: 0; cursor: pointer; justify-content: flex-end; background: transparent; font: inherit; }
+  .short__play::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,.6)); }
+  .short__play > * { position: relative; }
+  .short__play .short__poster { position: absolute; }
+  .short__ico { width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.35); backdrop-filter: blur(10px); margin-bottom: auto; margin-top: auto; transition: transform .3s var(--ease); }
+  .short__ico svg { width: 22px; height: 22px; margin-left: 3px; }
+  .short__play:hover .short__ico { transform: scale(1.08); }
+  .short__play strong { font-family: var(--font-display); font-size: .95rem; line-height: 1.25; }
+  .short__play small { font-size: .78rem; opacity: .8; }
+  .acc__note { margin-top: 4px; font-size: .85rem; color: rgba(255,255,255,.6); }
+  @media (max-width: 600px) { .short { flex-basis: 72vw; } .acc__rail { gap: 12px; } }
+</style>

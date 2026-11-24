@@ -3,6 +3,7 @@ import Base from '../layouts/Base.astro';
 import InnerHero from '../components/InnerHero.astro';
 import { Image } from 'astro:assets';
 import { categories, byCategory, cop, bySlug, productImage } from '../data/catalog';
+import { CAT_DETAL } from '../data/catalogos';
 const shots: Record<string, string[]> = { conectividad: ['cargador-pd-45w-gan-super-carga-rapida-tc-tc', 'power-bank-10-000-mah-22-5w-multipuerto', 'audifonos-oseos-con-pantalla'], hidrogel: ['maquina-de-hidrogel-21-pulgadas', 'hidrogel-mate', 'pala-grande'] };
 const pimg = (s: string) => productImage(bySlug(s)!.images[0].file);
 const cats = (['conectividad', 'hidrogel'] as const).map((c) => ({ ...categories[c], list: byCategory(c) }));
@@ -11,7 +12,7 @@ const cats = (['conectividad', 'hidrogel'] as const).map((c) => ({ ...categories
   <InnerHero kicker="Catálogo 2026" title="Todo el catálogo, en el orden del catálogo." lede="Precios de referencia en pesos colombianos (COP). Se confirman al cotizar." crumbs={[{ label: 'Catálogo' }]}>
     <p style="margin-top:26px;display:flex;flex-wrap:wrap;gap:12px">
       <a class="btn" href="/conectividad">Ver Conectividad</a><a class="btn" href="/hidrogel">Ver Hidrogel</a>
-      <a class="btn btn--ghost" href="/descargas/catalogo-ubu-2026.pdf" download>Descargar catálogo PDF</a>
+      <a class="btn btn--ghost" href={CAT_DETAL} target="_blank" rel="noopener" data-catalog data-cat-may="Descargar catálogo mayorista">Ver catálogo al detal</a>
     </p>
   </InnerHero>
   <section class="pick" aria-label="Elegir línea">

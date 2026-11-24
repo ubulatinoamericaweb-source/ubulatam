@@ -5,6 +5,7 @@ import UbuFace from '../components/UbuFace.astro';
 import { waUrl, waGeneric, WA_DISPLAY } from '../data/catalog';
 import { WA_PATH, PIN_PATH, DL_PATH, CART_PATH } from '../data/icons';
 import seal from '../assets/sello-365.webp';
+import { CAT_DETAL } from '../data/catalogos';
 
 const groups = [
   { id: 'equipos', t: 'Equipos', q: [
@@ -45,7 +46,7 @@ const maps = 'https://www.google.com/maps/search/?api=1&query=Centro%20Empresari
         <ul class="sh__cards">
           <li><a class="sc sc--wa" href={waGeneric} target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d={WA_PATH} fill="currentColor" /></svg><span><b>WhatsApp</b><small>{WA_DISPLAY}</small></span></a></li>
           <li><a class="sc" href="/ubicacion"><svg viewBox="0 0 24 24" aria-hidden="true"><path d={PIN_PATH} fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg><span><b>Punto de atención</b><small>Centro Empresarial Hayuelos</small></span></a></li>
-          <li><a class="sc" href="/descargas/catalogo-ubu-2026.pdf" download><svg viewBox="0 0 24 24" aria-hidden="true"><path d={DL_PATH} fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg><span><b>Catálogo en PDF</b><small>Referencias y precios</small></span></a></li>
+          <li><a class="sc" href={CAT_DETAL} target="_blank" rel="noopener" data-catalog><svg viewBox="0 0 24 24" aria-hidden="true"><path d={DL_PATH} fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg><span><b data-cat-may="Catálogo mayorista">Catálogo al detal</b><small>Referencias y precios</small></span></a></li>
           <li><a class="sc" href="/carrito"><svg viewBox="0 0 24 24" aria-hidden="true"><path d={CART_PATH} fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg><span><b>Carrito de pedido</b><small>Se envía por WhatsApp</small></span></a></li>
         </ul>
       </div>
@@ -90,7 +91,7 @@ const maps = 'https://www.google.com/maps/search/?api=1&query=Centro%20Empresari
   <!-- RECURSOS -->
   <section class="rs on-dark">
     <div class="wrap rs__grid">
-      <a class="rs__card" href="/descargas/catalogo-ubu-2026.pdf" download data-reveal><b>Catálogo 2026 en PDF</b><span>Todas las referencias con fotografía y precio de referencia.</span><i>Descargar PDF →</i></a>
+      <a class="rs__card" href={CAT_DETAL} target="_blank" rel="noopener" data-catalog data-reveal><b data-cat-may="Catálogo mayorista 2026">Catálogo al detal</b><span>Todas las referencias con fotografía y precio de referencia.</span><i data-cat-may="Descargar PDF →">Ver catálogo →</i></a>
       <a class="rs__card" href="/catalogo" data-reveal style="--i:1"><b>Fichas de producto</b><span>Presentación y datos de cada referencia, en el orden del catálogo.</span><i>Ir al catálogo →</i></a>
       <a class="rs__card" href={maps} target="_blank" rel="noopener" data-reveal style="--i:2"><b>Visítanos</b><span>Centro Empresarial Hayuelos. Confirma el horario por WhatsApp antes de ir.</span><i>Cómo llegar →</i></a>
     </div>

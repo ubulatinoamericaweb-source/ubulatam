@@ -3,9 +3,11 @@ import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import Truck from '../components/Truck.astro';
 import UbuFace from '../components/UbuFace.astro';
-import Hands from '../components/Hands.astro';
 import PcHead from '../components/PcHead.astro';
 import Logo from '../components/Logo.astro';
+import MapaLatam from '../components/MapaLatam.astro';
+import UbuEnAccion from '../components/UbuEnAccion.astro';
+import Garantia365 from '../components/Garantia365.astro';
 import { byCategory, pick, productImage, cop, waGeneric, waAdvice, waProduct, bySlug } from '../data/catalog';
 import seal from '../assets/sello-365.webp';
 
@@ -64,6 +66,9 @@ const catImg = (slug: string, i = 0) => productImage(bySlug(slug)!.images[i].fil
       <div class="hero__progress" aria-hidden="true"><i data-progress></i></div>
     </div>
   </section>
+
+  <!-- ================= MAPA LATINOAMÉRICA ================= -->
+  <MapaLatam />
 
   <!-- ================= 2 · DESTACADOS · RECORRIDO LATERAL ================= -->
   <section class="strip on-light" id="destacados" data-strip aria-labelledby="strip-t">
@@ -145,26 +150,8 @@ const catImg = (slug: string, i = 0) => productImage(bySlug(slug)!.images[i].fil
     </div>
   </section>
 
-  <!-- ================= 4 · MANOS ================= -->
-  <section class="handsec on-light" aria-labelledby="hands-t" data-handsec>
-    <div class="handsec__rings" aria-hidden="true"></div>
-    <div class="wrap">
-      <p class="kicker kicker--c">Tecnología · reparación · negocio</p>
-      <h2 id="hands-t" class="sr-only">Tecnología para quienes conectan y hacen crecer sus negocios</h2>
-    </div>
-    <div class="handsec__stack">
-      <p class="handsec__l1" aria-hidden="true">Tecnología para quienes conectan</p>
-      <div class="handsec__scene" data-hands-scene><Hands /></div>
-      <p class="handsec__l2" aria-hidden="true">y hacen crecer sus negocios</p>
-    </div>
-    <div class="wrap">
-      <ul class="handsec__cols">
-        <li data-reveal><h3>Servicios técnicos</h3><p>Máquinas de corte, laminación con bomba de vacío y baterías de reemplazo para iPhone.</p></li>
-        <li data-reveal style="--i:1"><h3>Tiendas de accesorios</h3><p>Suma la instalación de hidrogel a tu mostrador y complementa con cargadores, cables y vidrios.</p></li>
-        <li data-reveal style="--i:2"><h3>Comercios y distribuidores</h3><p>Hidrogel por paquetes y accesorios para reponer inventario.</p></li>
-      </ul>
-    </div>
-  </section>
+  <!-- ================= UBU EN ACCIÓN · VIDEOS VERTICALES ================= -->
+  <UbuEnAccion />
 
   <!-- ================= 5 · CATEGORÍAS ================= -->
   <section class="cats on-dark" aria-labelledby="cats-t">
@@ -231,6 +218,9 @@ const catImg = (slug: string, i = 0) => productImage(bySlug(slug)!.images[i].fil
       </div>
     </div>
   </section>
+
+  <!-- ================= GARANTÍA 365 ================= -->
+  <Garantia365 />
 
   <!-- ================= 7 · COTIZACIÓN Y CIERRE ================= -->
   <section class="close on-dark grain" aria-labelledby="close-t">
@@ -443,19 +433,6 @@ const catImg = (slug: string, i = 0) => productImage(bySlug(slug)!.images[i].fil
   }
   @media (prefers-reduced-motion: reduce) { .glass.is-lit .shard::after { animation: none; } .gprod__img { animation: none; } }
 
-  /* ---------- 4 · MANOS ---------- */
-  .handsec { position: relative; padding: clamp(64px, 8vw, 110px) 0 clamp(56px, 7vw, 96px); background: linear-gradient(180deg, #FFFFFF 0%, #EAF6F7 100%); overflow: hidden; text-align: center; }
-  .handsec__rings { position: absolute; left: 50%; top: 50%; width: min(120vw, 1100px); aspect-ratio: 1; transform: translate(-50%, -52%); border-radius: 50%; background: radial-gradient(closest-side, rgba(1,220,239,.16), rgba(66,147,208,.1) 55%, transparent 72%); pointer-events: none; }
-  .handsec__stack { position: relative; z-index: 1; margin-top: 10px; }
-  .handsec__l1, .handsec__l2 { font-family: var(--font-display); font-weight: 700; letter-spacing: -.02em; line-height: 1.08; font-size: clamp(1.7rem, 3.8vw, 3.3rem); padding: 0 var(--gut); text-wrap: balance; max-width: 22ch; margin-inline: auto; }
-  .handsec__l2 { color: var(--confianza-indigo); }
-  .handsec__scene { width: min(100%, 760px); margin: clamp(-6px, 1vw, 14px) auto; pointer-events: none; -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 12%, #000 88%, transparent 100%); mask-image: linear-gradient(90deg, transparent 0, #000 12%, #000 88%, transparent 100%); }
-  .handsec__scene :global(.hands) { width: 100%; }
-  .handsec__cols { position: relative; z-index: 3; margin: clamp(30px, 4vw, 56px) auto 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(16px, 3vw, 36px); text-align: left; }
-  .handsec__cols li { padding: 22px 24px; border-radius: var(--r-md); background: rgba(255,255,255,.7); border: 1px solid var(--linea); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
-  .handsec__cols h3 { font-size: 1.15rem; margin-bottom: 8px; }
-  .handsec__cols p { font-size: .98rem; color: var(--texto-suave); }
-  @media (max-width: 760px) { .handsec__cols { grid-template-columns: 1fr; } }
 
   /* ---------- 5 · CATEGORÍAS ---------- */
   .cats { position: relative; padding: clamp(80px, 10vw, 140px) 0; background: radial-gradient(60% 60% at 15% 0%, rgba(64,91,165,.35), transparent 70%), var(--tinta-1); overflow: hidden; }

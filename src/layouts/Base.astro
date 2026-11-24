@@ -9,6 +9,7 @@ import ConsentBanner from '../components/ConsentBanner.astro';
 import SocialFloat from '../components/SocialFloat.astro';
 import { WA_PATH, CART_PATH } from '../data/icons';
 import { WA_DISPLAY, waGeneric } from '../data/catalog';
+import { CAT_DETAL } from '../data/catalogos';
 
 interface Props {
   title: string;
@@ -122,7 +123,7 @@ const ld = [org, ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [])]
               <li><a href="/hidrogel">Hidrogel</a></li>
               <li><a href="/catalogo">Catálogo completo</a></li>
               <li><a href="/carrito">Carrito de pedido</a></li>
-              <li><a href="/descargas/catalogo-ubu-2026.pdf" download>Catálogo en PDF</a></li>
+              <li><a href={CAT_DETAL} target="_blank" rel="noopener" data-catalog data-cat-may="Catálogo mayorista">Catálogo al detal</a></li>
             </ul>
           </div>
           <div>
