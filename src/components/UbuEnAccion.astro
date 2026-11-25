@@ -1,8 +1,8 @@
 ---
-/* Videos verticales (Shorts de YouTube o MP4 propios). El reproductor de YouTube solo se carga al pulsar reproducir. */
-import { shorts, ytId } from '../data/shorts';
-const list = shorts.filter((s) => s.enabled !== false).map((s) => ({ ...s, yt: ytId(s.youtube) }));
-const ready = list.some((s) => s.yt || s.file);
+/* Videos verticales (TikTok, Shorts de YouTube o MP4 propios). Los reproductores externos solo se cargan al pulsar reproducir. */
+import { shorts, ytId, tiktokId } from '../data/shorts';
+const list = shorts.filter((s) => s.enabled !== false).map((s) => ({ ...s, yt: ytId(s.youtube), tt: tiktokId(s.tiktok) }));
+const ready = list.some((s) => s.yt || s.tt || s.file);
 ---
 <section class="acc on-dark" id="accion" aria-labelledby="acc-t">
   <div class="wrap">
@@ -14,12 +14,12 @@ const ready = list.some((s) => s.yt || s.file);
   </div>
   <div class="acc__rail" data-shorts aria-label="Videos verticales">
     {list.map((s, i) => (
-      <article class="short" data-reveal style={`--i:${i}`} data-yt={s.yt ?? undefined} data-title={s.title}>
+      <article class="short" data-reveal style={`--i:${i}`} data-yt={s.yt ?? undefined} data-tt={s.tt ?? undefined} data-title={s.title}>
         {s.file ? (
           <video src={s.file} poster={s.poster} controls playsinline preload="none" aria-label={s.title}></video>
-        ) : s.yt ? (
+        ) : s.yt || s.tt ? (
           <button type="button" class="short__play">
-            {s.poster ? <img class="short__poster" src={s.poster} alt="" loading="lazy" /> : <img class="short__poster" src={`https://i.ytimg.com/vi/${s.yt}/oar2.jpg`} alt="" loading="lazy" />}
+            {s.poster ? <img class="short__poster" src={s.poster} alt="" loading="lazy" /> : s.yt && <img class="short__poster" src={`https://i.ytimg.com/vi/${s.yt}/oar2.jpg`} alt="" loading="lazy" />}
             <span class="short__ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg></span>
             <strong>{s.title}</strong><small>Reproducir en la página</small>
           </button>
@@ -29,7 +29,7 @@ const ready = list.some((s) => s.yt || s.file);
       </article>
     ))}
   </div>
-  <div class="wrap"><p class="acc__note">Los videos de YouTube se cargan solo cuando pulsas reproducir, en modo de privacidad mejorada.</p></div>
+  <div class="wrap"><p class="acc__note">Los videos de TikTok y YouTube se cargan solo cuando pulsas reproducir.</p></div>
 </section>
 
 <script>
@@ -41,11 +41,13 @@ const ready = list.some((s) => s.yt || s.file);
     rail.addEventListener('click', (ev) => {
       const btn = (ev.target as HTMLElement).closest('.short__play');
       const card = btn?.closest<HTMLElement>('.short');
-      if (!card?.dataset.yt) return;
+      if (!card || !(card.dataset.yt || card.dataset.tt)) return;
       stop();
       saved.set(card, card.innerHTML);
       const fr = document.createElement('iframe');
-      fr.src = `https://www.youtube-nocookie.com/embed/${card.dataset.yt}?autoplay=1&playsinline=1&rel=0&modestbranding=1`;
+      fr.src = card.dataset.tt
+        ? `https://www.tiktok.com/player/v1/${card.dataset.tt}?autoplay=1&loop=1&rel=0&description=0&music_info=0`
+        : `https://www.youtube-nocookie.com/embed/${card.dataset.yt}?autoplay=1&playsinline=1&rel=0&modestbranding=1`;
       fr.allow = 'autoplay; encrypted-media; picture-in-picture';
       fr.allowFullscreen = true;
       fr.title = card.dataset.title || 'Video de UBU';

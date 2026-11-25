@@ -26,7 +26,8 @@ const words = (t: string) => t.split(' ');
 <section class="lam" id="mapa-latam" aria-labelledby="lam-t" data-lam>
   <h2 id="lam-t" class="sr-only">UBU Latinoamérica: tecnología e insumos para impulsar tu negocio</h2>
   <div class="lam__stage" style={`--ar:${map.H / map.W}`}>
-    <div class="lam__map">
+    <div class="lam__view" data-lam-view>
+    <div class="lam__map" data-lam-map>
       <svg class="lam__svg" viewBox={`0 0 ${map.W} ${map.H}`} aria-hidden="true" focusable="false">
         <defs>
           <linearGradient id="lamLand" x1="0" y1="0" x2=".35" y2="1"><stop offset="0" stop-color="#3ECCD6" /><stop offset="1" stop-color="#01DCEF" /></linearGradient>
@@ -50,16 +51,46 @@ const words = (t: string) => t.split(' ');
         <span class="lq__t">{words(l.t).map((w, j) => <span class="lq__w"><span style={`--wi:${j}`}>{w}</span></span>)}</span>
       </p>
     ))}
+    </div>
   </div>
 </section>
 
 <script>
   const s = document.querySelector<HTMLElement>('[data-lam]');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // Celular: recorrido norte → sur. El mapa queda fijo en pantalla y se desplaza con el scroll normal (sin secuestrarlo).
+  if (s && !reduce && matchMedia('(max-width: 899px)').matches) {
+    s.classList.add('lam--tour');
+    const stage = s.querySelector<HTMLElement>('.lam__stage')!, view = s.querySelector<HTMLElement>('[data-lam-view]')!, map = s.querySelector<HTMLElement>('[data-lam-map]')!;
+    const items = [...s.querySelectorAll<HTMLElement>('.lp')].map((el) => ({ el, y: parseFloat(el.style.top) / 100 }));
+    const lines = [...s.querySelectorAll<HTMLElement>('.lq')];
+    // Centro horizontal del territorio (fracción del ancho) según la latitud visible (fracción del alto).
+    const K = [[0, .12], [.15, .18], [.24, .36], [.32, .52], [.42, .62], [.6, .65], [.78, .6], [1, .5]];
+    const cx = (f: number) => { for (let i = 1; i < K.length; i++) if (f <= K[i][0]) { const [a, b] = [K[i - 1], K[i]]; return a[1] + (b[1] - a[1]) * (f - a[0]) / (b[0] - a[0]); } return K[K.length - 1][1]; };
+    let on = -1, raf = 0;
+    const frame = () => {
+      raf = 0;
+      const r = stage.getBoundingClientRect(), vh = view.clientHeight, vw = view.clientWidth, mw = map.offsetWidth, mh = map.offsetHeight;
+      s.style.setProperty('--z-tour', String(mw / 1100));
+      const p = Math.min(1, Math.max(0, -r.top / (r.height - vh)));
+      // La tarjeta de frases ocupa la parte de arriba: el mapa va de debajo de ella hasta el borde inferior.
+      const top = 240, ty = top + p * Math.min(0, vh - 24 - mh - top);
+      const f = (-ty + top + (vh - top) * 0.3) / mh;
+      const tx = Math.min(0, Math.max(vw - mw, vw / 2 - cx(f) * mw));
+      map.style.transform = `translate3d(${tx.toFixed(1)}px, ${ty.toFixed(1)}px, 0)`;
+      for (const it of items) if (it.y < f + 0.22) it.el.classList.add('is-in');
+      const i = Math.min(lines.length - 1, Math.floor(p * lines.length));
+      if (i !== on) { lines[on]?.classList.remove('is-in'); lines[i].classList.add('is-in'); on = i; }
+    };
+    const req = () => { if (!raf) raf = requestAnimationFrame(frame); };
+    addEventListener('scroll', req, { passive: true });
+    addEventListener('resize', req);
+    frame();
+  }
   if (s && !reduce && 'IntersectionObserver' in window) {
     s.classList.add('lam--anim');
     const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -12% 0px' });
-    s.querySelectorAll('.lp, .lq').forEach((el) => io.observe(el));
+    if (!s.classList.contains('lam--tour')) s.querySelectorAll('.lp, .lq').forEach((el) => io.observe(el));
     // Las animaciones en bucle solo corren mientras la sección está en pantalla.
     new IntersectionObserver(([e]) => s.classList.toggle('is-live', e.isIntersecting)).observe(s);
   }
@@ -70,6 +101,7 @@ const words = (t: string) => t.split(' ');
     background: radial-gradient(70% 40% at 70% 8%, rgba(1,220,239,.10), transparent 70%), linear-gradient(180deg, #F4FBFD 0%, #EAF6F8 55%, #F5FBFC 100%);
     padding: clamp(64px, 9vw, 128px) var(--gut) clamp(72px, 10vw, 140px); }
   .lam__stage { position: relative; display: grid; width: min(1100px, 100%); margin-inline: auto; }
+  .lam__view { display: contents; }
   .lam__map, .lq { grid-area: 1 / 1; }
   .lam__map { position: relative; aspect-ratio: 1 / var(--ar); }
   .lam__svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
@@ -120,13 +152,25 @@ const words = (t: string) => t.split(' ');
   .lam:not(.is-live) .lp__shine::before, .lam--anim .lp:not(.is-in) .lp__shine::before { animation-play-state: paused; }
 
   @media (max-width: 899px) {
-    .lam__stage { display: flex; flex-direction: column; gap: 28px; }
+    .lam__view { display: flex; flex-direction: column; gap: 28px; }
     .lam__map { order: 0; }
     .lq, .lq--r { order: var(--o); max-width: 30ch; margin: 0; }
     .lq--r { align-self: flex-end; }
     .lq__t { font-size: clamp(1.35rem, 6vw, 1.8rem); }
     .lp { --z: .5; }
     .lp--x { display: none; }
+    /* Recorrido (con JS): mapa ampliado fijo en pantalla y frases que aparecen una a una abajo */
+    .lam--tour { padding: 0; }
+    .lam--tour .lam__stage { width: 100%; height: 460svh; }
+    .lam--tour .lam__view { position: sticky; top: 0; display: block; height: 100svh; overflow: hidden; }
+    .lam--tour .lam__map { position: absolute; left: 0; top: 0; width: 230vw; will-change: transform; }
+    .lam--tour .lp { --z: var(--z-tour, .8); }
+    .lam--tour .lp--x { display: block; }
+    .lam--tour .lq { position: absolute; z-index: 3; left: 16px; right: 16px; top: calc(var(--header-h) + 14px); max-width: none; margin: 0; padding: 16px 18px 18px;
+      border-radius: var(--r-md); background: rgba(255,255,255,.82); border: 1px solid rgba(255,255,255,.95); box-shadow: 0 18px 40px rgba(15,36,54,.14);
+      -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); opacity: 0; transform: translateY(-12px); transition: opacity .5s var(--ease), transform .6s var(--ease); }
+    .lam--tour .lq.is-in { opacity: 1; transform: none; }
+    .lam--tour .lq__t { font-size: clamp(1.3rem, 6vw, 1.7rem); }
   }
   @media (prefers-reduced-motion: reduce) {
     .lp__f, .lp__sh, .lp__halo, .lp__gl, .lp__shine::before { animation: none; }

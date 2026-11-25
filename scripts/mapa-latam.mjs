@@ -77,7 +77,7 @@ console.log('productos', prods.length);
 
 // Tamaño en px en escritorio (mapa a ~1100 px => 1.1 px por unidad)
 let seed = 11; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
-const PXU = 1.1, RANGE = { l: [108, 132], m: [66, 84], s: [46, 58] };
+const PXU = 1.1, RANGE = { l: [140, 166], m: [86, 104], s: [58, 70] };
 for (const p of prods) { const [a, b] = RANGE[p.size]; p.px = Math.round(a + rnd() * (b - a)); p.r = p.px / PXU / 2; }
 
 // Orden mezclado: alterna tamaños.
@@ -98,7 +98,7 @@ const GAP = 1;
 // 1.ª pasada: un producto pequeño en cada país, empezando por los más chicos.
 const smalls = order.filter(p => p.size === 's').sort((a, b) => a.px - b.px);
 for (const c of [...main].sort((a, b) => a.area - b.area)) {
-  const p = smalls.shift(); p.px = Math.min(p.px, 46); p.r = p.px / PXU / 2; p.only = c;
+  const p = smalls.shift(); p.px = Math.min(p.px, 56); p.r = p.px / PXU / 2; p.only = c;
 }
 order.sort((a, b) => (b.only ? 1 : 0) - (a.only ? 1 : 0));
 for (const p of order) {
@@ -113,7 +113,7 @@ for (const p of order) {
       const x = bx0 + rnd() * (bx1 - bx0), y = by0 + rnd() * (by1 - by0);
       if (!(p.only ? inCountry(x, y, c) : fits(x, y, p.r, c))) continue;
       const d = Math.min(...placed.map(q => Math.hypot(q.x - x, q.y - y) - q.r - p.r), 999);
-      if (d < (p.only ? -26 : p.retry ? -10 : GAP)) continue;
+      if (d < (p.only ? -26 : p.retry ? -22 : GAP)) continue;
       if (d > bestD) { bestD = d; best = [x, y]; }
       if (bestD > 60) break;
     }
