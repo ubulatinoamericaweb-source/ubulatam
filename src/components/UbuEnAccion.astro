@@ -77,9 +77,11 @@ const ready = list.some((s) => s.yt || s.tt || s.file);
   .short__ph span { font-family: var(--font-display); font-size: .8rem; letter-spacing: .04em; padding: 8px 14px; border-radius: var(--r-pill); background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); color: #CFE6EC; }
   .short__ph strong { position: absolute; left: 16px; right: 16px; bottom: 18px; font-family: var(--font-display); font-size: .95rem; line-height: 1.25; text-align: left; opacity: .85; }
   .short__play { border: 0; cursor: pointer; justify-content: flex-end; background: transparent; font: inherit; }
-  .short__play::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,.6)); }
+  .short__play::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 45%, rgba(0,0,0,.75)); }
   .short__play > * { position: relative; }
-  .short__play .short__poster { position: absolute; }
+  .short__play { isolation: isolate; }
+  .short__play .short__poster { position: absolute; z-index: -1; transition: transform .6s var(--ease); }
+  .short__play:hover .short__poster { transform: scale(1.04); }
   .short__ico { width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.35); backdrop-filter: blur(10px); margin-bottom: auto; margin-top: auto; transition: transform .3s var(--ease); }
   .short__ico svg { width: 22px; height: 22px; margin-left: 3px; }
   .short__play:hover .short__ico { transform: scale(1.08); }
