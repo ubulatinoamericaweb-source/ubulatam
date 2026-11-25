@@ -42,9 +42,9 @@ const pill = (estado: string) => {
 const field = (label: string, input: HTMLElement) => h('label', { class: 'g-f' }, h('span', { text: label }), input);
 const sel = (opts: [string, string][], value = '', props: Any = {}) => h('select', props, opts.map(([v, l]) => h('option', { value: v, selected: v === value, text: l })));
 const btn = (text: string, onclick: () => void, cls = '') => h('button', { type: 'button', class: `g-btn ${cls}`, text, onclick });
-const table = (head: string[], rows: HTMLElement[], numCols: number[] = []) => h('div', { class: 'g-tablewrap' },
+const table = (head: string[], rows: HTMLElement[], numCols: number[] = []) => (rows.forEach((r) => [...r.children].forEach((td, i) => head[i] && td.setAttribute('data-l', head[i]))), h('div', { class: 'g-tablewrap' },
   h('table', { class: 'g-table' }, h('thead', {}, h('tr', {}, head.map((t, i) => h('th', { class: numCols.includes(i) ? 'n' : null, text: t })))),
-    h('tbody', {}, rows.length ? rows : h('tr', {}, h('td', { colspan: head.length, class: 'g-empty', text: 'Sin registros.' })))));
+    h('tbody', {}, rows.length ? rows : h('tr', {}, h('td', { colspan: head.length, class: 'g-empty', text: 'Sin registros.' }))))));
 
 function status(t: string, kind: '' | 'ok' | 'bad' = '') { const s = $('g-status'); s.textContent = t; s.className = `g-status ${kind ? 'is-' + kind : ''}`; }
 function fail(e: unknown) { if (e instanceof SessionLost) return; status((e as Error).message || 'Error inesperado.', 'bad'); }
